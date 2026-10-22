@@ -10,6 +10,7 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 - [Current implementation and roadmap](docs/STATUS.md) — what is implemented versus tested, and our next acceptance gates.
 - [First phone-test result](docs/DEVICE_TEST.md) — initial load, repeated loads and rotation passed as reported; cooperative-demo gate complete.
 - [Build and install APKs from your phone](docs/BUILDING.md).
+- [Engine phone-test result](docs/ENGINE_DEVICE_TEST.md) — linking passed as reported for the hash-matched Minecraft 1.26.50.4 engine; JNI/game startup pending.
 - [Try the supplied engine](docs/ENGINE_PROBE.md) — optional hash-checked import and private-process link diagnostic.
 - [Engine input provenance](docs/ENGINE_INPUT.json).
 

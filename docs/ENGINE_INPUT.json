@@ -13,8 +13,9 @@
   "build_ids": [
     "afa62bd3385161f1facfe36aad58ac63998f46d2"
   ],
-  "version_status": "Minecraft version not verified from a matching APK/package manifest. Do not assume 26.50.",
-  "execution": "Static inspection only in sandbox. Optional app-native probe outcome on ARM64 phone not yet reported.",
+  "version_status": "User-reported probe: supplied engine hash matched installed Minecraft versionName 1.26.50.4, versionCode 972605004. No independent device capture.",
+  "execution": "User reports successful dlopen/constructor completion in the private host probe process. Our probe did not invoke engine JNI_OnLoad/game entrypoints.",
   "archive_path": "libminecraftpe.7z",
-  "library_retention": "Extracted library stays in ignored cache. Archive used as CI import-test fixture, never bundled in APKs."
+  "library_retention": "Extracted library stays in ignored cache. Archive used as CI import-test fixture, never bundled in APKs.",
+  "runtime_evidence": "docs/ENGINE_DEVICE_TEST.md"
 }

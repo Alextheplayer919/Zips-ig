@@ -12,7 +12,7 @@ The supplied SHA-256-verified `libminecraftpe.so` is ARM64 ELF64, with `JNI_OnLo
 
 The ELF also declares 18,624 bytes of initializer-array slots (2,328 eight-byte slots). Loading it is not equivalent to reading inert data: the dynamic linker executes constructors, potentially in its dependencies too.
 
-A library alone is not a complete game. Exported JNI names do not establish callable signatures, an initialized Activity or a working game lifecycle. The supplied engine's version remains unverified until matched with installed package metadata.
+A library alone is not a complete game. Exported JNI names do not establish callable signatures, an initialized Activity or a working game lifecycle. The [user-reported phone result](ENGINE_DEVICE_TEST.md) now matches its hash to installed versionName **1.26.50.4**, versionCode **972605004**, and reports successful linking. JNI/game startup remain untested.
 
 ## Using the new APK on the phone
 
@@ -54,7 +54,7 @@ A private process reduces direct crash coupling to the UI but **is not a securit
 
 The existing demo remains separate. Added Android tests exercise malformed-input rejection, our own native bridge's successful/failing links, and actual import/hash verification of the supplied archive on an x86_64 Android 13 emulator. That last test treats the ARM64 library as data only; it must not execute it on x86_64.
 
-The real engine `dlopen` attempt requires the ARM64 phone with a matching Minecraft installation. No local/emulator result should be described as successful Minecraft engine loading. The next full hosting gate still requires actual game Java/lifecycle/resources and a title screen.
+The real engine `dlopen` requires the ARM64 phone with a matching Minecraft installation; the user has now [reported success](ENGINE_DEVICE_TEST.md). No local/emulator result should be described as successful Minecraft engine loading. The next full hosting gate still requires actual game Java/lifecycle/resources and a title screen.
 
 For bounded offline inventory (no execution):
 

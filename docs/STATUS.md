@@ -17,9 +17,11 @@ We are building a clean, independent hosting client, not porting the original pr
 - ARM64 and x86_64 native builds; min SDK 30, target SDK 33, compile SDK 35.
 - GitHub Actions APK build and Android 13/API 33 integration-test configuration.
 
-### Engine experiment added (phone outcome pending)
+### Engine experiment — phone link passed as reported
 
 The host now accepts the exact supplied archive/raw library, verifies its hash, checks the installed game's ARM64 engine matches before using its dependency paths, and offers a private-process `dlopen` diagnostic. It does not explicitly invoke the engine's `JNI_OnLoad` or any game entrypoint. See [ENGINE_PROBE.md](ENGINE_PROBE.md) and [the static linkage inventory](ENGINE_LINKAGE.json). Linker constructors may execute; a successful link is not Minecraft startup.
+
+**Phone result:** the user reports `LINK_CHECK_SUCCESS`, engine hash matching installed Minecraft **1.26.50.4 / 972605004**, and `JNI_OnLoad` resolving to our imported library. See [the engine device record](ENGINE_DEVICE_TEST.md). JNI initialization and game startup remain untested.
 
 ### Validation boundary
 
@@ -29,10 +31,12 @@ The local sandbox does not have an Android SDK and cannot fetch the Gradle distr
 
 **CI result:** APK compilation and Android 13/API 33 x86_64 integration passed in [run 39840759440](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39840759440). The user subsequently reported a successful first phone load; see [the device test record](DEVICE_TEST.md). Repeated phone loads and rotation also passed as reported. The phone rotation was not instrumented to verify Activity recreation; the emulator test covers explicit recreation.
 
-Two Android instrumentation tests are supplied:
+The original two Android instrumentation tests cover:
 
 1. Guest class-loader identity, JNI PID/UID matching the host, different installed guest UID, and guest resources.
 2. Actual load-button behavior and reloading after host Activity recreation.
+
+The engine build also passed [CI run 39851721708](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39851721708), adding wrong-input rejection, native-bridge link success/failure, and mandatory actual archive extraction/hash verification as data on x86_64. That CI does not execute the ARM64 engine.
 
 ### Not implemented
 
@@ -41,7 +45,7 @@ Two Android instrumentation tests are supplied:
 - Access to the separately installed game's private data.
 - Game features/modules or an update-compatible engine integration layer.
 
-The original client's successful Android 13 / Minecraft 26.50 launch is **user-reported**. It is not a test result for our base. The supplied engine library's version is independently unverified.
+The original client's successful Android 13 / Minecraft 26.50 launch is **user-reported**. It is not a test result for our base. The supplied engine now has a user-reported hash match to installed versionName **1.26.50.4**, versionCode **972605004**; this is not independent device capture.
 
 ## Gate 1 — cooperative demo on Android 13
 
@@ -52,6 +56,8 @@ The original client's successful Android 13 / Minecraft 26.50 launch is **user-r
 **Fail:** fix the specific class-loading, signing, resource, ABI or native-path problem. Do not add Minecraft hooks or restart protected-VM trace expansion to compensate.
 
 ## Gate 2 — hosting-only Minecraft adapter
+
+**Engine-link substep:** complete as reported; `JNI_OnLoad` invocation, lifecycle and title screen remain pending.
 
 After Gate 1, build a separate adapter for the original installed base/split APKs. Do not loosen the demo trust policy into an unrestricted plugin loader; Minecraft requires its own explicit package/trust and lifecycle design.
 
