@@ -95,6 +95,7 @@ jobs:
             host/build/outputs/androidTest-results/
             emulator.log
             emulator-install.log
+            emulator-create.log
             sdk-install.log
             device-tests.log
           if-no-files-found: warn

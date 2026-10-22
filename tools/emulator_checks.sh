@@ -2,18 +2,23 @@
 # Keep SDK/boot failures visible as annotations, not opaque action failures.
 set -Eeuo pipefail
 export ANDROID_SERIAL=emulator-5554
+export ANDROID_USER_HOME="$HOME/.android"
+export ANDROID_EMULATOR_HOME="$ANDROID_USER_HOME"
+export ANDROID_AVD_HOME="$ANDROID_USER_HOME/avd"
+mkdir -p "$ANDROID_AVD_HOME"
 sdk="$ANDROID_HOME/cmdline-tools/latest/bin"
 cleanup() { adb emu kill >/dev/null 2>&1 || true; }
 failure() {
     echo "::error::Emulator verification failed at script line $1"
-    for log in emulator-install.log emulator.log; do
+    for log in emulator-install.log emulator-create.log emulator.log; do
         if [[ -f "$log" ]]; then tail -n 12 "$log" | sed "s/^/::error::$log: /"; fi
     done
 }
 trap cleanup EXIT
 trap 'failure "$LINENO"' ERR
 "$sdk/sdkmanager" 'platforms;android-33' 'system-images;android-33;google_apis;x86_64' 'emulator' > emulator-install.log 2>&1
-printf 'no\n' | "$sdk/avdmanager" create avd --force --name client-base-api33 --device pixel_6 --package 'system-images;android-33;google_apis;x86_64'
+printf 'no\n' | "$sdk/avdmanager" create avd --force --name client-base-api33 --device pixel_6 --package 'system-images;android-33;google_apis;x86_64' --path "$ANDROID_AVD_HOME/client-base-api33.avd" > emulator-create.log 2>&1
+[[ -f "$ANDROID_AVD_HOME/client-base-api33.ini" ]]
 "$ANDROID_HOME/emulator/emulator" -avd client-base-api33 -port 5554 -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -memory 2048 -cores 2 -accel on > emulator.log 2>&1 &
 timeout 120 adb wait-for-device
 booted=false
