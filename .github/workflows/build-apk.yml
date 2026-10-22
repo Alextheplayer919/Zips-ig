@@ -82,7 +82,7 @@ jobs:
             adb install -r demo-guest/build/outputs/apk/debug/demo-guest-debug.apk
             adb install -r host/build/outputs/apk/debug/host-debug.apk
             adb shell -T "run-as dev.zips.clientbase.host sh -c 'mkdir -p files; cat > files/engine-test.7z'" < libminecraftpe.7z
-            ./gradlew :host:connectedDebugAndroidTest --stacktrace
+            ./gradlew :host:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.engineFixtureRequired=true --stacktrace
       - name: Device test reports
         if: always() && (github.event_name != 'workflow_dispatch' || inputs.emulator_tests)
         uses: actions/upload-artifact@v7.0.2

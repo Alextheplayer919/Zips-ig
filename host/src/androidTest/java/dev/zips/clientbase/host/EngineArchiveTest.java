@@ -16,7 +16,10 @@ public final class EngineArchiveTest {
     @Test public void suppliedArchiveExtractsAndVerifiesOnAndroid() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         File fixture = new File(context.getFilesDir(), "engine-test.7z");
-        assumeTrue("Optional exact archive not provisioned", fixture.isFile());
+        boolean required = Boolean.parseBoolean(InstrumentationRegistry.getArguments()
+                .getString("engineFixtureRequired", "false"));
+        if (required) assertTrue("CI must provision the exact engine archive", fixture.isFile());
+        else assumeTrue("Optional exact archive not provisioned", fixture.isFile());
         assertFalse("Do not overwrite an existing user import in this test", EngineInput.library(context).exists());
         try (FileInputStream input = new FileInputStream(fixture)) {
             File library = EngineInput.importStream(context, input);

@@ -85,6 +85,8 @@ class ClientBaseSourceTests(unittest.TestCase):
         for key in ('archive_bytes', 'library_bytes'):
             self.assertIn(str(metadata[key]) + 'L', source)
         self.assertLess(source.index('ARCHIVE_SHA.equals(fingerprint)'), source.index('new SevenZFile('))
+        workflow = (BASE / '.github/workflows/build-apk.yml').read_text()
+        self.assertIn('engineFixtureRequired=true', workflow)
 
     def test_engine_probe_is_private_and_match_gated(self):
         service = self.manifest('host').find('application/service')
