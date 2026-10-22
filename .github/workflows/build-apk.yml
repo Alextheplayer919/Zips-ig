@@ -17,18 +17,28 @@ permissions:
   contents: read
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-java@v6.1.0
         with:
           distribution: temurin
-          java-version: '17'
-      - uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v6.4.0
+      - name: Locate hosted Android SDK
+        run: |
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
       - name: Install pinned Android tools
-        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1'
+        run: |
+          printf 'y\n%.0s' {1..20} | sdkmanager --licenses > /dev/null
+          if ! sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1' > sdk-install.log 2>&1; then
+            tail -n 15 sdk-install.log | sed 's/^/::error::SDK setup: /'
+            exit 1
+          fi
+          cat sdk-install.log
       - name: Source and native identity checks
         run: python3 tools/test_client_base.py
       - name: Build host, guest and device tests
@@ -48,7 +58,7 @@ jobs:
                   assert not forbidden, (apk, forbidden)
           PYAPK
           (cd build/apks && sha256sum *.apk > SHA256SUMS)
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: client-base-debug-${{ github.run_number }}
           path: build/apks/
@@ -73,7 +83,7 @@ jobs:
             ./gradlew :host:connectedDebugAndroidTest --stacktrace
       - name: Device test reports
         if: always() && (github.event_name != 'workflow_dispatch' || inputs.emulator_tests)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: client-base-device-tests-${{ github.run_number }}
           path: host/build/reports/androidTests/

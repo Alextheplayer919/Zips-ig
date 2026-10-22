@@ -12,3 +12,4 @@ local.properties
 *.aab
 # Only the requested compressed engine input is retained, never extracted binaries.
 *.so
+*.log

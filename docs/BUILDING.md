@@ -4,7 +4,7 @@
 
 [Build APK](https://github.com/Alextheplayer919/Zips-ig/actions/workflows/build-apk.yml) runs for app/build changes on pushes and pull requests. It can also be dispatched manually once GitHub registers the workflow on the default branch. Push/PR runs include Android 13 emulator tests; manual dispatch offers an emulator-test toggle.
 
-The workflow uses JDK 17, Gradle 8.11.1, Android SDK 35/build tools 35.0.0, NDK 27.2.12479018 and CMake 3.22.1. It builds:
+The workflow pins the Ubuntu 24.04 runner and uses JDK 21 to run Gradle 8.11.1 (app Java source/bytecode level 17), Android SDK 35/build tools 35.0.0, NDK 27.2.12479018 and CMake 3.22.1. It builds:
 
 - `client-base-host-debug.apk`
 - `client-base-demo-debug.apk`
