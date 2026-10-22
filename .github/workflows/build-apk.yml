@@ -25,6 +25,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+      - name: Pin Android user state before signing or emulator setup
+        run: |
+          mkdir -p "$HOME/.android/avd"
+          echo "ANDROID_USER_HOME=$HOME/.android" >> "$GITHUB_ENV"
+          echo "ANDROID_EMULATOR_HOME=$HOME/.android" >> "$GITHUB_ENV"
+          echo "ANDROID_AVD_HOME=$HOME/.android/avd" >> "$GITHUB_ENV"
       - uses: gradle/actions/setup-gradle@v6.4.0
       - name: Locate hosted Android SDK
         run: |

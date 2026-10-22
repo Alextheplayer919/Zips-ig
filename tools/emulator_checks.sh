@@ -2,9 +2,9 @@
 # Keep SDK/boot failures visible as annotations, not opaque action failures.
 set -Eeuo pipefail
 export ANDROID_SERIAL=emulator-5554
-export ANDROID_USER_HOME="$HOME/.android"
-export ANDROID_EMULATOR_HOME="$ANDROID_USER_HOME"
-export ANDROID_AVD_HOME="$ANDROID_USER_HOME/avd"
+: "${ANDROID_USER_HOME:?Workflow must pin state before the first APK build}"
+: "${ANDROID_EMULATOR_HOME:?Workflow must pin state before the first APK build}"
+: "${ANDROID_AVD_HOME:?Workflow must pin state before the first APK build}"
 mkdir -p "$ANDROID_AVD_HOME"
 sdk="$ANDROID_HOME/cmdline-tools/latest/bin"
 cleanup() { adb emu kill >/dev/null 2>&1 || true; }
