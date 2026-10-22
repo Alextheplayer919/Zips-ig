@@ -18,12 +18,14 @@ APK paths loaded: 1
 
 This is device-side evidence for our cooperative guest mechanism. It does not establish arbitrary app lifecycle virtualization, Minecraft engine loading, hooks, access to Minecraft's private data or Minecraft 26.50 compatibility for our implementation. The demo does not use the supplied engine archive.
 
-## Still to check on the phone
+## Follow-up: repeated loads
 
-- Repeatedly tap **Load trusted demo** in the same host process.
+The user reports tapping **Load trusted demo** multiple times; the status stayed `PASS`. Repeated loading therefore passes as reported. No new PID/UID readings or rotation result were supplied.
+
+## Still to check on the phone
 - Rotate the host, then load again without a duplicate-native-library error.
 - Optionally open the demo separately and compare its execution UID with its installation UID.
 
-These cases are not reported by the initial output. Android 13 x86_64 emulator integration already passed in [the CI run](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39840759440), but emulator results do not substitute for these phone checks.
+Rotation and standalone comparison have not been reported. Android 13 x86_64 emulator integration already passed in [the CI run](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39840759440), but emulator results do not substitute for these phone checks.
 
 The next implementation stage remains the [hosting-only Minecraft adapter](STATUS.md#gate-2--hosting-only-minecraft-adapter), not gameplay features or engine hooks.

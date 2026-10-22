@@ -8,7 +8,7 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 
 - [How we think the original client works](docs/THEORY.md) — evidence, hypotheses and unresolved engine integration.
 - [Current implementation and roadmap](docs/STATUS.md) — what is implemented versus tested, and our next acceptance gates.
-- [First phone-test result](docs/DEVICE_TEST.md) — initial load passed as reported; rotation/repeated-load checks pending.
+- [First phone-test result](docs/DEVICE_TEST.md) — initial and repeated loads passed as reported; rotation check pending.
 - [Build and install APKs from your phone](docs/BUILDING.md).
 - [Engine input provenance](docs/ENGINE_INPUT.json).
 
