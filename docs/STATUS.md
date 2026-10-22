@@ -23,7 +23,7 @@ Eight local checks passed before and after the repository migration. These are s
 
 The local sandbox does not have an Android SDK and cannot fetch the Gradle distribution. Therefore local checks are **not** evidence of a successful Android build or device run. Check the [workflow runs](https://github.com/Alextheplayer919/Zips-ig/actions) for actual compilation, artifact and emulator outcomes. A workflow definition alone is not a passing test.
 
-**CI result:** APK compilation and Android 13/API 33 x86_64 integration passed in [run 39840759440](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39840759440). The user subsequently reported a successful first phone load; see [the device test record](DEVICE_TEST.md). Repeated phone loads also passed as reported; Activity recreation remains unreported.
+**CI result:** APK compilation and Android 13/API 33 x86_64 integration passed in [run 39840759440](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39840759440). The user subsequently reported a successful first phone load; see [the device test record](DEVICE_TEST.md). Repeated phone loads and rotation also passed as reported. The phone rotation was not instrumented to verify Activity recreation; the emulator test covers explicit recreation.
 
 Two Android instrumentation tests are supplied:
 
@@ -41,7 +41,7 @@ The original client's successful Android 13 / Minecraft 26.50 launch is **user-r
 
 ## Gate 1 — cooperative demo on Android 13
 
-**Current result:** initial phone load passed as reported: native PID/UID match the host, and the installed guest UID differs. Repeated loads also passed as reported. The complete gate remains pending the rotation check on that phone.
+**Current result:** initial phone load passed as reported: native PID/UID match the host, and the installed guest UID differs. Repeated loads and rotation also passed as reported. **Gate 1 is complete at this user-reported functional-check level.** No phone lifecycle trace was supplied; explicit Activity recreation is covered by the emulator test.
 
 **Pass:** both same-build APKs install; the host loads the guest resource/View; native PID/UID equal host PID/UID; installed guest UID differs; repeated loads and Activity recreation work. Confirm on the user's ARM64 phone, not just an x86_64 emulator.
 

@@ -1,6 +1,6 @@
 # First phone test — 2026-10-22
 
-**Source:** user-pasted output from a single manual load on the user's phone. Android 13 is the previously stated device environment; this output does not independently identify the OS, ABI, installed APK version or build run.
+**Source:** user-pasted output from the initial manual load, followed by repeated-load and rotation reports from the user's phone. Android 13 is the previously stated device environment; this output does not independently identify the OS, ABI, installed APK version or build run.
 
 ```text
 PASS: guest JNI executes inside the host
@@ -20,12 +20,14 @@ This is device-side evidence for our cooperative guest mechanism. It does not es
 
 ## Follow-up: repeated loads
 
-The user reports tapping **Load trusted demo** multiple times; the status stayed `PASS`. Repeated loading therefore passes as reported. No new PID/UID readings or rotation result were supplied.
+The user reports tapping **Load trusted demo** multiple times; the status stayed `PASS`. Repeated loading therefore passes as reported. No new PID/UID readings were supplied.
 
-## Still to check on the phone
-- Rotate the host, then load again without a duplicate-native-library error.
-- Optionally open the demo separately and compare its execution UID with its installation UID.
+## Follow-up: rotation
 
-Rotation and standalone comparison have not been reported. Android 13 x86_64 emulator integration already passed in [the CI run](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39840759440), but emulator results do not substitute for these phone checks.
+The user reports rotating the phone and still seeing `PASS`. Rotation therefore passes as reported, with no native-library error reported. No lifecycle trace or fresh PID/UID readings were supplied, so the phone report does not independently prove Activity recreation occurred.
+
+**Gate 1 is complete at the user-reported functional-check level:** initial load, repeated loads and rotation all pass. The optional standalone-demo UID comparison has not been reported and is not required to close this gate.
+
+Android 13 x86_64 emulator integration, including instrumented Activity recreation, also passed in [the CI run](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39840759440). This does not expand the result to arbitrary app or Minecraft hosting.
 
 The next implementation stage remains the [hosting-only Minecraft adapter](STATUS.md#gate-2--hosting-only-minecraft-adapter), not gameplay features or engine hooks.
