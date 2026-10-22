@@ -26,9 +26,10 @@ class ClientBaseSourceTests(unittest.TestCase):
         for path in BASE.glob('*/src/main/res/**/*.xml'):
             ET.parse(path)
 
-    def test_demo_only_visibility_and_extracted_native_libraries(self):
-        query = self.manifest('host').find('queries/package')
-        self.assertEqual('dev.zips.clientbase.guest', query.get(ANDROID + 'name'))
+    def test_package_visibility_and_extracted_native_libraries(self):
+        queries = self.manifest('host').findall('queries/package')
+        self.assertEqual({'dev.zips.clientbase.guest', 'com.mojang.minecraftpe'},
+                         {query.get(ANDROID + 'name') for query in queries})
         app = self.manifest('demo-guest').find('application')
         self.assertEqual('true', app.get(ANDROID + 'extractNativeLibs'))
         gradle = (BASE / 'demo-guest/build.gradle').read_text()
@@ -74,6 +75,25 @@ class ClientBaseSourceTests(unittest.TestCase):
         self.assertEqual(['nativeProcessId', 'nativeUserId'], methods)
         for method in methods:
             self.assertIn('Java_dev_zips_clientbase_guest_DemoGuestEntry_' + method, cpp)
+
+    def test_engine_pins_match_provenance(self):
+        import json
+        metadata = json.loads((BASE / 'docs/ENGINE_INPUT.json').read_text())
+        source = (BASE / 'host/src/main/java/dev/zips/clientbase/host/EngineInput.java').read_text()
+        for key in ('archive_sha256', 'library_sha256'):
+            self.assertIn(metadata[key], source)
+        for key in ('archive_bytes', 'library_bytes'):
+            self.assertIn(str(metadata[key]) + 'L', source)
+        self.assertLess(source.index('ARCHIVE_SHA.equals(fingerprint)'), source.index('new SevenZFile('))
+
+    def test_engine_probe_is_private_and_match_gated(self):
+        service = self.manifest('host').find('application/service')
+        self.assertEqual(':engine_probe', service.get(ANDROID + 'process'))
+        self.assertEqual('false', service.get(ANDROID + 'exported'))
+        source = (BASE / 'host/src/main/java/dev/zips/clientbase/host/EngineProbeService.java').read_text()
+        self.assertLess(source.index('EngineInput.verifyLibrary(engine)'), source.index('Class.forName'))
+        self.assertLess(source.index('if (!matchesInstalledEngine'), source.index('Class.forName'))
+        self.assertNotIn('System.load(', source)
 
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):

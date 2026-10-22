@@ -14,7 +14,7 @@
     "afa62bd3385161f1facfe36aad58ac63998f46d2"
   ],
   "version_status": "Minecraft version not verified from a matching APK/package manifest. Do not assume 26.50.",
-  "execution": "No library code loaded or executed.",
+  "execution": "Static inspection only in sandbox. Optional app-native probe outcome on ARM64 phone not yet reported.",
   "archive_path": "libminecraftpe.7z",
-  "library_retention": "Extracted library intentionally removed during repository reset; archive retained. Not a build input."
+  "library_retention": "Extracted library stays in ignored cache. Archive used as CI import-test fixture, never bundled in APKs."
 }

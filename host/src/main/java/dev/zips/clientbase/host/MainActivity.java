@@ -1,6 +1,10 @@
 package dev.zips.clientbase.host;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import java.io.InputStream;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -13,7 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-public final class MainActivity extends Activity {
+public final class MainActivity extends Activity implements EngineProbeController.Listener {
+    private static final int IMPORT_ENGINE = 20;
+    private TextView engineStatus;
     private TextView status;
     private FrameLayout guestPanel;
 
@@ -25,7 +31,7 @@ public final class MainActivity extends Activity {
         int padding = (int) (24 * getResources().getDisplayMetrics().density);
         page.setPadding(padding, padding, padding, padding);
         scroll.addView(page);
-        TextView eyebrow = text("CLIENT BASE / 0.1", 13);
+        TextView eyebrow = text("CLIENT BASE / 0.2", 13);
         eyebrow.setTextColor(Color.rgb(113, 217, 193));
         page.addView(eyebrow);
         page.addView(text("One process.\nA separate guest.", 30));
@@ -47,7 +53,62 @@ public final class MainActivity extends Activity {
         guestPanel = new FrameLayout(this);
         guestPanel.setId(R.id.guest_panel);
         page.addView(guestPanel);
+        page.addView(text("Engine linkage experiment", 24));
+        page.addView(text("Optional: import your exact engine archive or .so. This is a native link check, "
+                + "not Minecraft startup. Matching dependencies must come from your trusted installed game.", 14));
+        Button importEngine = new Button(this);
+        importEngine.setText("Import supplied engine file");
+        importEngine.setOnClickListener(v -> {
+            if (EngineProbeController.isRunning() || EngineInput.IMPORTING.get()) return;
+            Intent choose = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            choose.setType("*/*");
+            choose.addCategory(Intent.CATEGORY_OPENABLE);
+            startActivityForResult(choose, IMPORT_ENGINE);
+        });
+        page.addView(importEngine);
+        Button probe = new Button(this);
+        probe.setText("Run engine link probe");
+        probe.setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setTitle("Run native code in a private process?")
+                .setMessage("Only use your trusted Minecraft installation. ELF constructors and matching native "
+                        + "dependencies may execute and can crash. The private process is not a security sandbox. "
+                        + "We do not call Minecraft's JNI_OnLoad or start the game. Keep the app open until it finishes.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Run probe", (dialog, which) -> EngineProbeController.start()).show());
+        page.addView(probe);
+        engineStatus = text("Engine not imported.", 14);
+        engineStatus.setTypeface(Typeface.MONOSPACE);
+        engineStatus.setTextIsSelectable(true);
+        page.addView(engineStatus);
         setContentView(scroll);
+        EngineProbeController.attach(this, this);
+    }
+
+    @Override public void engineStatus(String text) { engineStatus.setText(text); }
+
+    @Override protected void onDestroy() {
+        EngineProbeController.detach(this);
+        super.onDestroy();
+    }
+
+    @Override protected void onActivityResult(int request, int result, Intent data) {
+        super.onActivityResult(request, result, data);
+        if (request != IMPORT_ENGINE || result != RESULT_OK || data == null || data.getData() == null) return;
+        if (EngineProbeController.isRunning() || !EngineInput.IMPORTING.compareAndSet(false, true)) return;
+        Context application = getApplicationContext();
+        android.net.Uri uri = data.getData();
+        EngineProbeController.show("Importing and hashing on a worker thread. Archive extraction needs "
+                + "roughly 400 MB free space (more if replacing an existing engine). Please wait...");
+        new Thread(() -> {
+            try (InputStream input = application.getContentResolver().openInputStream(uri)) {
+                if (input == null) throw new java.io.IOException("Selected document cannot be read.");
+                EngineInput.importStream(application, input);
+                EngineProbeController.show("Engine imported: exact SHA-256 verified; no engine code executed. "
+                        + "Now run the link probe. A matching installed Minecraft engine is required.");
+            } catch (Exception | LinkageError | OutOfMemoryError error) {
+                EngineProbeController.show("Import failed: " + error.getClass().getSimpleName() + "\n" + error.getMessage());
+            } finally { EngineInput.IMPORTING.set(false); }
+        }, "engine-import").start();
     }
 
     private TextView text(String content, int size) {

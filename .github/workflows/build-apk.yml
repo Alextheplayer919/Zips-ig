@@ -7,9 +7,9 @@ on:
         type: boolean
         default: true
   push:
-    paths: ['host/**', 'demo-guest/**', 'contract/**', 'gradle/**', 'gradlew*', '*.gradle', 'gradle.properties', '.github/workflows/build-apk.yml', 'tools/test_client_base.py']
+    paths: ['host/**', 'demo-guest/**', 'contract/**', 'gradle/**', 'gradlew*', '*.gradle', 'gradle.properties', '.github/workflows/build-apk.yml', 'tools/**']
   pull_request:
-    paths: ['host/**', 'demo-guest/**', 'contract/**', 'gradle/**', 'gradlew*', '*.gradle', 'gradle.properties', '.github/workflows/build-apk.yml', 'tools/test_client_base.py']
+    paths: ['host/**', 'demo-guest/**', 'contract/**', 'gradle/**', 'gradlew*', '*.gradle', 'gradle.properties', '.github/workflows/build-apk.yml', 'tools/**']
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
@@ -80,6 +80,8 @@ jobs:
           disable-animations: true
           script: |
             adb install -r demo-guest/build/outputs/apk/debug/demo-guest-debug.apk
+            adb install -r host/build/outputs/apk/debug/host-debug.apk
+            adb shell -T "run-as dev.zips.clientbase.host sh -c 'mkdir -p files; cat > files/engine-test.7z'" < libminecraftpe.7z
             ./gradlew :host:connectedDebugAndroidTest --stacktrace
       - name: Device test reports
         if: always() && (github.event_name != 'workflow_dispatch' || inputs.emulator_tests)

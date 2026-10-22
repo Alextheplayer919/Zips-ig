@@ -17,9 +17,13 @@ We are building a clean, independent hosting client, not porting the original pr
 - ARM64 and x86_64 native builds; min SDK 30, target SDK 33, compile SDK 35.
 - GitHub Actions APK build and Android 13/API 33 integration-test configuration.
 
+### Engine experiment added (phone outcome pending)
+
+The host now accepts the exact supplied archive/raw library, verifies its hash, checks the installed game's ARM64 engine matches before using its dependency paths, and offers a private-process `dlopen` diagnostic. It does not explicitly invoke the engine's `JNI_OnLoad` or any game entrypoint. See [ENGINE_PROBE.md](ENGINE_PROBE.md) and [the static linkage inventory](ENGINE_LINKAGE.json). Linker constructors may execute; a successful link is not Minecraft startup.
+
 ### Validation boundary
 
-Eight local checks passed before and after the repository migration. These are source guards plus an actually compiled/executed **Linux** native PID/UID test. The six Java sources also passed syntax parsing before migration; the Android source was moved unchanged.
+Eight local checks passed before and after the repository migration; the engine changes expand the local suite to ten checks. These are source guards plus an actually compiled/executed **Linux** native PID/UID test. The six Java sources also passed syntax parsing before migration; the Android source was moved unchanged.
 
 The local sandbox does not have an Android SDK and cannot fetch the Gradle distribution. Therefore local checks are **not** evidence of a successful Android build or device run. Check the [workflow runs](https://github.com/Alextheplayer919/Zips-ig/actions) for actual compilation, artifact and emulator outcomes. A workflow definition alone is not a passing test.
 
@@ -32,7 +36,7 @@ Two Android instrumentation tests are supplied:
 
 ### Not implemented
 
-- Minecraft package discovery/launch or a general guest Activity/Application/provider environment.
+- Minecraft launch or a general guest Activity/Application/provider environment. Installed package discovery exists only for the engine probe preflight.
 - Minecraft native-engine startup, resolver reconstruction or hooks.
 - Access to the separately installed game's private data.
 - Game features/modules or an update-compatible engine integration layer.

@@ -66,6 +66,6 @@ Running as our host's UID does not automatically expose the original app's priva
 
 ## Engine input
 
-`libminecraftpe.7z` contains one ARM64 ELF shared library. Its identity and hashes are in [ENGINE_INPUT.json](ENGINE_INPUT.json). We have **not** verified its Minecraft version from a matching APK manifest. It remains a reference input only: neither demo APK extracts, loads or bundles it.
+`libminecraftpe.7z` contains one ARM64 ELF shared library. Its identity and hashes are in [ENGINE_INPUT.json](ENGINE_INPUT.json). We have **not** verified its Minecraft version from a matching APK manifest. It is not bundled in either APK. The host now offers an explicit fingerprint-pinned import/link experiment; see [ENGINE_PROBE.md](ENGINE_PROBE.md). The real ARM64 engine load still needs a phone result; it is not demonstrated by the cooperative demo.
 
 A standalone engine library is insufficient to reconstruct the complete Android game environment; code, resources, dependencies and any required splits must be handled together.
