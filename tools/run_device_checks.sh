@@ -4,11 +4,12 @@ set -Eeuo pipefail
 failure() {
     echo "::error::Android device checks failed at script line $1"
     if [[ -f device-tests.log ]]; then
-        tail -n 25 device-tests.log | sed 's/^/::error::Gradle device test: /'
+        grep -iE 'what went wrong|failed|caused by|exception|could not|no devices|tests? completed' device-tests.log | head -n 5 | sed 's/^/::error::Gradle device test: /' || true
     fi
     python3 - <<'PY'
 from pathlib import Path
 import xml.etree.ElementTree as ET
+reported = 0
 for path in Path('host/build/outputs/androidTest-results').rglob('*.xml'):
     try:
         root = ET.parse(path).getroot()
@@ -16,7 +17,9 @@ for path in Path('host/build/outputs/androidTest-results').rglob('*.xml'):
         continue
     for failure in list(root.iter('failure')) + list(root.iter('error')):
         text = ' '.join((failure.get('message', '') + ' ' + (failure.text or '')).split())
-        print('::error::' + text[:2000].replace('%', '%25'))
+        if reported < 3:
+            print('::error::' + text[:2000].replace('%', '%25'))
+            reported += 1
 PY
 }
 trap 'failure "$LINENO"' ERR

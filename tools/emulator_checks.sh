@@ -10,6 +10,7 @@ sdk="$ANDROID_HOME/cmdline-tools/latest/bin"
 cleanup() { adb emu kill >/dev/null 2>&1 || true; }
 failure() {
     echo "::error::Emulator verification failed at script line $1"
+    if [[ -f device-tests.log ]]; then return; fi
     for log in emulator-install.log emulator-create.log emulator.log; do
         if [[ -f "$log" ]]; then tail -n 12 "$log" | sed "s/^/::error::$log: /"; fi
     done
