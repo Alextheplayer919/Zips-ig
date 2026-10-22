@@ -1,0 +1,14 @@
+# Local inputs, build products, Android SDK configuration and IDE state
+.cache/
+.venv/
+__pycache__/
+.gradle/
+.idea/
+*.iml
+local.properties
+**/build/
+**/.cxx/
+*.apk
+*.aab
+# Only the requested compressed engine input is retained, never extracted binaries.
+*.so

@@ -1,0 +1,5 @@
+<resources>
+    <item name="load_demo" type="id" />
+    <item name="load_status" type="id" />
+    <item name="guest_panel" type="id" />
+</resources>
