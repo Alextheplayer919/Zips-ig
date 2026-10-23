@@ -40,3 +40,14 @@ Do **not** repeat the demo or link test. No archive import is needed: the loader
 The new emulator fixture runs **our own copied native bridge**, not Minecraft: a fresh child loader owns its Java class and native library; ART invokes our JNI callback exactly once; JNI calls resolve through that loader; and `RTLD_NOLOAD` can inspect the loaded copy but must not load another existing copy. Additional tests accept the reported initializer metadata and reject changed code/references, truncation and unreviewed superclass initializers.
 
 These are meaningful JVM/loader checks, not a Minecraft execution result. Actual installed GameActivity and real JNI initialization still need the phone report. Build/workflow success must be recorded separately, not assumed from the presence of this implementation.
+
+### Validated host 0.4 build
+
+App/test commit **`bf94035495a5a0c0f078d8c2e559a03896441dc4`**, host **0.4.0 / code 4**, passed compilation and Android 13/API 33 x86_64 integration in [run 39905493730](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39905493730), job **120256815483**, **4m59s**. The three new JVM/policy cases pass alongside the previous ten cases, including mandatory actual engine-archive import/hash checks as data only. Fourteen local source/native checks pass; seventeen Java sources syntax-parse. Minecraft initialization is not exercised by CI; timeout child-PID guards are source-checked, not a captured real-game hang test.
+
+- [APK ZIP: client-base-debug-35](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39905493730/artifacts/12480831820) — **3,460,302 bytes**. Install only `client-base-host-debug.apk` for this phone experiment.
+- [Device reports: client-base-device-tests-35](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39905493730/artifacts/12480538812) — **137,251 bytes**.
+
+### Later Activity-path evidence, not invoked
+
+A bounded `.dynsym` lookup in the unchanged SHA-pinned supplied engine finds **`GameActivity_onCreate`** (ELF VA `0x7f7c6b8`, 620 bytes) and **`Java_com_google_androidgamesdk_GameActivity_initializeNativeCode`** (ELF VA `0x7f791c4`, 116 bytes). This is consistent with the reported GameActivity superclass and explains why absence of `ANativeActivity_onCreate` was not proof of a missing custom/native adapter path. These are build-specific ELF addresses, not process addresses or verified calling signatures. Neither export is called by host 0.4; the original Activity lifecycle/resources environment must be prepared before that later step.

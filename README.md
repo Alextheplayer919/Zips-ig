@@ -21,7 +21,7 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 
 | Path | Purpose |
 | --- | --- |
-| `host/` | Launcher, demo loader, engine import/link probe, static bootstrap inspection and Android tests |
+| `host/` | Launcher, demo loader, engine import/link probe, bootstrap inspection/initialization and Android tests |
 | `demo-guest/` | Separate demo app with guest resources and a tiny native library |
 | `contract/` | Cooperative Java interface shared by both apps |
 | `.github/workflows/build-apk.yml` | Builds debug APKs; runs Android 13 emulator tests |
@@ -36,4 +36,4 @@ Install the host and demo APKs from the **same workflow run**. Open **Client Bas
 
 Passing this milestone proves a cooperative plugin can execute in the host. It does **not** establish Minecraft lifecycle virtualization, engine loading, hooks, entitlement compatibility or access to Minecraft's private worlds/account data.
 
-The host now offers an explicit, fingerprint-pinned engine import/link experiment; it does not start the game. Both apps currently request no permissions. Guest code is **not sandboxed from the host**; the loader accepts only our fixed, same-signed demo. No ProtoHax runtime, Minecraft engine/content, private keys or credentials are packaged into the debug APKs.
+The host offers a fingerprint-pinned engine import/link experiment and a separate consent-gated JVM initialization experiment using the hash-identical installed engine. The latter executes original Java/native initialization, but creates no Minecraft Activity or title screen. Both apps currently request no permissions. Guest code is **not sandboxed from the host**; the loader accepts only our fixed, same-signed demo. No ProtoHax runtime, Minecraft engine/content, private keys or credentials are packaged into the debug APKs.
