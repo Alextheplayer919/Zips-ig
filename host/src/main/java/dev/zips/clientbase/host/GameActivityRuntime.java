@@ -25,6 +25,9 @@ final class GameActivityRuntime {
     private static Consumer<String> progress;
     private static boolean created;
 
+    static boolean hasCreatedActivity() { return created; }
+    static boolean isPrepared() { return prepared != null; }
+
     static void requireGameProcess(Context c) {
         if (!(c.getPackageName() + ":game_host").equals(Application.getProcessName())) {
             throw new SecurityException("Original game Activity must run in the dedicated host process");

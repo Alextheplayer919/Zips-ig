@@ -27,6 +27,7 @@ public final class GameHostController {
     private static int generation, pid, collectionId;
     private static long startedAt;
     private static IBinder binder;
+    private static ServiceConnection connection;
     private static String latest;
     private GameHostController() {}
     private static File runFile() { return new File(app.getFilesDir(), "game-host-run.json"); }
@@ -55,7 +56,8 @@ public final class GameHostController {
         catch (Exception ignored) { }
         show("Preparing original Bedrock Activity in a separate host-owned process...");
         try {
-            bound = app.bindService(new Intent(app, GameHostService.class), CONNECTION, Context.BIND_AUTO_CREATE);
+            connection = connectionFor(generation);
+            bound = app.bindService(new Intent(app, GameHostService.class), connection, Context.BIND_AUTO_CREATE);
             if (!bound) show("Game service binding rejected");
             else MAIN.postDelayed(TIMEOUT, 180000);
         } catch (Exception e) { bound = false; show("Game service binding failed: " + e); }
@@ -66,24 +68,27 @@ public final class GameHostController {
         if (!bound || data.getInt("id") != generation || data.getInt("uid", -1) != Process.myUid()) return true;
         int child = data.getInt("pid", 0);
         if (child <= 0 || child == Process.myPid() || (pid != 0 && child != pid)) return true;
-        if (pid == 0) { pid = child; saveRun("none"); }
+        if (pid == 0) { pid = child; startedAt = data.getLong("started_at", startedAt); saveRun("none"); }
+        if (data.getBoolean("reattached") && data.getBoolean("activity_created")) {
+            launched = true; MAIN.removeCallbacks(TIMEOUT);
+        }
         show(data.getString("text", "Empty game stage"));
         if (data.getBoolean("blocked")) { MAIN.removeCallbacks(TIMEOUT); stop("Preparation blocked; host cleanup requested"); }
         else if (data.getBoolean("ready")) { ready = true; launchIfReady(); }
         return true;
     }));
-    private static final ServiceConnection CONNECTION = new ServiceConnection() {
+    private static ServiceConnection connectionFor(final int attempt) { return new ServiceConnection() {
         @Override public void onServiceConnected(ComponentName n, IBinder service) {
-            if (!bound) return;
+            if (!bound || attempt != generation) return;
             binder = service;
             try { Message request = Message.obtain(null, 1); request.replyTo = RECEIVER;
                 Bundle data = new Bundle(); data.putInt("id", generation); request.setData(data); new Messenger(service).send(request);
             } catch (Exception e) { stop("IPC preparation failed: " + e); }
         }
-        @Override public void onServiceDisconnected(ComponentName n) { disconnected(); }
-        @Override public void onBindingDied(ComponentName n) { disconnected(); }
-        @Override public void onNullBinding(ComponentName n) { stop("Null game binding"); }
-    };
+        @Override public void onServiceDisconnected(ComponentName n) { if (attempt == generation) disconnected(); }
+        @Override public void onBindingDied(ComponentName n) { if (attempt == generation) disconnected(); }
+        @Override public void onNullBinding(ComponentName n) { if (attempt == generation) stop("Null game binding"); }
+    }; }
     private static void launchIfReady() {
         Activity a = foreground.get();
         if (!bound || !ready || launched || a == null || a.isFinishing() || a.isDestroyed()) return;
@@ -106,7 +111,7 @@ public final class GameHostController {
     private static void unbind() {
         MAIN.removeCallbacks(TIMEOUT); MAIN.removeCallbacks(STARTUP_WATCH);
         ready = false; binder = null;
-        if (bound) { bound = false; try { app.unbindService(CONNECTION); } catch (Exception ignored) { } }
+        if (bound) { bound = false; try { app.unbindService(connection); } catch (Exception ignored) { } }
     }
     private static void disconnected() {
         if (!bound) return;

@@ -15,8 +15,17 @@ public final class GameHostService extends Service {
     private final AtomicBoolean started = new AtomicBoolean();
     private Messenger client;
     private int id;
+    private final long processStartedAt = System.currentTimeMillis();
+    private boolean reattached;
     private final Messenger endpoint = new Messenger(new Handler(android.os.Looper.getMainLooper(), message -> {
-        if (message.what == 1 && started.compareAndSet(false, true)) {
+        if (message.what != 1) return true;
+        if (!started.compareAndSet(false, true)) {
+            client = message.replyTo; id = message.getData().getInt("id"); reattached = true;
+            report("REATTACHED_EXISTING_GAME_PROCESS (no restart or repeated initialization)",
+                    GameActivityRuntime.isPrepared() && !GameActivityRuntime.hasCreatedActivity(), false);
+            return true;
+        }
+        {
             client = message.replyTo; id = message.getData().getInt("id");
             report("GAME_PREPARATION_STARTED", false, false);
             new Thread(() -> {
@@ -35,6 +44,8 @@ public final class GameHostService extends Service {
         String saved = GameHostReport.stage(this, text);
         Message response = Message.obtain(); Bundle data = new Bundle();
         data.putInt("id", id); data.putInt("pid", Process.myPid()); data.putInt("uid", Process.myUid());
+        data.putLong("started_at", processStartedAt); data.putBoolean("reattached", reattached);
+        data.putBoolean("activity_created", GameActivityRuntime.hasCreatedActivity());
         data.putString("text", saved); data.putBoolean("ready", ready); data.putBoolean("blocked", blocked);
         response.setData(data);
         try { if (client != null) client.send(response); } catch (android.os.RemoteException ignored) { }
