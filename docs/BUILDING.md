@@ -24,7 +24,7 @@ No secrets/signing credentials are required. These are **debug** APKs, not produ
 6. Rotate and load again; tap repeatedly. There should be no duplicate-native-library error.
 7. Open **Client Base Demo** separately to compare execution under the guest app's own UID.
 
-Do not uninstall Minecraft or ProtoHax for this experiment. No wireless ADB, rooting, game files, credentials or private worlds are needed. Both new apps request no Android permissions.
+Do not uninstall Minecraft or ProtoHax for this experiment. No wireless ADB, rooting, game files, credentials or private worlds are needed. Host 0.4.3 requests only normal `ACCESS_NETWORK_STATE` (no runtime prompt); demo/contract request none. Older builds requested no permissions, which caused the confirmed Xbox network-observer initialization abort.
 
 Both APKs must have matching signing certificates. GitHub runners can generate different debug keys across runs, so updating an older pair may require uninstalling **our host/demo only**, deleting their own data. Do not mix APKs from different runs. Force-stop/reopen the host after updating the demo.
 
@@ -49,7 +49,7 @@ The last command requires an emulator/device. CI supplies an Android 13 x86_64 e
 python3 tools/test_client_base.py
 ```
 
-Seventeen checks cover manifests/permissions, demo visibility/native extraction, protocol version, trust-check ordering, app separation, official wrapper identity, JNI names native process identity, engine fingerprint pins, private/match-gated probe configuration, static-bootstrap no-loading guards and JNI-evidence identity. The native test needs `g++`; otherwise it is skipped. These do **not** compile Android resources/classes or validate Android runtime behavior.
+Eighteen checks cover manifests/permissions, demo visibility/native extraction, protocol version, trust-check ordering, app separation, official wrapper identity, JNI names native process identity, engine fingerprint pins, private/match-gated probe configuration, static-bootstrap no-loading guards and JNI-evidence identity. The native test needs `g++`; otherwise it is skipped. These do **not** compile Android resources/classes or validate Android runtime behavior.
 
 The wrapper files are from Gradle's official `v8.11.1` source tag. Its JAR contains the upstream license; the local suite checks SHA-256 `2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046`.
 
@@ -74,3 +74,7 @@ Use **host 0.4.1** for the next initialization attempt. Host 0.4 stopped on a pr
 ### Current step: diagnose the initialization disconnect
 
 Use **host 0.4.2** and see [EXIT_DIAGNOSTICS.md](EXIT_DIAGNOSTICS.md). If the update preserves host data/UID, try **Collect last probe exit details** first. A new debug key may require uninstalling only Client Base host and lose old crash-history access; then make one new initialization attempt, leave the host open for automatic exit collection, and share the full report. Retry the diagnostic button if details are delayed; it never starts game code. No demo/link test or engine import is required. Do not uninstall Minecraft.
+
+### Current initialization correction: host network-state permission
+
+Use **host 0.4.3**. The new phone diagnostic identified a `SecurityException` for missing `ACCESS_NETWORK_STATE`, followed by a checked-JNI abort. This patch adds only that normal permission and checks it before initialization. Install the new host only, tap **Initialize Minecraft Java / JNI (no Activity)** once and share the result. There is no runtime permission prompt, engine import or demo/link/static test to repeat. Keep Minecraft unchanged. If another exit occurs, the existing automatic/manual exit diagnostics remain available. See [the recorded cause and correction](NETWORK_PERMISSION_DEVICE_TEST.md).

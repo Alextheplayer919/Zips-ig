@@ -1,8 +1,8 @@
-# Host 0.4.2 — controlled original Java / JNI initialization
+# Host 0.4.3 — controlled original Java / JNI initialization
 
-## Current failure and diagnosis
+## Current failure and correction
 
-Host 0.4.1 passed the empty-superclass gate on the phone, then the private process disconnected during JVM initialization, last recording a PlayFabMultiplayer lookup. The cause is not established. Host 0.4.2 keeps this initialization path unchanged and [adds Android own-process exit/crash diagnostics](EXIT_DIAGNOSTICS.md). Prefer collecting existing exit details; if a debug-key uninstall lost them, make one new controlled attempt and collect the result. A lookup is not a completed load or proof of a failing module.
+Host 0.4.2's phone diagnostic now identifies the initialization exit: missing host `ACCESS_NETWORK_STATE` during Xbox `NetworkObserver.Initialize` left a pending `SecurityException`, followed by PlayFab JNI `FindClass` and ART SIGABRT. [Selected evidence](NETWORK_PERMISSION_DEVICE_TEST.md). Host 0.4.3 declares that normal permission and checks it before game class loading. It does not change load order, disable CheckJNI, add Internet access or claim later initialization succeeds. Existing [exit diagnostics](EXIT_DIAGNOSTICS.md) remain available for a different subsequent failure.
 
 ## Why this is the next experiment
 
@@ -13,6 +13,7 @@ Upstream [AOSP-mirrored GameActivity source](https://github.com/msft-mirror-aosp
 ## Preconditions and execution
 
 - Explicit UI consent: execute only the user's trusted, original installed Minecraft. Native hashing is not Java signing-certificate authentication. This private process shares the host's UID/permissions; it is crash separation, **not a security sandbox**.
+- Host `ACCESS_NETWORK_STATE` must be granted (normal install-time permission; no runtime prompt). The installed game's permissions do not transfer to this host UID.
 - ARM64 and exact reported **versionName 1.26.50.4 / versionCode 972605004**.
 - Installed engine matches the supplied SHA-256. MainActivity's 45-unit initializer and its resolved references must match the reported build, including the six native library names and normal `System.loadLibrary` calls.
 - Inspect and save the **actual GameActivity DEX**. An unexpected direct superclass or an unreviewed GameActivity `<clinit>` blocks initialization and returns evidence, rather than guessing at its behavior. Accepted forms are an absent initializer or the phone-reported exact no-op: zero registers, one code unit `000e` (`return-void`), no truncation, complete reference scan and no references. This does not audit every AndroidX/framework/transitive SDK initializer; consent allows those normal JVM initialization effects.
@@ -33,7 +34,7 @@ Initialization/SDK callbacks can crash or hang. Stages are saved before entering
 
 ## Phone steps
 
-1. Install **host 0.4.2** from the validated APK artifact. No demo/test APK is needed for this experiment. If the debug key changed, uninstall **Client Base host only**, not Minecraft.
+1. Install **host 0.4.3** from the validated APK artifact. No demo/test APK is needed for this experiment. If the debug key changed, uninstall **Client Base host only**, not Minecraft.
 2. Tap **Initialize Minecraft Java / JNI (no Activity)** and read/accept the execution consent. Keep the host open.
 3. Use **Share current engine / bootstrap report** and send the result, including a blocked/last-stage result if it does not return normally.
 

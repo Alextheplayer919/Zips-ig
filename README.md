@@ -13,6 +13,7 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 - [Engine phone-test result](docs/ENGINE_DEVICE_TEST.md) — linking passed as reported for the hash-matched Minecraft 1.26.50.4 engine; JNI/game startup pending.
 - [Try the supplied engine](docs/ENGINE_PROBE.md) — optional hash-checked import and private-process link diagnostic.
 - [Phone Java bootstrap result](docs/BOOTSTRAP_DEVICE_TEST.md) — original MainActivity loads the dependencies and engine itself.
+- [Confirmed permission abort and correction](docs/NETWORK_PERMISSION_DEVICE_TEST.md) — host 0.4.3 adds the missing network-state permission and checks it before JNI.
 - [Initialization disconnect / exit diagnostics](docs/EXIT_DIAGNOSTICS.md) — host 0.4.2 collects own-process exit reasons and available crash evidence; cause not yet known.
 - [GameActivity phone preflight](docs/GAMEACTIVITY_DEVICE_TEST.md) — empty superclass initializer identified; host 0.4.1 corrects the overly strict gate.
 - [Controlled Java/JNI initialization](docs/JVM_INITIALIZATION.md) — host 0.4 experiment; not an Activity launch.
@@ -38,4 +39,4 @@ Install the host and demo APKs from the **same workflow run**. Open **Client Bas
 
 Passing this milestone proves a cooperative plugin can execute in the host. It does **not** establish Minecraft lifecycle virtualization, engine loading, hooks, entitlement compatibility or access to Minecraft's private worlds/account data.
 
-The host offers a fingerprint-pinned engine import/link experiment and a separate consent-gated JVM initialization experiment using the hash-identical installed engine. The latter executes original Java/native initialization, but creates no Minecraft Activity or title screen. Both apps currently request no permissions. Guest code is **not sandboxed from the host**; the loader accepts only our fixed, same-signed demo. No ProtoHax runtime, Minecraft engine/content, private keys or credentials are packaged into the debug APKs.
+The host offers a fingerprint-pinned engine import/link experiment and a separate consent-gated JVM initialization experiment using the hash-identical installed engine. The latter executes original Java/native initialization, but creates no Minecraft Activity or title screen. Host 0.4.3 requests only the normal `ACCESS_NETWORK_STATE` permission required by the original Xbox network observer; the demo requests none. No runtime permission dialog or `INTERNET` permission is added in this patch. Guest code is **not sandboxed from the host**; the loader accepts only our fixed, same-signed demo. No ProtoHax runtime, Minecraft engine/content, private keys or credentials are packaged into the debug APKs.

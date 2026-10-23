@@ -19,10 +19,11 @@ class ClientBaseSourceTests(unittest.TestCase):
     def manifest(self, module):
         return ET.parse(BASE / module / 'src/main/AndroidManifest.xml').getroot()
 
-    def test_manifest_xml_and_no_permissions(self):
+    def test_manifest_xml_and_least_privilege_permissions(self):
         for module in ('host', 'demo-guest', 'contract'):
             root = self.manifest(module)
-            self.assertEqual([], root.findall('uses-permission'))
+            expected = ['android.permission.ACCESS_NETWORK_STATE'] if module == 'host' else []
+            self.assertEqual(expected, [permission.get(ANDROID + 'name') for permission in root.findall('uses-permission')])
         for path in BASE.glob('*/src/main/res/**/*.xml'):
             ET.parse(path)
 
@@ -183,6 +184,13 @@ class ClientBaseSourceTests(unittest.TestCase):
         self.assertEqual('JVM_INITIALIZATION_IN_PROGRESS', report['last_stage'])
         self.assertEqual('PlayFabMultiplayer', report['native_library_lookups_not_completion_receipts'][-1]['name'])
         self.assertTrue(report['cause'].startswith('Unknown:'))
+
+    def test_network_permission_preflight_precedes_guest_class_loading(self):
+        runtime = (BASE / 'host/src/main/java/dev/zips/clientbase/host/MinecraftBootstrap.java').read_text()
+        self.assertIn('Manifest.permission.ACCESS_NETWORK_STATE', runtime)
+        self.assertIn('context.checkSelfPermission', runtime)
+        self.assertLess(runtime.index('verifyHostPermissions(context)'), runtime.index('Class.forName(MAIN, false, loader)'))
+        self.assertLess(runtime.index('verifyHostPermissions(context)'), runtime.index('Class.forName(MAIN, true, loader)'))
 
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):

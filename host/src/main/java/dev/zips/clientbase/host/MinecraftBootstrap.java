@@ -1,6 +1,8 @@
 package dev.zips.clientbase.host;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.os.Handler;
@@ -73,6 +75,13 @@ final class MinecraftBootstrap {
         throw new IOException(blocked);
     }
 
+    static void verifyHostPermissions(Context context) throws IOException {
+        if (context.checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
+            throw new IOException("Host is missing android.permission.ACCESS_NETWORK_STATE; "
+                    + "refusing Java/JNI initialization before Xbox NetworkObserver can leave a pending SecurityException");
+        }
+    }
+
     private static void verifySelectedEngine(String path, ApplicationInfo game, List<String> apks)
             throws IOException {
         if (path == null) throw new IOException("Guest loader cannot resolve minecraftpe");
@@ -101,6 +110,8 @@ final class MinecraftBootstrap {
         if (!"1.26.50.4".equals(pkg.versionName) || pkg.getLongVersionCode() != 972605004L) {
             throw new IOException("This initialization experiment is restricted to reported Minecraft 1.26.50.4 / 972605004");
         }
+        verifyHostPermissions(context);
+        progress.accept("HOST_NETWORK_STATE_PERMISSION_GRANTED: android.permission.ACCESS_NETWORK_STATE");
         JSONObject main = DexBootstrapInspector.inspectApks(apks, "Lcom/mojang/minecraftpe/MainActivity;", context.getCacheDir());
         progress.accept("JAVA_BOOTSTRAP_PREFLIGHT\nActual MainActivity DEX:\n" + main.toString(2));
         verifyMainInitializer(main);

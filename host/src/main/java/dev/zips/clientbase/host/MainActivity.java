@@ -31,7 +31,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         int padding = (int) (24 * getResources().getDisplayMetrics().density);
         page.setPadding(padding, padding, padding, padding);
         scroll.addView(page);
-        TextView eyebrow = text("CLIENT BASE / 0.4.2", 13);
+        TextView eyebrow = text("CLIENT BASE / 0.4.3", 13);
         eyebrow.setTextColor(Color.rgb(113, 217, 193));
         page.addView(eyebrow);
         page.addView(text("One process.\nA separate guest.", 30));
@@ -90,7 +90,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
                         + "known initializer and exact supplied engine fingerprint, then let the real game class "
                         + "load its native libraries through the JVM. Java static initializers, SDK callbacks, "
                         + "ELF constructors and JNI_OnLoad may execute or crash in the private process. It shares "
-                        + "this host's UID/permissions and is not a security sandbox. No Activity, lifecycle or "
+                        + "this host's UID/permissions, including network-state access, and is not a security sandbox. No Activity, lifecycle or "
                         + "title screen is started. No engine re-import is needed. Keep the app open.")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Initialize", (dialog, which) -> EngineProbeController.initializeMinecraft()).show());

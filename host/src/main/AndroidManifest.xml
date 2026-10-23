@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Original Xbox HTTP initialization listens for connectivity under the host UID. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <queries>
         <package android:name="dev.zips.clientbase.guest" />
         <package android:name="com.mojang.minecraftpe" />

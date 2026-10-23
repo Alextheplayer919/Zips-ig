@@ -1,5 +1,9 @@
 # Host 0.4.2 — diagnose the initialization disconnect
 
+## Latest phone result
+
+The collector returned useful real phone evidence: Android native crash/SIGABRT, pending `ACCESS_NETWORK_STATE` SecurityException from Xbox network observer initialization, and PlayFab JNI frames. [Evidence and host 0.4.3 correction](NETWORK_PERMISSION_DEVICE_TEST.md). Earlier uncertainty below documents what was known before that report; the cause of this particular abort is no longer just a last-lookup guess. No later engine/bootstrap success has been reported.
+
 ## Reported failure, not an inferred culprit
 
 The user reports host 0.4.1 losing its private process during real JVM initialization: PID **18392**, UID **11068**, Minecraft **1.26.50.4 / 972605004**, one APK and supplied engine hash matched. MainActivity matched and GameActivity's exact `000e` no-op gate passed. [Normalized record](JVM_DISCONNECT_DEVICE_TEST.json) refers to the already recorded identical GameActivity metadata and omits installation-specific random path components.
