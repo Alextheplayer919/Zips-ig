@@ -339,6 +339,16 @@ class ClientBaseSourceTests(unittest.TestCase):
             self.assertIn(required, controls)
 
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
+    def test_ported_module_policies_without_engine_or_network_side_effects(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binary = str(Path(directory) / 'module-policies-test')
+            subprocess.run(['g++', '-std=c++17', '-Wall', '-Wextra', '-Werror',
+                            '-I', str(BASE / 'host/src/main/cpp/modules'),
+                            str(BASE / 'tests/native/module_policies_test.cpp'), '-o', binary],
+                           check=True, timeout=30)
+            subprocess.run([binary], check=True, timeout=10)
+
+    @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -7,9 +7,9 @@ on:
         type: boolean
         default: true
   push:
-    paths: ['bedrock-api/**', 'host/**', 'demo-guest/**', 'contract/**', 'gradle/**', 'gradlew*', '*.gradle', 'gradle.properties', '.github/workflows/build-apk.yml', 'tools/**']
+    paths: ['bedrock-api/**', 'host/**', 'demo-guest/**', 'contract/**', 'gradle/**', 'gradlew*', '*.gradle', 'gradle.properties', '.github/workflows/build-apk.yml', 'tools/**', 'tests/**', 'third_party/**']
   pull_request:
-    paths: ['bedrock-api/**', 'host/**', 'demo-guest/**', 'contract/**', 'gradle/**', 'gradlew*', '*.gradle', 'gradle.properties', '.github/workflows/build-apk.yml', 'tools/**']
+    paths: ['bedrock-api/**', 'host/**', 'demo-guest/**', 'contract/**', 'gradle/**', 'gradlew*', '*.gradle', 'gradle.properties', '.github/workflows/build-apk.yml', 'tools/**', 'tests/**', 'third_party/**']
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
