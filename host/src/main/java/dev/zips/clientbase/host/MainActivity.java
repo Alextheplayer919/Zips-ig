@@ -33,7 +33,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         int padding = (int) (24 * getResources().getDisplayMetrics().density);
         page.setPadding(padding, padding, padding, padding);
         scroll.addView(page);
-        TextView eyebrow = text("CLIENT BASE / 0.5.1", 13);
+        TextView eyebrow = text("CLIENT BASE / 0.5.2", 13);
         eyebrow.setTextColor(Color.rgb(113, 217, 193));
         page.addView(eyebrow);
         page.addView(text("One process.\nA separate guest.", 30));
@@ -75,7 +75,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         stopGame.setOnClickListener(v -> GameHostController.stop()); page.addView(stopGame);
         Button collectGame = new Button(this); collectGame.setText("Collect last game exit (no game execution)");
         collectGame.setOnClickListener(v -> GameHostController.collect()); page.addView(collectGame);
-        Button shareGame = new Button(this); shareGame.setText("Share Bedrock Activity report");
+        Button shareGame = new Button(this); shareGame.setText("Share Activity preview (Save exports full log)");
         shareGame.setOnClickListener(v -> {
             GameHostController.refresh();
             Intent send = new Intent(Intent.ACTION_SEND); send.setType("text/plain");
@@ -178,7 +178,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
                 String message;
                 try (java.io.OutputStream out = application.getContentResolver().openOutputStream(target, "wt")) {
                     if (out == null) throw new java.io.IOException("Document is not writable");
-                    out.write(snapshot.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    GameHostController.writeFullReport(out, snapshot);
                     message = "Activity report saved; review before sharing.";
                 } catch (Exception error) { message = "Report save failed: " + error.getMessage(); }
                 final String notice = message;

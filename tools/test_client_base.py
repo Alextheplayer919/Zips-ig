@@ -166,7 +166,7 @@ class ClientBaseSourceTests(unittest.TestCase):
         for required in ('getHistoricalProcessExitReasons(context.getPackageName(), run.pid, 8)',
                          'run.uid != Process.myUid()', 'pid == run.pid', 'uid == run.uid',
                          'packageName + ":engine_probe"', 'TRACE_LIMIT', 'getTraceInputStream()',
-                         '24 * 1024', '2500, TimeUnit.MILLISECONDS'):
+                         'FullLogCapture.copy(input, output)', '2500, TimeUnit.MILLISECONDS'):
             self.assertIn(required, source)
         parser = (BASE / 'host/src/main/java/dev/zips/clientbase/host/NativeTombstoneSummary.java').read_text()
         self.assertIn('pid != expectedPid || uid != expectedUid', parser)

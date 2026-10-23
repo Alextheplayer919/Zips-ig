@@ -126,7 +126,7 @@ final class ProbeExitDiagnostics {
                 } catch (Exception error) { out.append("Native trace unavailable/unparsed: ").append(error.getMessage()).append('\n'); }
             } else out.append("No native protobuf trace requested for this reason/API.\n");
         }
-        out.append("\nBest-effort own-PID logcat (may be restricted; review before sharing):\n").append(logcat(run));
+        out.append("\nBest-effort own-PID logcat (may be restricted; review before sharing):\n").append(logcat(context, run));
         return out.length() <= 96 * 1024 ? out.toString() : out.substring(0, 96 * 1024) + "\n[diagnostic output truncated]";
     }
     static String reasonName(int reason) {
@@ -152,18 +152,70 @@ final class ProbeExitDiagnostics {
         }
         return out.toByteArray();
     }
-    private static String logcat(Run run) {
+    private static File fullLogFile(Context context, Run run) {
+        return new File(context.getFilesDir(), run.processSuffix.equals(":game_host")
+                ? "game-host-logcat-full.txt" : "probe-logcat-full.txt");
+    }
+    private static String logHeader(Run run) {
+        return "FULL_AVAILABLE_OWN_PID_LOGCAT\nPID: " + run.pid + " UID: " + run.uid
+                + " Started: " + run.startedAt + "\n";
+    }
+    static synchronized void appendFullLog(Context context, Run run, java.io.OutputStream output) throws IOException {
+        if (run.uid != Process.myUid() || run.pid <= 0 || run.pid == Process.myPid())
+            throw new IOException("Refusing non-own-child log export");
+        AtomicFile file = new AtomicFile(fullLogFile(context, run));
+        if (!file.getBaseFile().isFile()) {
+            output.write("\nNo saved full log for this attempt; collect its exit first.\n".getBytes(StandardCharsets.UTF_8));
+            return;
+        }
+        try (InputStream input = file.openRead()) {
+            byte[] expected = logHeader(run).getBytes(StandardCharsets.UTF_8);
+            byte[] actual = new byte[expected.length]; int offset = 0;
+            while (offset < actual.length) {
+                int n = input.read(actual, offset, actual.length - offset);
+                if (n == -1) break;
+                offset += n;
+            }
+            if (offset != expected.length || !java.util.Arrays.equals(expected, actual)) {
+                output.write("\nSaved full log belongs to a different attempt; not exported.\n".getBytes(StandardCharsets.UTF_8));
+                return;
+            }
+            output.write("\n--- Full available log (not limited to the UI preview) ---\n".getBytes(StandardCharsets.UTF_8));
+            output.write(expected);
+            byte[] buffer = new byte[8192];
+            for (int n; (n = input.read(buffer)) != -1;) output.write(buffer, 0, n);
+        }
+    }
+    private static String logcat(Context context, Run run) {
         java.lang.Process process = null;
         try {
             process = new ProcessBuilder("logcat", "-d", "-b", "main", "-b", "crash", "--pid=" + run.pid,
                     "-T", String.format(java.util.Locale.ROOT, "%d.%03d", run.startedAt / 1000, run.startedAt % 1000),
                     "-v", "threadtime").redirectErrorStream(true).start();
             InputStream input = process.getInputStream();
-            FutureTask<byte[]> task = new FutureTask<>(() -> readBounded(input, 24 * 1024));
+            FutureTask<String> task = new FutureTask<>(() -> {
+                synchronized (ProbeExitDiagnostics.class) {
+                AtomicFile file = new AtomicFile(fullLogFile(context, run));
+                FileOutputStream output = null;
+                try {
+                    output = file.startWrite(); output.write(logHeader(run).getBytes(StandardCharsets.UTF_8));
+                    String preview = FullLogCapture.copy(input, output);
+                    file.finishWrite(output);
+                    return preview.isEmpty() ? "No accessible matching lines.\n" : preview;
+                } catch (Exception error) {
+                    if (output != null) file.failWrite(output);
+                    throw error;
+                } finally { input.close(); }
+                }
+            });
             Thread reader = new Thread(task, "own-probe-logcat"); reader.setDaemon(true); reader.start();
-            byte[] bytes = task.get(2500, TimeUnit.MILLISECONDS);
-            if (bytes.length == 0) return "No accessible matching lines.\n";
-            return new String(bytes, StandardCharsets.UTF_8) + (bytes.length == 24 * 1024 ? "\n[logcat cap reached]" : "");
+            try { return task.get(2500, TimeUnit.MILLISECONDS); }
+            catch (java.util.concurrent.TimeoutException timeout) {
+                // No byte cap. A stalled subprocess must not hang collection indefinitely.
+                process.destroyForcibly();
+                return "[Logcat collection timed out; available output may be partial]\n"
+                        + task.get(1000, TimeUnit.MILLISECONDS);
+            }
         } catch (Exception error) { return "Unavailable: " + error.getClass().getSimpleName() + "\n"; }
         finally { if (process != null) process.destroyForcibly(); }
     }

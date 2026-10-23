@@ -43,6 +43,15 @@ public final class GameHostController {
     public static boolean busy() { return bound || collecting; }
     private static void show(String text) { latest = text; Listener l = listener.get(); if (l != null) l.gameStatus(text); }
     public static String current() { return latest == null ? "No game report" : latest; }
+    static void writeFullReport(java.io.OutputStream output, String snapshot) throws Exception {
+        output.write(snapshot.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        if (!runFile().isFile()) return;
+        if (runFile().length() > 4096) throw new java.io.IOException("Oversized run metadata");
+        JSONObject run = new JSONObject(new String(java.nio.file.Files.readAllBytes(runFile().toPath()),
+                java.nio.charset.StandardCharsets.UTF_8));
+        ProbeExitDiagnostics.appendFullLog(app, new ProbeExitDiagnostics.Run(run.getInt("pid"),
+                run.getInt("uid"), run.getLong("started_at"), run.optString("cleanup", "unknown"), ":game_host"), output);
+    }
     private static void saveRun(String cleanup) {
         try { GameHostReport.write(runFile(), new JSONObject().put("pid", pid).put("uid", Process.myUid())
                 .put("started_at", startedAt).put("cleanup", cleanup).toString()); }
