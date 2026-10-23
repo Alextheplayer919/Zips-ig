@@ -182,6 +182,7 @@ public final class DexBootstrapInspector {
         result.put("truncated", count != total);
         JSONArray refs = new JSONArray(); result.put("references", refs);
         int cursor = 0;
+        boolean complete = count == total;
         while (cursor < count) {
             int op = units[cursor] & 255;
             int width = width(units, cursor);
@@ -189,6 +190,9 @@ public final class DexBootstrapInspector {
                 result.put("scan_stop_unit", cursor); result.put("reference_scan_complete", false);
                 return result;
             }
+            // Invoke-custom call sites and method-handle/type pools need a separate
+            // resolver. Preserve raw bytes but never label these references complete.
+            if (op >= 0xfc) complete = false;
             String ref = null;
             if ((op >= 0x6e && op <= 0x72) || (op >= 0x74 && op <= 0x78) || op == 0xfa || op == 0xfb) {
                 ref = method(units[cursor + 1]);
@@ -204,7 +208,7 @@ public final class DexBootstrapInspector {
             }
             cursor += width;
         }
-        result.put("reference_scan_complete", count == total && refs.length() < 64);
+        result.put("reference_scan_complete", complete && refs.length() < 64);
         return result;
     }
 
@@ -233,6 +237,12 @@ public final class DexBootstrapInspector {
     }
 
     public static JSONObject inspectApks(List<String> apks, String descriptor, File cache) throws IOException, JSONException {
+        File work = new File(cache, "bootstrap-inspection");
+        if (!work.isDirectory() && !work.mkdirs()) throw new IOException("Cannot create bootstrap scratch directory");
+        File[] stale = work.listFiles((dir, name) -> name.startsWith("bootstrap-") && name.endsWith(".dex.tmp"));
+        if (stale == null) throw new IOException("Cannot list bootstrap scratch directory");
+        // A forced process kill can bypass finally. Clean only our stale scratch files.
+        for (File file : stale) java.nio.file.Files.deleteIfExists(file.toPath());
         int entries = 0;
         long totalBytes = 0;
         for (int apkIndex = 0; apkIndex < apks.size(); apkIndex++) {
@@ -242,7 +252,7 @@ public final class DexBootstrapInspector {
                     ZipEntry entry = all.nextElement();
                     if (!entry.getName().matches("classes(?:[2-9]|[1-9][0-9]+)?\\.dex")) continue;
                     if (++entries > 32 || entry.getSize() < 112 || entry.getSize() > MAX_DEX) throw new IOException("DEX inventory limit exceeded");
-                    File temporary = File.createTempFile("bootstrap-", ".dex.tmp", cache);
+                    File temporary = File.createTempFile("bootstrap-", ".dex.tmp", work);
                     try {
                         try (InputStream in = zip.getInputStream(entry); FileOutputStream out = new FileOutputStream(temporary)) {
                             byte[] b = new byte[65536]; long copied = 0;
