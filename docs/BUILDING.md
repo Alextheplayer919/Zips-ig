@@ -2,6 +2,8 @@
 
 **Current integration build:** [host 0.6.2 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40000628335/artifacts/12522700433), [Android 13 build/APK and full 60-case suite passed](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40000628335). Install only **client-base-host-debug.apk**. [Category click GUI and inputs for future modules](CLICK_GUI.md). Floating menu has Movement, Combat, Visual, Misc; memory refresh/copy/report options stay in the separate host Controls screen. Existing explicit overlay permission/Enable/launch flow unchanged; [permission instructions](EXTERNAL_OVERLAY.md#validated-overlay-build-and-phone-steps). No auto-start, new permissions, fake modules, game-renderer hooks or native startup/backend change. Keep working 0.6.1 and 0.5.4 APKs as references. No demo/import/link/bootstrap repeat. Earlier phone instructions below are historical.
 
+**Optional 0.6.3 registration preview:** [APK and limits](MODULE_RUNTIME.md#validated-preview-artifact). Android build and 62-case suite passed, but concrete live module adapters are still absent and both module rows display unavailable. Do not confuse this with a working Fly/KillAura release. The validated 0.6.2 category-only build above remains a reference.
+
 ## GitHub Actions
 
 [Build APK](https://github.com/Alextheplayer919/Zips-ig/actions/workflows/build-apk.yml) runs for app/build changes on pushes and pull requests. It can also be dispatched manually once GitHub registers the workflow on the default branch. Push/PR runs include Android 13 emulator tests; manual dispatch offers an emulator-test toggle.

@@ -14,7 +14,7 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 
 **Module work in progress:** [Melody KillAura adaptation + supplied MotionFly](docs/MODULE_PORTS.md). Portable selection/movement policies and the supplied tracker’s self-state subset are adapted and host-native tested; collision/adaptive-governor helpers are removed at the user’s request; **not yet connected to Minecraft or a packet transport**, so there are no working module toggles/new module APK yet. Custom packet handling is scoped to Fly only.
 
-**0.6.3 integration preview in development:** [registered module rows + decoded packet/native runtime drivers](docs/MODULE_RUNTIME.md). **No live transport or verified native engine adapters yet**; rows show unavailable, not working toggles. Android validation pending.
+**0.6.3 registration/runtime preview:** [registered module rows + decoded packet/native runtime drivers](docs/MODULE_RUNTIME.md). **No live transport or verified native engine adapters yet**; rows show unavailable, not working toggles. [Android build and full 62-case emulator suite passed](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40006774087). [Preview artifact and limitations](docs/MODULE_RUNTIME.md#validated-preview-artifact); this is **not** a completed gameplay-module release.
 
 ## Documentation
 

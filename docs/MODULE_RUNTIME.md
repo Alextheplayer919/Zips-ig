@@ -20,4 +20,12 @@ A targeted static check of the **exact original engine** is recorded in [ENGINE_
 
 32 local source/native tests pass. The new runtime executable tests session/tracker ordering, untouched-original disposition, Fly-only injection/direction, wrong executor, invalid inputs, failed/throwing sends, world reset/reconnect, build/thread gating, native attack/swing actions, disappearing targets, errors and stopping during callbacks. Real ASan/UBSan execution also passes. The packet/combat adapters used in those tests are clearly test fixtures, **not production implementations**.
 
-New Android regressions check immutable category registration/readiness labels and retained separate diagnostics. The actual overlay test checks each registered row exists and is not clickable. Existing mapped-memory/native/IPC/overlay/startup coverage remains. Android build/emulator validation pending; no finished module APK is claimed.
+New Android regressions check immutable category registration/readiness labels and retained separate diagnostics. The actual overlay test checks each registered row exists and is not clickable. Existing mapped-memory/native/IPC/overlay/startup coverage remains. Android build/emulator validation passed for this registration/runtime preview below; no finished gameplay-module APK is claimed.
+
+## Validated preview artifact
+
+[Android 13 CI run 40006774087](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40006774087) **passed**, job **120597247317**, **7m24s**, app/test **4f7dec6339a61c7b8876f767464aec10c64f3127**, host **0.6.3 / code16**. Android NDK ARM64/x86_64 build and APK exclusion checks passed, as did the full **62-case Android13 x86_64 suite**. **32 local source/native tests** pass; the runtime regression also passed local ASan/UBSan. Original ARM64 Minecraft is not executed in CI. Report XML not parsed locally; successful Actions job is the validation source.
+
+- [Optional registration-preview APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40006774087/artifacts/12524767242): **client-base-debug-102**, **6,255,189 bytes**. Install only **client-base-host-debug.apk**. **This does not enable working Fly/KillAura.** Both rows accurately show unavailable. Keep the preceding 0.6.2 APK if you do not need to inspect registrations; no Minecraft reimport/bootstrap repeat.
+- [Device reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40006774087/artifacts/12524183914): **client-base-device-tests-102**, **384,836 bytes**.
+- Unchanged archive blob **c78f6e8642d334916d247487897eb871ad27c160**. Startup/wrapper/SDK, memory IPC and overlay service unchanged. Working 0.5.4/0.6.1 references preserved. PR#1 remains open, no merge/release/history rewrite.
