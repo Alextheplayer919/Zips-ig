@@ -57,6 +57,7 @@ public final class FrameworkActivityTest {
                 assertNotNull(a.getWindow().getDecorView().getWindowToken());
             });
         }
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         assertTrue(FrameworkActivityRuntime.events().toString(), FrameworkActivityRuntime.events().contains("surfaceDestroyed"));
     }
 
@@ -66,8 +67,14 @@ public final class FrameworkActivityTest {
                     HostedGuestPlaceholderActivity.class.getName(), new Intent());
             fail("Missing host component accepted");
         } catch (InstantiationException expected) { assertTrue(expected.getCause() instanceof SecurityException); }
-        Activity normal = new HostComponentFactory().instantiateActivity(context().getClassLoader(), MainActivity.class.getName(), new Intent());
-        assertEquals(MainActivity.class, normal.getClass());
+        // Activity constructors allocate a Handler: mirror the framework main-thread contract.
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            try {
+                Activity normal = new HostComponentFactory().instantiateActivity(context().getClassLoader(),
+                        MainActivity.class.getName(), new Intent());
+                assertEquals(MainActivity.class, normal.getClass());
+            } catch (Exception error) { throw new AssertionError(error); }
+        });
     }
 
     private void assertEnvironment(Activity activity) {

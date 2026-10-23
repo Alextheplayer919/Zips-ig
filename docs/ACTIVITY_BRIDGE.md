@@ -16,6 +16,8 @@ The important startup order is:
 4. It configures native input before entering AppCompatActivity's `onCreate`. Later original lifecycle methods forward start/resume/pause/stop and Surface changes to native code.
 5. MainActivity then performs additional real SDK/device setup (including FMOD, input/network monitoring and other application work). A mapped engine alone does not supply this environment.
 
+**Process-lifetime finding:** the supplied MainActivity `onDestroy` ends with `System.exit(0)` after its cleanup/native shutdown path. The original-game adapter must therefore live in a dedicated host-owned game process, not the host UI process. The developer fixture has no such exit behavior; its same-process tests do not validate game-process IPC or lifetime management.
+
 This rules out simply calling `onCreate` on an unattached Java object, using a second unrelated loader, or treating a resource lookup as a complete Activity environment.
 
 ## Implemented code
