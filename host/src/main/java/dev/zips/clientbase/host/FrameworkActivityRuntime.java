@@ -44,6 +44,7 @@ public final class FrameworkActivityRuntime {
         }
         Activity activity = (Activity) type.getDeclaredConstructor().newInstance();
         ((HostedActivity) activity).configureHost(new ActivityEnvironment() {
+            private boolean observing;
             @Override public Context attach(Context base) {
                 return new ActivityResourceContext(base, resources, guest.loader, theme);
             }
@@ -55,6 +56,10 @@ public final class FrameworkActivityRuntime {
             @Override public void event(Activity instance, String event) {
                 if (instance != activity) throw new IllegalStateException("Wrong Activity instance");
                 record(event);
+                if ("onResume".equals(event) && !observing) {
+                    observing = true;
+                    new HostedSurfaceObserver(activity, this).observe(activity.getWindow().getDecorView());
+                }
             }
         });
         record("factoryCreated");

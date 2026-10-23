@@ -48,10 +48,13 @@ public final class FrameworkActivityTest {
         FrameworkActivityRuntime.clearEvents();
         try (ActivityScenario<Activity> scenario = ActivityScenario.launch(FrameworkActivityRuntime.fixtureIntent(context()))) {
             long deadline = android.os.SystemClock.uptimeMillis() + 8000;
-            while (!FrameworkActivityRuntime.events().contains("surfaceCreated") && android.os.SystemClock.uptimeMillis() < deadline) {
+            while ((!FrameworkActivityRuntime.events().contains("surfaceCreated")
+                    || !FrameworkActivityRuntime.events().contains("SURFACE_CREATED (not title screen)"))
+                    && android.os.SystemClock.uptimeMillis() < deadline) {
                 Thread.sleep(50); // bounded test-only wait for actual WindowManager/Surface delivery
             }
             assertTrue(FrameworkActivityRuntime.events().toString(), FrameworkActivityRuntime.events().contains("surfaceCreated"));
+            assertTrue(FrameworkActivityRuntime.events().toString(), FrameworkActivityRuntime.events().contains("SURFACE_CREATED (not title screen)"));
             scenario.onActivity(a -> {
                 assertTrue(((android.view.SurfaceView) a.findViewById(android.R.id.custom)).getHolder().getSurface().isValid());
                 assertNotNull(a.getWindow().getDecorView().getWindowToken());
@@ -59,6 +62,7 @@ public final class FrameworkActivityTest {
         }
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         assertTrue(FrameworkActivityRuntime.events().toString(), FrameworkActivityRuntime.events().contains("surfaceDestroyed"));
+        assertTrue(FrameworkActivityRuntime.events().toString(), FrameworkActivityRuntime.events().contains("SURFACE_DESTROYED"));
     }
 
     @Test public void factoryRejectsWrongComponentIdentity() throws Exception {

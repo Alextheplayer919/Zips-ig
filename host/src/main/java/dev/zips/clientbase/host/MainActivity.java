@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 public final class MainActivity extends Activity implements EngineProbeController.Listener, GameHostController.Listener {
     private static final int IMPORT_ENGINE = 20;
+    private static final int SAVE_GAME_REPORT = 21;
     private TextView gameStatus;
     private TextView engineStatus;
     private TextView status;
@@ -32,7 +33,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         int padding = (int) (24 * getResources().getDisplayMetrics().density);
         page.setPadding(padding, padding, padding, padding);
         scroll.addView(page);
-        TextView eyebrow = text("CLIENT BASE / 0.5.0", 13);
+        TextView eyebrow = text("CLIENT BASE / 0.5.1", 13);
         eyebrow.setTextColor(Color.rgb(113, 217, 193));
         page.addView(eyebrow);
         page.addView(text("One process.\nA separate guest.", 30));
@@ -81,6 +82,13 @@ public final class MainActivity extends Activity implements EngineProbeControlle
             send.putExtra(Intent.EXTRA_TEXT, GameHostController.current());
             startActivity(Intent.createChooser(send, "Share Activity report"));
         }); page.addView(shareGame);
+        Button saveGame = new Button(this); saveGame.setText("Save Bedrock Activity report (.txt)");
+        saveGame.setOnClickListener(v -> {
+            Intent create = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            create.addCategory(Intent.CATEGORY_OPENABLE); create.setType("text/plain");
+            create.putExtra(Intent.EXTRA_TITLE, "bedrock-activity-report.txt");
+            startActivityForResult(create, SAVE_GAME_REPORT);
+        }); page.addView(saveGame);
         gameStatus = text("No Activity attempt yet.", 14); gameStatus.setTextIsSelectable(true);
         gameStatus.setTypeface(Typeface.MONOSPACE); page.addView(gameStatus);
         page.addView(text("Engine linkage experiment", 24));
@@ -161,6 +169,24 @@ public final class MainActivity extends Activity implements EngineProbeControlle
 
     @Override protected void onActivityResult(int request, int result, Intent data) {
         super.onActivityResult(request, result, data);
+        if (request == SAVE_GAME_REPORT) {
+            if (result != RESULT_OK || data == null || data.getData() == null) return;
+            GameHostController.refresh();
+            String snapshot = GameHostController.current();
+            Context application = getApplicationContext(); android.net.Uri target = data.getData();
+            new Thread(() -> {
+                String message;
+                try (java.io.OutputStream out = application.getContentResolver().openOutputStream(target, "wt")) {
+                    if (out == null) throw new java.io.IOException("Document is not writable");
+                    out.write(snapshot.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    message = "Activity report saved; review before sharing.";
+                } catch (Exception error) { message = "Report save failed: " + error.getMessage(); }
+                final String notice = message;
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                        android.widget.Toast.makeText(application, notice, android.widget.Toast.LENGTH_LONG).show());
+            }, "save-game-report").start();
+            return;
+        }
         if (request != IMPORT_ENGINE || result != RESULT_OK || data == null || data.getData() == null) return;
         if (EngineProbeController.isRunning() || !EngineInput.IMPORTING.compareAndSet(false, true)) return;
         Context application = getApplicationContext();

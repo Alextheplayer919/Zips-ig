@@ -94,7 +94,7 @@ public final class GameHostController {
         if (!bound || !ready || launched || a == null || a.isFinishing() || a.isDestroyed()) return;
         ready = false; launched = true;
         try {
-            a.startActivity(new Intent(a, GameActivityPlaceholder.class));
+            a.startActivity(new Intent().setComponent(new ComponentName(a.getPackageName(), GameActivityRuntime.WRAPPER)));
             // Bound child is now owned by the real Activity, not one-shot service cleanup.
             // Keep startup timeout until original onResume returns, not merely a successful startActivity call.
             MAIN.postDelayed(STARTUP_WATCH, 500);

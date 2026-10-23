@@ -219,7 +219,7 @@ class ClientBaseSourceTests(unittest.TestCase):
 
     def test_game_adapter_is_separate_process_and_compile_only_api_is_not_packaged(self):
         app = self.manifest('host').find('application')
-        component = next(a for a in app.findall('activity') if a.get(ANDROID + 'name') == '.GameActivityPlaceholder')
+        component = next(a for a in app.findall('activity') if a.get(ANDROID + 'name') == '.MinecraftHostedActivity')
         self.assertEqual(':game_host', component.get(ANDROID + 'process'))
         self.assertEqual('false', component.get(ANDROID + 'exported'))
         gradle = (BASE / 'host/build.gradle').read_text()
@@ -243,6 +243,20 @@ class ClientBaseSourceTests(unittest.TestCase):
         for required in ('data.getInt("uid", -1) != Process.myUid()', 'pid != Process.myPid()',
                          'binder.isBinderAlive()', '12000', 'request != collectionId', 'expected != generation'):
             self.assertIn(required, controller)
+
+    def test_wrapper_helpers_share_loader_and_manifest_registers_actual_wrapper_name(self):
+        source = (BASE / 'host/src/main/java/dev/zips/clientbase/host/BootstrapClassLoader.java').read_text()
+        self.assertIn('name.startsWith(root + "$"', source)
+        self.assertIn('ownsHostClass(name)', source)
+        wrapper = (BASE / 'host/src/main/java/dev/zips/clientbase/host/MinecraftHostedActivity.java').read_text()
+        self.assertIn('new HostedSurfaceObserver(this, environment)', wrapper)
+        factory = (BASE / 'host/src/main/java/dev/zips/clientbase/host/HostComponentFactory.java').read_text()
+        self.assertIn('GameActivityRuntime.WRAPPER.equals(name)', factory)
+        activity = self.manifest('host').find("application/activity[@" + ANDROID + "name='.MinecraftHostedActivity']")
+        self.assertIsNotNone(activity)
+        ui = (BASE / 'host/src/main/java/dev/zips/clientbase/host/MainActivity.java').read_text()
+        self.assertIn('Intent.ACTION_CREATE_DOCUMENT', ui)
+        self.assertIn('openOutputStream(target, "wt")', ui)
 
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):

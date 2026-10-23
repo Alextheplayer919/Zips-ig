@@ -39,7 +39,8 @@ public final class BedrockActivityPolicyTest {
     }
     @Test public void gameComponentIsPrivateSameUidSeparateProcessWithNativeMetadata() throws Exception {
         Context c = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        ActivityInfo a = c.getPackageManager().getActivityInfo(new ComponentName(c, GameActivityPlaceholder.class), PackageManager.GET_META_DATA);
+        ActivityInfo a = c.getPackageManager().getActivityInfo(new ComponentName(c.getPackageName(), GameActivityRuntime.WRAPPER), PackageManager.GET_META_DATA);
+        assertEquals(GameActivityRuntime.WRAPPER, a.name); // AppCompat's class-derived ComponentName must resolve too.
         assertFalse(a.exported); assertEquals(c.getPackageName() + ":game_host", a.processName);
         assertEquals(c.getApplicationInfo().uid, a.applicationInfo.uid);
         assertEquals("minecraftpe", a.metaData.getString("android.app.lib_name"));
@@ -49,7 +50,7 @@ public final class BedrockActivityPolicyTest {
     @Test public void unpreparedGameFactoryCannotExecuteInsideHostUiProcess() throws Exception {
         Context c = InstrumentationRegistry.getInstrumentation().getTargetContext();
         try {
-            new HostComponentFactory().instantiateActivity(c.getClassLoader(), GameActivityPlaceholder.class.getName(), new Intent(c, GameActivityPlaceholder.class));
+            new HostComponentFactory().instantiateActivity(c.getClassLoader(), GameActivityRuntime.WRAPPER, new Intent().setComponent(new ComponentName(c.getPackageName(), GameActivityRuntime.WRAPPER)));
             fail("Game Activity created in UI process");
         } catch (InstantiationException expected) { assertTrue(expected.getCause() instanceof SecurityException); }
     }

@@ -11,7 +11,7 @@
         android:extractNativeLibs="true" android:supportsRtl="true" android:theme="@style/AppTheme">
         <service android:name=".EngineProbeService" android:process=":engine_probe" android:exported="false" />
         <service android:name=".GameHostService" android:process=":game_host" android:exported="false" />
-        <activity android:name=".GameActivityPlaceholder" android:process=":game_host" android:exported="false"
+        <activity android:name=".MinecraftHostedActivity" android:process=":game_host" android:exported="false"
             android:theme="@android:style/Theme.Material.NoActionBar" android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape" android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|fontScale" android:excludeFromRecents="true">
             <meta-data android:name="android.app.lib_name" android:value="minecraftpe" />

@@ -8,7 +8,7 @@ import android.content.Intent;
 public final class HostComponentFactory extends AppComponentFactory {
     @Override public Activity instantiateActivity(ClassLoader loader, String name, Intent intent)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-        boolean game = GameActivityPlaceholder.class.getName().equals(name);
+        boolean game = GameActivityRuntime.WRAPPER.equals(name);
         if (!game && !HostedGuestPlaceholderActivity.class.getName().equals(name)) {
             return super.instantiateActivity(loader, name, intent);
         }

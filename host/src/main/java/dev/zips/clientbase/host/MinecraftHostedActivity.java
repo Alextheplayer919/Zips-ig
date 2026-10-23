@@ -2,10 +2,6 @@ package dev.zips.clientbase.host;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewGroup;
 import dev.zips.clientbase.contract.ActivityEnvironment;
 import dev.zips.clientbase.contract.HostedActivity;
 
@@ -34,21 +30,7 @@ public final class MinecraftHostedActivity extends com.mojang.minecraftpe.MainAc
         try { super.onCreate(state); } // Android framework delivers this; never called manually by the host.
         finally { leaveGuestThread(previous); }
         event("ORIGINAL_ON_CREATE_RETURNED (not title screen)");
-        observeSurfaces(getWindow().getDecorView(), new int[] {256});
-    }
-    private void observeSurfaces(View view, int[] budget) {
-        if (--budget[0] < 0) return;
-        if (view instanceof SurfaceView) {
-            ((SurfaceView) view).getHolder().addCallback(new SurfaceHolder.Callback() {
-                @Override public void surfaceCreated(SurfaceHolder h) { event("SURFACE_CREATED (not title screen)"); }
-                @Override public void surfaceChanged(SurfaceHolder h, int f, int w, int height) { event("SURFACE_CHANGED " + w + "x" + height); }
-                @Override public void surfaceDestroyed(SurfaceHolder h) { event("SURFACE_DESTROYED"); }
-            });
-        }
-        if (view instanceof ViewGroup) {
-            ViewGroup group = (ViewGroup) view;
-            for (int i = 0; i < group.getChildCount() && budget[0] > 0; i++) observeSurfaces(group.getChildAt(i), budget);
-        }
+        new HostedSurfaceObserver(this, environment).observe(getWindow().getDecorView());
     }
     @Override protected void onStart() { event("ORIGINAL_ON_START_ENTERED"); ClassLoader previous = enterGuestThread(); try { super.onStart(); } finally { leaveGuestThread(previous); } event("ORIGINAL_ON_START_RETURNED"); }
     @Override protected void onResume() { event("ORIGINAL_ON_RESUME_ENTERED"); ClassLoader previous = enterGuestThread(); try { super.onResume(); } finally { leaveGuestThread(previous); } event("ORIGINAL_ON_RESUME_RETURNED"); }
