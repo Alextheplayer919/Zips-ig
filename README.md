@@ -2,9 +2,9 @@
 
 A clean Android hosting prototype for an independent, rootless client. The intended target is **Android 13 / Minecraft 26.50**, with the original installed Minecraft APK left unchanged.
 
-**Current implementation: rootless Bedrock hosting prototype; original native startup and onCreate reached on the phone, not a proven title-screen launcher.**
+**Current implementation: rootless Bedrock hosting prototype with a fully functioning launch confirmed by the user. Native-memory integration is not implemented yet.**
 
-**Latest phone result:** [The latest fatal excerpt identifies missing default Firebase initialization](docs/FIREBASE_DEVICE_TEST.md), reached through Minecraft notification-token retrieval, followed by a pending-exception JNI SIGABRT. Host **0.5.4** now initializes the original Firebase API before Play Games/native startup, restores the three original Firebase component-discovery registrar entries under the real host package, and verifies the default app and Messaging component before launch. [Android 13 build/APK checks and 48-case regressions passed](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056). [Host 0.5.4 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056/artifacts/12516682587). Separate EventsSDK storage/SELinux warnings are not established as this fatal cause. No new input file, engine import or Minecraft change is needed; no token delivery/title-screen success is claimed.
+**Latest phone result:** **[The user confirms a fully functioning hosted launch](docs/HOSTED_LAUNCH_SUCCESS.md) after host 0.5.4.** This is the first reported working Bedrock launch, not merely onCreate/Surface progress. Preserve app/test commit `287e04b` and [the validated 0.5.4 APK](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056/artifacts/12516682587) as the working baseline. The confirmation is user-reported, without a new PID/UID or capture; it does not establish every SDK feature or long-session stability. No engine reimport or repeated bootstrap/demo test is needed. Native-memory integration/hooks remain the next development stage, not a completed feature.
 
 ## Documentation
 

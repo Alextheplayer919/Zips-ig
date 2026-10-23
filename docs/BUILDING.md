@@ -1,6 +1,6 @@
 # Building and testing APKs
 
-**Current phone step:** use the validated [**host 0.5.4 APK ZIP**](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056/artifacts/12516682587) ([Android 13 checks](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056)). [Confirmed failure and correction](FIREBASE_DEVICE_TEST.md). Install only `client-base-host-debug.apk`, keep Minecraft unchanged, launch the experimental Activity once, then save the Activity report after exit collection if needed. No Firebase config file, SDK download, engine import, demo/link/bootstrap repeat or new user file is needed. Earlier instructions below are historical.
+**Current phone status:** [the user confirms host 0.5.4 launches the game fully functioning](HOSTED_LAUNCH_SUCCESS.md). Keep the working [0.5.4 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056/artifacts/12516682587) as the reference build. No new phone attempt, engine import, demo/link/bootstrap repeat or additional input is currently requested. Earlier phone instructions below are historical.
 
 ## GitHub Actions
 

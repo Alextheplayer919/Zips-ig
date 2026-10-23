@@ -51,3 +51,7 @@ Five new Android tests use our own explicitly named demo initializer/component f
 - Retained engine archive blob **c78f6e8642d334916d247487897eb871ad27c160**, all startup/engine pins and permissions unchanged. Only the private Firebase discovery service/registrar metadata is added; no original init provider or push receiver/service is registered.
 
 Next phone attempt: update only the host, keep Minecraft unchanged, **Launch Bedrock Activity (experimental)** once, report visible output and **Save Bedrock Activity report (.txt)** after exit collection if it exits. Preserve diagnostics before uninstalling only the host if debug keys conflict. No Firebase configuration file, SDK download, engine import, demo/link/bootstrap repeat or new user file is needed. Corrected real Firebase/default Messaging startup, token delivery, EventsSDK storage and title-screen outcome remain unproven until actual device evidence.
+
+## Subsequent phone result
+
+After this corrected build was delivered, [the user confirmed a fully functioning hosted launch](HOSTED_LAUNCH_SUCCESS.md). This supersedes the pending functioning-launch outcome, not the evidence limits for token delivery, all SDK services or long-session stability. Preserve 0.5.4 as the working baseline; no repeat test requested.
