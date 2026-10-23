@@ -9,6 +9,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,8 +34,15 @@ public final class DexBootstrapInspectorTest {
         assertFalse(result.getBoolean("native_methods_truncated"));
         JSONObject clinit = result.getJSONObject("clinit");
         assertTrue(clinit.toString(), clinit.getBoolean("reference_scan_complete"));
-        assertTrue(clinit.toString(), clinit.toString().contains("Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V"));
-        assertTrue(clinit.toString(), clinit.toString().contains("const-string: clientbase_demo"));
+        assertTrue(clinit.toString(), references(clinit).contains("Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V"));
+        assertTrue(clinit.toString(), references(clinit).contains("const-string: clientbase_demo"));
+    }
+
+    private static List<String> references(JSONObject clinit) throws JSONException {
+        JSONArray array = clinit.getJSONArray("references");
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) result.add(array.getJSONObject(i).getString("reference"));
+        return result;
     }
 
     @Test public void inspectionDoesNotExecuteStaticInitializer() throws Exception {
