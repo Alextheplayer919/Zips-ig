@@ -288,6 +288,24 @@ class ClientBaseSourceTests(unittest.TestCase):
         self.assertEqual(':game_host', service.get(ANDROID + 'process'))
         self.assertEqual(3, len(service.findall('meta-data')))
 
+    def test_controls_are_external_and_memory_reads_are_fixed_read_only(self):
+        activity = self.manifest('host').find("application/activity[@" + ANDROID + "name='.ControlsActivity']")
+        self.assertEqual('false', activity.get(ANDROID + 'exported'))
+        self.assertEqual('true', activity.get(ANDROID + 'resizeableActivity'))
+        self.assertEqual('dev.zips.clientbase.host.controls', activity.get(ANDROID + 'taskAffinity'))
+        self.assertIsNone(activity.get(ANDROID + 'process'))
+        runtime = (BASE / 'host/src/main/java/dev/zips/clientbase/host/GameActivityRuntime.java').read_text()
+        self.assertNotIn('HostedClickGui', runtime)
+        self.assertFalse((BASE / 'host/src/main/java/dev/zips/clientbase/host/HostedClickGui.java').exists())
+        native = (BASE / 'host/src/main/cpp/memory_snapshot.cpp').read_text()
+        for required in ('dl_iterate_phdr(findModule', '"/proc/self/mem", O_RDONLY', 'pread(fd', 'MODULE_NOT_LOADED', 'NT_GNU_BUILD_ID'):
+            self.assertIn(required, native)
+        for forbidden in ('pwrite(', 'mprotect(', 'ptrace(', 'dlopen(', 'process_vm_writev('):
+            self.assertNotIn(forbidden, native)
+        client = (BASE / 'host/src/main/java/dev/zips/clientbase/host/MemoryClient.java').read_text()
+        self.assertIn('8000', client)
+        self.assertNotIn('GameHostController.start()', client)
+
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -65,6 +65,18 @@ final class GameActivityRuntime {
             throw new IOException("Unexpected Firebase discovery service identity");
         return (android.app.Service) type.getDeclaredConstructor().newInstance();
     }
+    static String memorySnapshot(Context context) throws Exception {
+        requireGameProcess(context);
+        MinecraftBootstrap.Prepared session = prepared;
+        if (session == null || !created) throw new IOException("No live prepared Activity session");
+        Class<?> bridge = Class.forName("dev.zips.clientbase.host.EngineNativeBridge", true, session.loader);
+        if (bridge.getClassLoader() != session.loader) throw new IOException("Memory bridge owner mismatch");
+        String snapshot = (String) bridge.getMethod("memorySnapshot", String.class).invoke(null, session.enginePath);
+        String build = "afa62bd3385161f1facfe36aad58ac63998f46d2";
+        return (snapshot.contains("Build ID: " + build + "\n") && snapshot.contains("ELF64_HEADER_READ_OK")
+                ? "ENGINE IDENTITY VERIFIED (in-memory build ID)\n" : "ENGINE IDENTITY NOT CONFIRMED — no offsets may be used\n")
+                + snapshot + "\nStartup file SHA-256 pin: " + EngineInput.LIBRARY_SHA;
+    }
     static Activity create(Context context) throws Exception {
         requireGameProcess(context);
         if (prepared == null || created) throw new IOException("No fresh prepared game session (no automatic relaunch/recreation)");

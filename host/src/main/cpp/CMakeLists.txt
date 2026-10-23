@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(clientbase_engineprobe LANGUAGES CXX)
-add_library(clientbase_engineprobe SHARED engine_probe.cpp)
+add_library(clientbase_engineprobe SHARED engine_probe.cpp memory_snapshot.cpp)
 target_compile_features(clientbase_engineprobe PRIVATE cxx_std_17)
 target_link_libraries(clientbase_engineprobe PRIVATE dl)

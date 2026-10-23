@@ -27,6 +27,9 @@
         <!-- Developer fixture only; no exported/arbitrary guest launch or Minecraft launch. -->
         <activity android:name=".HostedGuestPlaceholderActivity" android:exported="false"
             android:theme="@android:style/Theme.Material.NoActionBar" android:excludeFromRecents="true" />
+        <activity android:name=".ControlsActivity" android:exported="false"
+            android:label="Zips Controls" android:taskAffinity="dev.zips.clientbase.host.controls"
+            android:launchMode="singleTask" android:resizeableActivity="true" />
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

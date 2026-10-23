@@ -13,11 +13,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** Private persistent process owner. Unlike the one-shot probe, unbinding never kills a running Activity. */
 public final class GameHostService extends Service {
     private final AtomicBoolean started = new AtomicBoolean();
+    private final AtomicBoolean memoryBusy = new AtomicBoolean();
     private Messenger client;
     private int id;
     private final long processStartedAt = System.currentTimeMillis();
     private boolean reattached;
     private final Messenger endpoint = new Messenger(new Handler(android.os.Looper.getMainLooper(), message -> {
+        if (message.what == MemoryProtocol.SNAPSHOT) {
+            if (!MemoryProtocol.accepts(message)) return true;
+            final Messenger receiver=message.replyTo; final int request=message.arg1;
+            if (!memoryBusy.compareAndSet(false,true)) {
+                sendMemory(receiver,request,"Memory inspection already in progress");return true;
+            }
+            new Thread(() -> {
+                String result;
+                try { result=GameActivityRuntime.memorySnapshot(this); }
+                catch (Exception | LinkageError error) { result="Memory unavailable: "+MinecraftBootstrap.describeFailure(error); }
+                finally { memoryBusy.set(false); }
+                sendMemory(receiver,request,result);
+            },"game-memory-read").start();
+            return true; // Does NOT prepare, initialize, launch or reattach the original Activity.
+        }
         if (message.what != 1) return true;
         if (!started.compareAndSet(false, true)) {
             client = message.replyTo; id = message.getData().getInt("id"); reattached = true;
@@ -39,6 +55,9 @@ public final class GameHostService extends Service {
         }
         return true;
     }));
+    private static void sendMemory(Messenger receiver,int request,String report) {
+        try { receiver.send(MemoryProtocol.response(request,report)); } catch(android.os.RemoteException ignored) { }
+    }
     @Override public IBinder onBind(Intent intent) { return endpoint.getBinder(); }
     @Override public void onDestroy() {
         super.onDestroy();

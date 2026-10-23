@@ -33,33 +33,17 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         int padding = (int) (24 * getResources().getDisplayMetrics().density);
         page.setPadding(padding, padding, padding, padding);
         scroll.addView(page);
-        TextView eyebrow = text("CLIENT BASE / 0.5.4", 13);
-        eyebrow.setTextColor(Color.rgb(113, 217, 193));
-        page.addView(eyebrow);
-        page.addView(text("One process.\nA separate guest.", 30));
-        page.addView(text("Foundation test: load code, resources and JNI from the installed demo APK. "
-                + "Experimental Bedrock Activity hosting is below; engine hooks are not implemented.", 16));
-        page.addView(text("Only install the demo built with this host. Loaded code runs with this "
-                + "app's permissions; it is not sandboxed from the host.", 14));
-        Button load = new Button(this);
-        load.setId(R.id.load_demo);
-        load.setText("Load trusted demo");
-        load.setOnClickListener(v -> loadGuest());
-        page.addView(load);
-        status = text("Host PID: " + Process.myPid() + "\nHost UID: " + Process.myUid()
-                + "\n\nInstall Client Base Demo, then tap above.", 14);
-        status.setId(R.id.load_status);
-        status.setTypeface(Typeface.MONOSPACE);
-        status.setTextIsSelectable(true);
-        page.addView(status);
-        guestPanel = new FrameLayout(this);
-        guestPanel.setId(R.id.guest_panel);
-        page.addView(guestPanel);
-        page.addView(text("Original Bedrock Activity attempt", 24));
-        page.addView(text("Experimental: starts the original installed Bedrock Activity in a separate host-owned process. "
-                + "This adapter does not install the original providers or reproduce every SDK/package environment. "
-                + "An onCreate/Surface result is not a title-screen success.", 14));
-        Button launchGame = new Button(this);
+        page.setBackgroundColor(ClientUi.BG);
+        page.addView(ClientUi.label(this,"Z I P S   /   B E D R O C K",13,ClientUi.ACCENT));
+        page.addView(ClientUi.label(this,"A new way in.",36,ClientUi.TEXT));
+        page.addView(ClientUi.label(this,"Client base 0.6.0  ·  Android 13  ·  Bedrock 26.50",13,ClientUi.MUTED));
+        ClientUi.gap(page,16);
+        LinearLayout launchCard=ClientUi.card(this); page.addView(launchCard);
+        launchCard.addView(ClientUi.label(this,"READY TO LAUNCH",12,ClientUi.ACCENT));
+        launchCard.addView(ClientUi.label(this,"Minecraft Bedrock",26,ClientUi.TEXT));
+        launchCard.addView(ClientUi.label(this,"Your original installation, running in a host-owned process. The controls run separately from the game, with read-only memory inspection on demand.",15,ClientUi.MUTED));
+        Button launchGame = ClientUi.button(this,"Launch Bedrock",true);
+        launchGame.setId(R.id.launch_bedrock);
         launchGame.setText("Launch Bedrock Activity (experimental)");
         launchGame.setOnClickListener(v -> new AlertDialog.Builder(this)
                 .setTitle("Run the original Bedrock Activity?")
@@ -70,31 +54,47 @@ public final class MainActivity extends Activity implements EngineProbeControlle
                         + "No provider/entitlement bypass or title-screen guarantee. Keep Client Base available for the report.")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Launch", (dialog, which) -> GameHostController.start()).show());
-        page.addView(launchGame);
-        Button stopGame = new Button(this); stopGame.setText("Stop hosted game process");
-        stopGame.setOnClickListener(v -> GameHostController.stop()); page.addView(stopGame);
-        Button collectGame = new Button(this); collectGame.setText("Collect last game exit (no game execution)");
-        collectGame.setOnClickListener(v -> GameHostController.collect()); page.addView(collectGame);
-        Button shareGame = new Button(this); shareGame.setText("Share Activity preview (Save exports full log)");
+        launchCard.addView(launchGame);
+        Button controls=ClientUi.button(this,"Open client controls  ↗",false);controls.setId(R.id.open_controls);
+        controls.setOnClickListener(v -> startActivity(ControlsActivity.intent(this)));launchCard.addView(controls);
+        ClientUi.gap(page,16);
+        Button diagnostics=ClientUi.button(this,"Session diagnostics  +",false);page.addView(diagnostics);
+        LinearLayout session=ClientUi.card(this);session.setVisibility(View.GONE);page.addView(session);
+        diagnostics.setOnClickListener(v -> session.setVisibility(session.getVisibility()==View.VISIBLE?View.GONE:View.VISIBLE));
+        session.addView(ClientUi.label(this,"SESSION / DIAGNOSTICS",12,ClientUi.ACCENT));
+        Button stopGame = ClientUi.button(this,"",false); stopGame.setText("Stop hosted game process");
+        stopGame.setOnClickListener(v -> GameHostController.stop()); session.addView(stopGame);
+        Button collectGame = ClientUi.button(this,"",false); collectGame.setText("Collect last game exit (no game execution)");
+        collectGame.setOnClickListener(v -> GameHostController.collect()); session.addView(collectGame);
+        Button shareGame = ClientUi.button(this,"",false); shareGame.setText("Share Activity preview (Save exports full log)");
         shareGame.setOnClickListener(v -> {
             GameHostController.refresh();
             Intent send = new Intent(Intent.ACTION_SEND); send.setType("text/plain");
             send.putExtra(Intent.EXTRA_TEXT, GameHostController.current());
             startActivity(Intent.createChooser(send, "Share Activity report"));
-        }); page.addView(shareGame);
-        Button saveGame = new Button(this); saveGame.setText("Save Bedrock Activity report (.txt)");
+        }); session.addView(shareGame);
+        Button saveGame = ClientUi.button(this,"",false); saveGame.setText("Save Bedrock Activity report (.txt)");
         saveGame.setOnClickListener(v -> {
             Intent create = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             create.addCategory(Intent.CATEGORY_OPENABLE); create.setType("text/plain");
             create.putExtra(Intent.EXTRA_TITLE, "bedrock-activity-report.txt");
             startActivityForResult(create, SAVE_GAME_REPORT);
-        }); page.addView(saveGame);
+        }); session.addView(saveGame);
         gameStatus = text("No Activity attempt yet.", 14); gameStatus.setTextIsSelectable(true);
-        gameStatus.setTypeface(Typeface.MONOSPACE); page.addView(gameStatus);
-        page.addView(text("Engine linkage experiment", 24));
-        page.addView(text("Optional: import your exact engine archive or .so. This is a native link check, "
-                + "not Minecraft startup. Matching dependencies must come from your trusted installed game.", 14));
-        Button importEngine = new Button(this);
+        gameStatus.setTypeface(Typeface.MONOSPACE); session.addView(gameStatus);
+        ClientUi.gap(page,16);
+        Button developer=ClientUi.button(this,"Developer tools  +",false); developer.setId(R.id.developer_tools);page.addView(developer);
+        LinearLayout tools=ClientUi.card(this);tools.setVisibility(View.GONE);page.addView(tools);
+        developer.setOnClickListener(v -> {
+            boolean open=tools.getVisibility()!=View.VISIBLE;tools.setVisibility(open?View.VISIBLE:View.GONE);
+            developer.setText(open?"Developer tools  −":"Developer tools  +");
+        });
+        tools.addView(text("Legacy diagnostics",22));
+        tools.addView(text("Not needed for normal launch. Demo, import and bootstrap checks remain available for development.",14));
+        Button load=ClientUi.button(this,"Load trusted demo",false);load.setId(R.id.load_demo);load.setOnClickListener(v -> loadGuest());tools.addView(load);
+        status=text("Demo not loaded. Optional developer fixture only.",13);status.setId(R.id.load_status);tools.addView(status);
+        guestPanel=new FrameLayout(this);guestPanel.setId(R.id.guest_panel);tools.addView(guestPanel);
+        Button importEngine = ClientUi.button(this,"",false);
         importEngine.setText("Import supplied engine file");
         importEngine.setOnClickListener(v -> {
             if (EngineProbeController.isRunning() || EngineInput.IMPORTING.get()) return;
@@ -103,8 +103,8 @@ public final class MainActivity extends Activity implements EngineProbeControlle
             choose.addCategory(Intent.CATEGORY_OPENABLE);
             startActivityForResult(choose, IMPORT_ENGINE);
         });
-        page.addView(importEngine);
-        Button probe = new Button(this);
+        tools.addView(importEngine);
+        Button probe = ClientUi.button(this,"",false);
         probe.setText("Run engine link probe");
         probe.setOnClickListener(v -> new AlertDialog.Builder(this)
                 .setTitle("Run native code in a private process?")
@@ -113,14 +113,14 @@ public final class MainActivity extends Activity implements EngineProbeControlle
                         + "We do not call Minecraft's JNI_OnLoad or start the game. Keep the app open until it finishes.")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Run probe", (dialog, which) -> EngineProbeController.start()).show());
-        page.addView(probe);
-        Button bootstrap = new Button(this);
+        tools.addView(probe);
+        Button bootstrap = ClientUi.button(this,"",false);
         bootstrap.setText("Inspect Minecraft bootstrap (no code execution)");
         bootstrap.setOnClickListener(v -> EngineProbeController.inspectBootstrap());
-        page.addView(bootstrap);
-        page.addView(text("Reads the installed game's MainActivity DEX and static initializer as data. "
+        tools.addView(bootstrap);
+        tools.addView(text("Reads the installed game's MainActivity DEX and static initializer as data. "
                 + "No engine import or repeat link test is needed. Does not launch or initialize Minecraft.", 14));
-        Button initialize = new Button(this);
+        Button initialize = ClientUi.button(this,"",false);
         initialize.setText("Initialize Minecraft Java / JNI (no Activity)");
         initialize.setOnClickListener(v -> new AlertDialog.Builder(this)
                 .setTitle("Execute original Minecraft initialization?")
@@ -132,12 +132,12 @@ public final class MainActivity extends Activity implements EngineProbeControlle
                         + "title screen is started. No engine re-import is needed. Keep the app open.")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Initialize", (dialog, which) -> EngineProbeController.initializeMinecraft()).show());
-        page.addView(initialize);
-        Button exitDetails = new Button(this);
+        tools.addView(initialize);
+        Button exitDetails = ClientUi.button(this,"",false);
         exitDetails.setText("Collect last probe exit details (no game execution)");
         exitDetails.setOnClickListener(v -> EngineProbeController.collectLastExitDetails());
-        page.addView(exitDetails);
-        Button share = new Button(this);
+        tools.addView(exitDetails);
+        Button share = ClientUi.button(this,"",false);
         share.setText("Share current engine / bootstrap report");
         share.setOnClickListener(v -> {
             if (EngineProbeController.isRunning()) return;
@@ -146,17 +146,19 @@ public final class MainActivity extends Activity implements EngineProbeControlle
             send.putExtra(Intent.EXTRA_TEXT, engineStatus.getText().toString());
             startActivity(Intent.createChooser(send, "Share diagnostic report"));
         });
-        page.addView(share);
+        tools.addView(share);
         engineStatus = text("Engine not imported.", 14);
         engineStatus.setTypeface(Typeface.MONOSPACE);
         engineStatus.setTextIsSelectable(true);
-        page.addView(engineStatus);
+        tools.addView(engineStatus);
         setContentView(scroll);
         EngineProbeController.attach(this, this);
         GameHostController.attach(this, this);
     }
 
-    @Override public void gameStatus(String text) { gameStatus.setText(text); }
+    @Override public void gameStatus(String text) {
+        gameStatus.setText(text.length()>12000?text.substring(0,6000)+"\n… UI preview shortened. Save TXT for full report …\n"+text.substring(text.length()-6000):text);
+    }
     @Override protected void onResume() { super.onResume(); GameHostController.resumed(this); }
     @Override protected void onPause() { GameHostController.paused(this); super.onPause(); }
     @Override public void engineStatus(String text) { engineStatus.setText(text); }
@@ -209,7 +211,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         TextView view = new TextView(this);
         view.setText(content);
         view.setTextSize(size);
-        view.setTextColor(Color.rgb(230, 237, 243));
+        view.setTextColor(ClientUi.TEXT);
         view.setPadding(0, 12, 0, 12);
         return view;
     }
