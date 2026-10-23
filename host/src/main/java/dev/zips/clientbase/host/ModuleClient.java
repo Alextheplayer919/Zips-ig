@@ -28,6 +28,9 @@ final class ModuleClient {
     private Consumer<ModuleState> callback;
     private boolean bound, done;
 
+    private final Runnable timeout = this::onTimeout;
+    private final Messenger receiver = new Messenger(new Handler(Looper.getMainLooper(), this::onReply));
+
     ModuleClient(Context context, int operation,
                  boolean fly, boolean aura,
                  boolean attackMobs, boolean multiTarget, boolean checkHurtTime,
@@ -59,16 +62,18 @@ final class ModuleClient {
         return false;
     }
 
-    private final Runnable timeout = () -> finish(
-            ModuleState.unavailable("Module IPC timed out · check Bedrock session", attackMobs, multiTarget, checkHurtTime));
+    private void onTimeout() {
+        finish(ModuleState.unavailable(
+                "Module IPC timed out · check Bedrock session", attackMobs, multiTarget, checkHurtTime));
+    }
 
-    private final Messenger receiver = new Messenger(new Handler(Looper.getMainLooper(), message -> {
+    private boolean onReply(Message message) {
         if (!done && ModuleProtocol.matches(message, operation, requestId)
                 && message.getData().getInt("pid") != Process.myPid()) {
             finish(ModuleState.parse(message.getData().getString("payload", "")));
         }
         return true;
-    }));
+    }
 
     private final ServiceConnection connection = new ServiceConnection() {
         @Override public void onServiceConnected(ComponentName name, IBinder binder) {
