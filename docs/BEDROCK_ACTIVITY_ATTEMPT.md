@@ -1,6 +1,6 @@
 # Original Bedrock Activity attempts
 
-**Latest: [host 0.5.3 Play Games startup correction](PLAY_GAMES_DEVICE_TEST.md), [Android 13 build/APK checks and 43-case regressions passed](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39986653012). [Host 0.5.3 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39986653012/artifacts/12515634180).** The new fatal excerpt identifies the missing SDK initializer. Earlier 0.5.1 resume/Surface evidence and 0.5.2 focused diagnostics remain valid milestones; they are not title-screen success. The sections below record the preceding wrapper repair.
+**Latest: [host 0.5.4 Firebase initialization and registrar-discovery correction](FIREBASE_DEVICE_TEST.md), [Android 13 build/APK checks and 48-case regressions passed](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056). [Host 0.5.4 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056/artifacts/12516682587).** The notification-token path hit an uninitialized default Firebase app. Earlier wrapper/Play Games corrections and focused diagnostics remain retained; token delivery and title-screen hosting are not proven. Sections below record the preceding wrapper repair.
 
 ## Host 0.5.1 — original Bedrock Activity loader repair
 

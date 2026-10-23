@@ -1,6 +1,6 @@
 # Building and testing APKs
 
-**Current phone step:** use the validated [**host 0.5.3 APK ZIP**](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39986653012/artifacts/12515634180) ([Android 13 checks](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39986653012)). [Confirmed failure and inspection](PLAY_GAMES_DEVICE_TEST.md): the original SDK was not initialized before getAchievementsClient. This is a runtime startup correction, not another logging-only build. Install only `client-base-host-debug.apk`, keep Minecraft unchanged, launch the experimental Bedrock Activity once, then save the Activity report. No SDK download, engine import or demo/link/bootstrap repeat. Earlier milestone instructions below are historical.
+**Current phone step:** use the validated [**host 0.5.4 APK ZIP**](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056/artifacts/12516682587) ([Android 13 checks](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056)). [Confirmed failure and correction](FIREBASE_DEVICE_TEST.md). Install only `client-base-host-debug.apk`, keep Minecraft unchanged, launch the experimental Activity once, then save the Activity report after exit collection if needed. No Firebase config file, SDK download, engine import, demo/link/bootstrap repeat or new user file is needed. Earlier instructions below are historical.
 
 ## GitHub Actions
 
