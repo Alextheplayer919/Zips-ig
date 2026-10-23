@@ -57,3 +57,14 @@ The tool verifies the complete library SHA before inspecting a bounded set of in
 ## Validation
 
 Local source/native guards and Java syntax checks cover repository invariants, not Android execution. New Android instrumentation cases read our real demo DEX, resolve its `System.loadLibrary("clientbase_demo")` call and two native methods, verify a sentinel static initializer is not executed, and reject malformed headers/tables and unsupported instruction encodings. Actual build/emulator results must come from the workflow, not this description. No matching Minecraft Java APK is available in the development sandbox; its initializer remains an explicit device-data prerequisite.
+
+### Validated build
+
+Host **0.3.0 / code 3**, app/test source **`d132ae71a5dd233e0cda1f99e0f398b0f950c8f9`**, passed compilation and Android 13/API 33 x86_64 integration in [run 39902922705](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39902922705), job **120248509379**, **5m17s**. This includes the four new static-inspection cases alongside the existing demo/import/bridge checks. Twelve local guards passed and fourteen Java files syntax-parsed. These checks do not execute the ARM64 game engine or inspect the unavailable Minecraft Java APK in the sandbox.
+
+- [APK ZIP: client-base-debug-32](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39902922705/artifacts/12479691483) — 3,448,370 bytes; install `client-base-host-debug.apk` for this step.
+- [Device reports: client-base-device-tests-32](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39902922705/artifacts/12478879513) — 157,292 bytes.
+
+An earlier run (39902279915) compiled and parsed the demo correctly but failed an assertion that compared an escaped JSON serialization with an unescaped method signature. The corrected test compares decoded reference values; the final run above passes. Header/table rejection also has a valid-header positive control. No emulator or archive checks were disabled.
+
+The LP64 signal-structure interpretation was checked against [Bionic's public signal types](https://github.com/aosp-mirror/platform_bionic/blob/master/libc/include/bits/signal_types.h): `sa_flags` precedes the handler pointer on LP64. The actual phone JNI execution and MainActivity bootstrap report remain pending.

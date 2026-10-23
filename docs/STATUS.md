@@ -29,6 +29,8 @@ Bounded static inspection of the supplied engine shows `JNI_OnLoad` needs the re
 
 Host **0.3.0** adds a separate, match-gated **static DEX bootstrap inspection** and a share-report button. It reads MainActivity's superclass, native declarations and bounded `<clinit>` instructions without defining/initializing game classes or loading game native code. The installed game's actual initializer remains unknown until the device report is collected. See [JNI_BOOTSTRAP.md](JNI_BOOTSTRAP.md) for findings, limits and the next phone step. This does not invoke `JNI_OnLoad` and does not complete Gate 2.
 
+**Host 0.3 validation:** [run 39902922705](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39902922705) passed compilation and Android 13 emulator integration for app/test commit `d132ae71a5dd233e0cda1f99e0f398b0f950c8f9` (5m17s). It includes the no-initialization sentinel, real demo DEX decoding, malformed-header/table checks and instruction-width cases. [Download APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39902922705/artifacts/12479691483), `client-base-debug-32`. For this phone step install only the host, inspect bootstrap and share the report. No new demo/link test or engine import is needed.
+
 ### Validation boundary
 
 Eight local checks passed before and after the repository migration; the engine changes expanded the local suite to ten checks; the bootstrap diagnostic adds two source guards (twelve total). These are source guards plus an actually compiled/executed **Linux** native PID/UID test. The six Java sources also passed syntax parsing before migration; the Android source was moved unchanged.
