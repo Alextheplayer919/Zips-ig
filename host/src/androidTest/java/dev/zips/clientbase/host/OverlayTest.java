@@ -77,7 +77,12 @@ public final class OverlayTest {
             InstrumentationRegistry.getInstrumentation().waitForIdleSync();
             MinecraftBootstrap.onMainThread(()->{
                 assertSame(first,OverlayService.activeWindows());assertTrue(first.chip().isAttachedToWindow());
-                first.chip().performClick();assertTrue(first.panel().isAttachedToWindow());
+                first.chip().performClick();return null;
+            });
+            // addView schedules attachment/traversal; observe the real attached window on a later frame.
+            await(()->first.panel()!=null&&first.panel().isAttachedToWindow());
+            MinecraftBootstrap.onMainThread(()->{
+                assertTrue(first.panel().isAttachedToWindow());
                 WindowManager.LayoutParams p=(WindowManager.LayoutParams)first.panel().getLayoutParams();assertTrue(p.width>0&&p.height>0);
                 first.panel().findViewById(R.id.overlay_refresh).performClick();return null;
             });

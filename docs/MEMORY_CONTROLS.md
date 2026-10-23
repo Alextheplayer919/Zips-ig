@@ -1,5 +1,7 @@
 # 0.6.0 — external controls and first read-only memory integration
 
+> **0.6.1 update:** The user subsequently authorized an optional external system overlay, implemented in Java with the same IPC, foreground-service Stop and explicit permissions. See [EXTERNAL_OVERLAY.md](EXTERNAL_OVERLAY.md) for current development/validation state. This page records the validated 0.6.0 screen-only design and APK; its no-overlay/no-new-permissions statements describe that version, not 0.6.1. Neither version attaches GUI to Minecraft’s renderer.
+
 ## User-selected architecture
 
 One APK; **controls in the normal host UI process**, memory backend in **:game_host**. The user explicitly chose a separate screen, not an in-game click GUI or companion overlay APK. No overlay view, button, renderer, input interception or GUI callback is attached to Minecraft. The abandoned in-game menu draft was removed before commit. Keep the 0.5.4 working baseline ([source/APK](HOSTED_LAUNCH_SUCCESS.md)) intact as reference.

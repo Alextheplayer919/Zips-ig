@@ -26,3 +26,7 @@ This avoids an Activity switch merely to access controls and avoids deliberately
 Five new Android regressions: bounded geometry/flags; actual denied-permission window refusal; real foreground service, repeated start, real overlay attachment/open/close, no-game memory IPC and immutable notification Stop cleanup; reflow and real AppOps revocation removing windows; and private UI-process service manifest identity. Emulator-only `UiAutomation` shell commands authorize/revoke overlay access and grant notifications for those tests; production uses Android Settings/runtime permission dialogs and never grants itself access. Existing tests remain enabled.
 
 Android build/APK/emulator validation pending. Do not deliver until it passes. No real Minecraft overlay compatibility or phone memory snapshot has yet been reported for this build. Keep the user-confirmed 0.5.4 and validated 0.6.0 references; original startup/engine pins, target Android13 and unchanged Minecraft requirement remain in effect.
+
+### First Android result
+
+Run 39996951448 compiled and passed APK checks, but the real-menu test checked `isAttachedToWindow()` in the same main-loop callback as `addView`. Android schedules attachment/traversal asynchronously; that assertion raced the first frame. The correction waits for actual attachment before retaining the original assertion and performing memory IPC. No test is skipped or replaced with a mock. That first artifact is not a deliverable; corrected full validation remains pending.

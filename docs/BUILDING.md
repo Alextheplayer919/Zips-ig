@@ -2,6 +2,8 @@
 
 **Current integration build:** [host 0.6.0 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39993673423/artifacts/12518682891), build/APK and 54 Android 13 regressions passed. [External controls/memory architecture and phone steps](MEMORY_CONTROLS.md#first-phone-integration-check). Keep the user-confirmed working 0.5.4 APK as the reference baseline. Install only the new host; controls have their own task, no GUI is rendered inside Minecraft. No demo/import/link/bootstrap repeat. Split-screen is optional and device-dependent, not guaranteed. Earlier phone instructions are historical.
 
+**0.6.1 overlay candidate:** source is implemented, Android validation pending; see [architecture/permissions](EXTERNAL_OVERLAY.md). Do not substitute an artifact from an unfinished or failed run. Overlay permission is optional and separate Controls still works without it.
+
 ## GitHub Actions
 
 [Build APK](https://github.com/Alextheplayer919/Zips-ig/actions/workflows/build-apk.yml) runs for app/build changes on pushes and pull requests. It can also be dispatched manually once GitHub registers the workflow on the default branch. Push/PR runs include Android 13 emulator tests; manual dispatch offers an emulator-test toggle.
