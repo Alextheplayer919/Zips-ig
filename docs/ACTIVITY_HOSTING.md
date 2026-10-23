@@ -2,6 +2,10 @@
 
 **Status: implementation plan, not an implemented Activity adapter or launch result.** The [phone bootstrap success](JVM_BOOTSTRAP_DEVICE_TEST.md) completes the class-initialization substep. The next acceptance target remains the original, unmodified Bedrock **1.26.50.4 / 972605004** title screen in our own process/UID on Android 13. No hooks or gameplay features in this stage.
 
+## Startup input now available
+
+The user supplied [`dexes.7z`](STARTUP_INPUT.md): all five DEX files, binary manifest and resource table. Manifest identity matches the target, and classes2/classes3 sizes and CRCs match the phone reports. The input audit records two DEX header SHA-1 discrepancies without altering files; APK signature authenticity is not established. Application/factory/provider and Activity metadata are now known from this manifest. No additional upload is needed for the initial startup audit. This does not implement Activity hosting.
+
 ## Known baseline
 
 - Original MainActivity static initialization returned with JVM-managed loads and a hash-matched installed engine mapped.
