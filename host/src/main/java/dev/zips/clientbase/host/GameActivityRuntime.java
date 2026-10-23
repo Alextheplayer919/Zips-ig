@@ -64,6 +64,9 @@ final class GameActivityRuntime {
         ClassLoader previous = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(prepared.loader);
         try {
+            // Before construction/lifecycle: the SDK registers Application lifecycle callbacks.
+            // Use the already pinned original SDK, not a parent copy or synthetic provider authority.
+            PlayGamesStartup.initialize(ClientBaseApplication.current(), prepared.loader, progress);
             progress.accept("ORIGINAL_CLASS_INITIALIZATION_AND_CONSTRUCTION_ENTERED");
             Class<?> wrapper = Class.forName(WRAPPER, true, prepared.loader);
             if (wrapper.getClassLoader() != prepared.loader || wrapper.getSuperclass() != prepared.mainClass

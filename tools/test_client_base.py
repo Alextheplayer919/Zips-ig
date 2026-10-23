@@ -258,6 +258,20 @@ class ClientBaseSourceTests(unittest.TestCase):
         self.assertIn('Intent.ACTION_CREATE_DOCUMENT', ui)
         self.assertIn('openOutputStream(target, "wt")', ui)
 
+    def test_play_games_initializes_only_after_pins_and_before_original_activity(self):
+        runtime = (BASE / 'host/src/main/java/dev/zips/clientbase/host/GameActivityRuntime.java').read_text()
+        self.assertLess(runtime.index('PlayGamesStartup.initialize('), runtime.index('Class.forName(WRAPPER, true'))
+        self.assertIn('BedrockInputPins.verify(game.sourceDir)', runtime)
+        startup = (BASE / 'host/src/main/java/dev/zips/clientbase/host/PlayGamesStartup.java').read_text()
+        for required in ('GameActivityRuntime.requireGameProcess(application)',
+                         'com.google.android.gms.games.PlayGamesSdk',
+                         'sdk.getClassLoader() != loader', 'Looper.getMainLooper()',
+                         'getMethod("initialize", Context.class)', 'method.invoke(null, application)',
+                         'finally { Thread.currentThread().setContextClassLoader(previous); }'):
+            self.assertIn(required, startup)
+        self.assertNotIn('com.google.android.gms.games.provider.PlayGamesInitProvider',
+                         (BASE / 'host/src/main/AndroidManifest.xml').read_text())
+
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:
