@@ -51,3 +51,10 @@ App/test commit **`bf94035495a5a0c0f078d8c2e559a03896441dc4`**, host **0.4.0 / c
 ### Later Activity-path evidence, not invoked
 
 A bounded `.dynsym` lookup in the unchanged SHA-pinned supplied engine finds **`GameActivity_onCreate`** (ELF VA `0x7f7c6b8`, 620 bytes) and **`Java_com_google_androidgamesdk_GameActivity_initializeNativeCode`** (ELF VA `0x7f791c4`, 116 bytes). This is consistent with the reported GameActivity superclass and explains why absence of `ANativeActivity_onCreate` was not proof of a missing custom/native adapter path. These are build-specific ELF addresses, not process addresses or verified calling signatures. Neither export is called by host 0.4; the original Activity lifecycle/resources environment must be prepared before that later step.
+
+### Validated host 0.4.1 correction
+
+App/test commit **`8399e9750c0fd46012e49ce2a743948f1c90ac76`**, host **0.4.1 / code 5**, passed compilation and Android 13/API 33 x86_64 regression checks in [run 39911337051](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39911337051), job **120275291398**, **5m0s**. The exact reported no-op and absent forms are accepted; altered, longer, referenced, truncated/incomplete and malformed forms remain rejected. All previous archive/bridge/JVM checks remain enabled. Fifteen local source/native checks also pass. This validates the correction, not real Minecraft initialization on the phone.
+
+- [Current APK ZIP: client-base-debug-38](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39911337051/artifacts/12483002590) — **3,461,139 bytes**. Install only `client-base-host-debug.apk`, use the same initialization button and share the result. No engine import or repeated demo/link/static test is needed.
+- [Device reports: client-base-device-tests-38](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39911337051/artifacts/12483107940) — **215,802 bytes**.
