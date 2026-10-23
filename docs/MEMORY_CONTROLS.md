@@ -43,7 +43,7 @@ Run 39992531136 built and passed APK checks, but the new real-library memory reg
 
 - [APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39993673423/artifacts/12518682891): **client-base-debug-86**, **6,234,777 bytes**. Install only **client-base-host-debug.apk**.
 - [Reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39993673423/artifacts/12518288786): **client-base-device-tests-86**, **262,603 bytes**.
-- Retained engine archive blob **c78f6e8642d334916d247487897eb871ad27c160**; original wrapper/lifecycle, SDK startup order and permissions are unchanged from the user-reported working baseline. No native game code is patched or packaged. Do not use the earlier failed debug-84 integration artifact.
+- Retained engine archive blob **c78f6e8642d334916d247487897eb871ad27c160**; original wrapper/lifecycle, SDK startup order and permissions are unchanged from the user-reported working baseline. No native game code is patched or packaged. Do not use the earlier failed integration artifact.
 
 ### First phone integration check
 
