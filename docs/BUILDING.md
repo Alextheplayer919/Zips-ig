@@ -49,7 +49,7 @@ The last command requires an emulator/device. CI supplies an Android 13 x86_64 e
 python3 tools/test_client_base.py
 ```
 
-Fourteen checks cover manifests/permissions, demo visibility/native extraction, protocol version, trust-check ordering, app separation, official wrapper identity, JNI names native process identity, engine fingerprint pins, private/match-gated probe configuration, static-bootstrap no-loading guards and JNI-evidence identity. The native test needs `g++`; otherwise it is skipped. These do **not** compile Android resources/classes or validate Android runtime behavior.
+Fifteen checks cover manifests/permissions, demo visibility/native extraction, protocol version, trust-check ordering, app separation, official wrapper identity, JNI names native process identity, engine fingerprint pins, private/match-gated probe configuration, static-bootstrap no-loading guards and JNI-evidence identity. The native test needs `g++`; otherwise it is skipped. These do **not** compile Android resources/classes or validate Android runtime behavior.
 
 The wrapper files are from Gradle's official `v8.11.1` source tag. Its JAR contains the upstream license; the local suite checks SHA-256 `2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046`.
 
@@ -66,3 +66,7 @@ Tap the inspection button, then **Share current engine / bootstrap report** and 
 ## Next step after the successful host 0.3 report
 
 Host **0.4** adds **Initialize Minecraft Java / JNI (no Activity)** with explicit execution consent. Install only the new host APK; keep Minecraft unchanged. No demo, repeated link/static test or archive import is needed. Send the result using the share button, even if blocked or disconnected. See [JVM_INITIALIZATION.md](JVM_INITIALIZATION.md) for the gates, native-code risks and result boundaries. Older host 0.3 inspection instructions above are historical for the completed report.
+
+### Empty GameActivity initializer correction
+
+Use **host 0.4.1** for the next initialization attempt. Host 0.4 stopped on a present-but-empty superclass initializer (`000e`, DEX `return-void`). The patch accepts only that exact reviewed no-op shape, preserving all other checks. Install the new host only; tap the same **Initialize Minecraft Java / JNI (no Activity)** button and share the result. No archive import, static-only inspection, demo or link test is needed. See [the recorded reason for the correction](GAMEACTIVITY_DEVICE_TEST.md).

@@ -63,11 +63,49 @@ public final class MinecraftBootstrapTest {
         expectMainBlocked(truncated);
     }
 
-    @Test public void unreviewedGameActivityInitializerIsBlockedBeforeExecution() throws Exception {
-        JSONObject parent = new JSONObject().put("class", "Lcom/google/androidgamesdk/GameActivity;")
-                .put("clinit", JSONObject.NULL);
+    @Test public void reportedNoopGameActivityInitializerIsAccepted() throws Exception {
+        JSONObject parent = reportedParent();
         MinecraftBootstrap.verifyParentInitializer(parent);
-        parent.put("clinit", new JSONObject());
+        parent.put("clinit", JSONObject.NULL);
+        MinecraftBootstrap.verifyParentInitializer(parent); // Originally supported absent initializer.
+    }
+
+    @Test public void unreviewedGameActivityInitializerIsBlockedBeforeExecution() throws Exception {
+        JSONObject unknown = reportedParent().put("clinit", new JSONObject());
+        expectParentBlocked(unknown);
+        for (String code : new String[] {"0000", "0027", "0000 000e", "0071 0001 0000 000e"}) {
+            JSONObject changed = reportedParent();
+            changed.getJSONObject("clinit").put("code_units_hex", code).put("code_units_total", code.split(" ").length);
+            expectParentBlocked(changed);
+        }
+        JSONObject truncated = reportedParent();
+        truncated.getJSONObject("clinit").put("truncated", true);
+        expectParentBlocked(truncated);
+        JSONObject partial = reportedParent();
+        partial.getJSONObject("clinit").put("reference_scan_complete", false);
+        expectParentBlocked(partial);
+        JSONObject referenced = reportedParent();
+        referenced.getJSONObject("clinit").getJSONArray("references").put(new JSONObject().put("unit", 0));
+        expectParentBlocked(referenced);
+        JSONObject registers = reportedParent(); registers.getJSONObject("clinit").put("registers", 1);
+        expectParentBlocked(registers);
+        JSONObject missingRefs = reportedParent(); missingRefs.getJSONObject("clinit").remove("references");
+        expectParentBlocked(missingRefs);
+        JSONObject wrongClass = reportedParent().put("class", "Lunreviewed/Parent;");
+        expectParentBlocked(wrongClass);
+        JSONObject missingCode = reportedParent(); missingCode.remove("clinit");
+        expectParentBlocked(missingCode);
+    }
+
+    private static JSONObject reportedParent() throws Exception {
+        JSONObject code = new JSONObject().put("registers", 0).put("code_units_total", 1)
+                .put("code_units_hex", "000e").put("truncated", false)
+                .put("references", new JSONArray()).put("reference_scan_complete", true);
+        return new JSONObject().put("class", "Lcom/google/androidgamesdk/GameActivity;")
+                .put("superclass", "Landroidx/appcompat/app/AppCompatActivity;").put("clinit", code);
+    }
+
+    private static void expectParentBlocked(JSONObject parent) throws Exception {
         try { MinecraftBootstrap.verifyParentInitializer(parent); fail("Unknown superclass initializer accepted"); }
         catch (IOException expected) { assertTrue(expected.getMessage().contains("unreviewed")); }
     }

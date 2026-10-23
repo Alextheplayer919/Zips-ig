@@ -31,7 +31,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         int padding = (int) (24 * getResources().getDisplayMetrics().density);
         page.setPadding(padding, padding, padding, padding);
         scroll.addView(page);
-        TextView eyebrow = text("CLIENT BASE / 0.4", 13);
+        TextView eyebrow = text("CLIENT BASE / 0.4.1", 13);
         eyebrow.setTextColor(Color.rgb(113, 217, 193));
         page.addView(eyebrow);
         page.addView(text("One process.\nA separate guest.", 30));

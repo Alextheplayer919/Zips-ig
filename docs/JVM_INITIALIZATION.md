@@ -1,17 +1,17 @@
-# Host 0.4 — controlled original Java / JNI initialization
+# Host 0.4.1 — controlled original Java / JNI initialization
 
 ## Why this is the next experiment
 
 The [phone bootstrap report](BOOTSTRAP_DEVICE_TEST.md) establishes that the original MainActivity loads the native dependencies and `minecraftpe` itself. This experiment therefore uses **ART's normal class initialization/native loading**, not a manual `dlsym` function-pointer call. It is not Activity hosting or a game launch.
 
-Upstream [AOSP-mirrored GameActivity source](https://github.com/msft-mirror-aosp/platform.frameworks.opt.gamesdk/blob/0fea90e46030a34d8845330ff5bc091ec7e39ed6/game-activity/src/main/java/com/google/androidgamesdk/GameActivity.java) has no static initializer and performs native Activity initialization from `onCreate`. That is context, **not proof of the installed Minecraft subclass hierarchy**. The actual installed GameActivity DEX is inspected before this experiment proceeds.
+Upstream [AOSP-mirrored GameActivity source](https://github.com/msft-mirror-aosp/platform.frameworks.opt.gamesdk/blob/0fea90e46030a34d8845330ff5bc091ec7e39ed6/game-activity/src/main/java/com/google/androidgamesdk/GameActivity.java) has no static initializer and performs native Activity initialization from `onCreate`. That is context, **not proof of the installed Minecraft subclass hierarchy**. The actual installed GameActivity DEX is inspected before this experiment proceeds. The [host 0.4 phone result](GAMEACTIVITY_DEVICE_TEST.md) now establishes an explicit `return-void`-only initializer; host 0.4.1 accepts that exact no-op instead of rejecting every present initializer.
 
 ## Preconditions and execution
 
 - Explicit UI consent: execute only the user's trusted, original installed Minecraft. Native hashing is not Java signing-certificate authentication. This private process shares the host's UID/permissions; it is crash separation, **not a security sandbox**.
 - ARM64 and exact reported **versionName 1.26.50.4 / versionCode 972605004**.
 - Installed engine matches the supplied SHA-256. MainActivity's 45-unit initializer and its resolved references must match the reported build, including the six native library names and normal `System.loadLibrary` calls.
-- Inspect and save the **actual GameActivity DEX**. An unexpected direct superclass or any GameActivity `<clinit>` blocks initialization and returns evidence, rather than guessing at its behavior. This does not audit every AndroidX/framework/transitive SDK initializer; consent allows those normal JVM initialization effects.
+- Inspect and save the **actual GameActivity DEX**. An unexpected direct superclass or an unreviewed GameActivity `<clinit>` blocks initialization and returns evidence, rather than guessing at its behavior. Accepted forms are an absent initializer or the phone-reported exact no-op: zero registers, one code unit `000e` (`return-void`), no truncation, complete reference scan and no references. This does not audit every AndroidX/framework/transitive SDK initializer; consent allows those normal JVM initialization effects.
 - Build one `DexClassLoader` containing our APK plus the installed game's original base/split APKs. Parent-first loading is retained except for **our bridge only**, which must be defined in the same child loader. No fake Minecraft/GameActivity classes or patched APKs are supplied.
 - Resolve the engine **without loading it**, then independently hash the exact loader-selected installed file/APK entry. Reject other paths or a mismatch before defining/initializing game classes. This selects the same engine bytes the user supplied, directly from the matching installed original APK/native directory; an imported duplicate is **not required**.
 - Resolve the real MainActivity without initialization and verify it and GameActivity belong to the intended child loader. Then initialize it on the private process's **main looper**, with that thread's context class loader temporarily set to the guest loader. The JVM native-library owner is established by the original `System.loadLibrary` calls, not by the context-loader setting.
@@ -29,7 +29,7 @@ Initialization/SDK callbacks can crash or hang. Stages are saved before entering
 
 ## Phone steps
 
-1. Install **host 0.4** from the validated APK artifact. No demo/test APK is needed for this experiment. If the debug key changed, uninstall **Client Base host only**, not Minecraft.
+1. Install **host 0.4.1** from the validated APK artifact. No demo/test APK is needed for this experiment. If the debug key changed, uninstall **Client Base host only**, not Minecraft.
 2. Tap **Initialize Minecraft Java / JNI (no Activity)** and read/accept the execution consent. Keep the host open.
 3. Use **Share current engine / bootstrap report** and send the result, including a blocked/last-stage result if it does not return normally.
 

@@ -37,9 +37,15 @@ Host **0.3.0** adds a separate, match-gated **static DEX bootstrap inspection** 
 
 No engine re-import is needed: the selected installed engine must have the supplied library's exact SHA. No Activity instance/lifecycle or title screen is created. Parent/SDK initialization can still fail or hang; results/last stages and nested causes are saved, and the controller can terminate the reported own-UID child even if its main looper is stuck. Actual GameActivity/JVM initialization results remain pending. **Validation:** [run 39905493730](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39905493730) passed compilation and Android 13 emulator checks for app/test commit `bf94035495a5a0c0f078d8c2e559a03896441dc4` (4m59s), including the new own-bridge JVM/native-library and initializer-policy cases. [Host 0.4 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39905493730/artifacts/12480831820), `client-base-debug-35`. This is not a real Minecraft initialization result.
 
+### Host 0.4.1 — reviewed empty superclass initializer
+
+The user reported host 0.4 stopping at the superclass gate, **before game initialization**, with GameActivity's actual initializer: zero registers and one `000e` (`return-void`) code unit, no references, complete extraction. See [the normalized phone result](GAMEACTIVITY_DEVICE_TEST.md). This is a no-op, not a Minecraft JNI failure; the absent-only policy was overly strict.
+
+Host 0.4.1 / code 5 narrowly accepts that exact empty form as well as absence. Longer/changed/partial code, references, extra registers, missing data and unexpected classes remain blocked. Other gates and the Java/JNI initialization path are unchanged. Fifteen local checks pass; Android regression coverage is extended for the no-op and rejected mutations. Corrected-build Android validation and actual phone JNI execution must be recorded separately; no title screen is claimed.
+
 ### Validation boundary
 
-Eight local checks passed before and after the repository migration; the engine changes expanded the local suite to ten checks; the bootstrap diagnostic added two source guards and JVM initialization adds two more guards (fourteen total). These are source guards plus an actually compiled/executed **Linux** native PID/UID test. The six Java sources also passed syntax parsing before migration; the Android source was moved unchanged.
+Eight local checks passed before and after the repository migration; the engine changes expanded the local suite to ten checks; the bootstrap diagnostic added two source guards and JVM initialization adds two more guards (fifteen total, including the reported no-op guard). These are source guards plus an actually compiled/executed **Linux** native PID/UID test. The six Java sources also passed syntax parsing before migration; the Android source was moved unchanged.
 
 The local sandbox does not have an Android SDK and cannot fetch the Gradle distribution. Therefore local checks are **not** evidence of a successful Android build or device run. Check the [workflow runs](https://github.com/Alextheplayer919/Zips-ig/actions) for actual compilation, artifact and emulator outcomes. A workflow definition alone is not a passing test.
 

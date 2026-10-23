@@ -54,10 +54,23 @@ final class MinecraftBootstrap {
     }
 
     static void verifyParentInitializer(JSONObject parent) throws IOException, JSONException {
+        String blocked = "GameActivity has an unreviewed static initializer; saved its DEX report, no initialization attempted";
         if (!parent.getString("class").equals("Lcom/google/androidgamesdk/GameActivity;")
-                || !parent.has("clinit") || !parent.isNull("clinit")) {
-            throw new IOException("GameActivity has an unreviewed static initializer; saved its DEX report, no initialization attempted");
+                || !parent.has("clinit")) throw new IOException(blocked);
+        if (parent.isNull("clinit")) return;
+        try {
+            JSONObject code = parent.getJSONObject("clinit");
+            // The phone's actual GameActivity has an explicit empty <clinit>:
+            // zero registers and exactly DEX return-void (000e), with no references.
+            // Do not generalize this to NOPs, longer code, missing or partial data.
+            if (code.getInt("registers") == 0 && code.getInt("code_units_total") == 1
+                    && "000e".equals(code.getString("code_units_hex"))
+                    && !code.getBoolean("truncated") && code.getBoolean("reference_scan_complete")
+                    && code.getJSONArray("references").length() == 0) return;
+        } catch (JSONException malformed) {
+            throw new IOException(blocked + " (incomplete initializer metadata)", malformed);
         }
+        throw new IOException(blocked);
     }
 
     private static void verifySelectedEngine(String path, ApplicationInfo game, List<String> apks)

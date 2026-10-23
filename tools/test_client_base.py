@@ -145,6 +145,20 @@ class ClientBaseSourceTests(unittest.TestCase):
         self.assertIn(report['version_name'], runtime)
         self.assertIn(str(report['version_code']) + 'L', runtime)
 
+    def test_reported_gameactivity_is_exactly_the_reviewed_noop(self):
+        import json
+        report = json.loads((BASE / 'docs/GAMEACTIVITY_DEVICE_TEST.json').read_text())
+        parent = report['game_activity']
+        self.assertEqual({'registers': 0, 'code_units_total': 1, 'code_units_hex': '000e',
+                          'truncated': False, 'references': [], 'reference_scan_complete': True}, parent['clinit'])
+        self.assertEqual(24, len(parent['native_methods']))
+        self.assertEqual('PROBE_BLOCKED', report['result'])
+        runtime = (BASE / 'host/src/main/java/dev/zips/clientbase/host/MinecraftBootstrap.java').read_text()
+        for guard in ('code.getInt("registers") == 0', 'code.getInt("code_units_total") == 1',
+                      '"000e".equals(code.getString("code_units_hex"))', '!code.getBoolean("truncated")',
+                      'code.getBoolean("reference_scan_complete")', 'code.getJSONArray("references").length() == 0'):
+            self.assertIn(guard, runtime)
+
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:
