@@ -34,3 +34,12 @@ No engine re-import or demo/link test is needed. The loader/order/gates and exac
 New Android cases validate selected-field protobuf decoding with a **synthetic** fixture, omission of synthetic memory/register strings, PID/UID mismatch rejection, partial/malformed handling, and exact run identity/time filtering. An emulator test binds our private service **without sending any probe request**, intentionally SIGKILLs that own-UID process, and checks Android's real matching exit record. It does not crash/load Minecraft, and its SIGKILL must not be labelled a native crash.
 
 A successful emulator test is not evidence that this phone/OEM will supply a tombstone or that its native-crash format is identical. Actual Android build/test results and the next phone exit report must be recorded separately. No load-order fix is claimed before that evidence exists.
+
+### Validated host 0.4.2 build
+
+App/test commit **`2ac0b627eb1369c2824661fe783ebea3744455f2`**, host **0.4.2 / code 6**, passed compilation and Android 13/API 33 x86_64 integration in [run 39931616080](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39931616080), job **120341631453**, **4m58s**. All eighteen instrumentation cases are retained, including four new diagnostic cases. The real own-child termination test found a matching Android exit record and did not call it a native crash. The native tombstone parser was tested with synthetic data, not a real phone tombstone. Seventeen local source/native checks pass; twenty Java files syntax-parse.
+
+- [Current APK ZIP: client-base-debug-41](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39931616080/artifacts/12491479101) — **3,473,285 bytes**, install only `client-base-host-debug.apk`.
+- [Device reports: client-base-device-tests-41](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39931616080/artifacts/12491957614) — **173,498 bytes**.
+
+This verifies the implemented diagnostics on the emulator, not crash attribution on the user's phone. Original Minecraft initialization still has not returned successfully as reported. No archive/game library/initializer/load-order changes were made in this correction.
