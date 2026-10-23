@@ -2,7 +2,7 @@
 
 ## Latest phone result
 
-The collector returned useful real phone evidence: Android native crash/SIGABRT, pending `ACCESS_NETWORK_STATE` SecurityException from Xbox network observer initialization, and PlayFab JNI frames. [Evidence and host 0.4.3 correction](NETWORK_PERMISSION_DEVICE_TEST.md). Earlier uncertainty below documents what was known before that report; the cause of this particular abort is no longer just a last-lookup guess. No later engine/bootstrap success has been reported.
+The collector returned useful real phone evidence: Android native crash/SIGABRT, pending `ACCESS_NETWORK_STATE` SecurityException from Xbox network observer initialization, and PlayFab JNI frames. [Evidence and host 0.4.3 correction](NETWORK_PERMISSION_DEVICE_TEST.md). Earlier uncertainty below documents what was known before that report; the cause of this particular abort is no longer just a last-lookup guess. A subsequent [phone report](JVM_BOOTSTRAP_DEVICE_TEST.md) now shows successful returned class initialization with the engine already mapped; Activity/title-screen startup remains untested.
 
 ## Reported failure, not an inferred culprit
 

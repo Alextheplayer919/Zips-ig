@@ -2,6 +2,8 @@
 
 ## Current direction
 
+**Latest phone milestone:** [original Bedrock class initialization returned](JVM_BOOTSTRAP_DEVICE_TEST.md), PID 12037 / UID 11072, hash-matched installed engine already mapped after JVM-managed loading. Bootstrap substep complete as reported; Activity/title-screen hosting remains incomplete. [Next bounded stage](ACTIVITY_HOSTING.md).
+
 We are building a clean, independent hosting client, not porting the original protected native VM. The current repository contains only the retained engine archive and the source/documentation/build infrastructure needed for the new base.
 
 ### Implemented
@@ -53,7 +55,7 @@ The initialization sequence is unchanged. Host 0.4.2 adds own-UID/PID/process/ti
 
 The user supplied a real selected native tombstone: PID 31985 / UID 11070, Android reason `NATIVE_CRASH`, SIGABRT, and a pending `SecurityException` for missing **`ACCESS_NETWORK_STATE`** from Xbox `NetworkObserver.Initialize`/`registerNetworkCallback`. `FindClass` in PlayFab JNI initialization then triggered ART's abort. [Selected evidence and correction](NETWORK_PERMISSION_DEVICE_TEST.md). This is a concrete host prerequisite failure, not just a suspicious last library lookup.
 
-Host 0.4.3 adds only that normal install-time permission, verifies it before game class loading/initialization, and keeps original load order, all identity/code gates, CheckJNI and diagnostics unchanged. No INTERNET or other permission is added speculatively; demo/contract still request none. Tests cover actual permission grant, denied preflight and network callback registration/unregistration with our context, without running Minecraft or needing network traffic. Eighteen local guards pass. [Corrected Android 13 build and regression suite](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39959687156) passed for app/test commit `9a1d0a20b6c5f1c0ed84ff73b0dea9820b8fcda5`, job `120436542251` (4m19s), including the three permission tests. [Host 0.4.3 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39959687156/artifacts/12505205745), `client-base-debug-44`. Actual corrected phone initialization remains pending. No Minecraft title screen or completed engine JNI initialization is claimed.
+Host 0.4.3 adds only that normal install-time permission, verifies it before game class loading/initialization, and keeps original load order, all identity/code gates, CheckJNI and diagnostics unchanged. No INTERNET or other permission is added speculatively; demo/contract still request none. Tests cover actual permission grant, denied preflight and network callback registration/unregistration with our context, without running Minecraft or needing network traffic. Eighteen local guards pass. [Corrected Android 13 build and regression suite](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39959687156) passed for app/test commit `9a1d0a20b6c5f1c0ed84ff73b0dea9820b8fcda5`, job `120436542251` (4m19s), including the three permission tests. [Host 0.4.3 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39959687156/artifacts/12505205745), `client-base-debug-44`. The subsequent [phone report](JVM_BOOTSTRAP_DEVICE_TEST.md) now establishes returned class initialization and an already mapped engine. The engine JNI callback is not separately instrumented; no Activity/title screen is claimed.
 
 ### Validation boundary
 
@@ -72,7 +74,7 @@ The engine build also passed [CI run 39851721708](https://github.com/Alextheplay
 
 ### Not implemented
 
-- Minecraft launch or a general guest Activity/Application/provider environment. Installed package discovery exists for the engine probe and static bootstrap inspection only.
+- Minecraft launch or a general guest Activity/Application/provider environment. Installed package discovery also supports the now-successful bounded class-initialization probe.
 - Minecraft native-engine startup, resolver reconstruction or hooks.
 - Access to the separately installed game's private data.
 - Game features/modules or an update-compatible engine integration layer.
@@ -89,7 +91,7 @@ The original client's successful Android 13 / Minecraft 26.50 launch is **user-r
 
 ## Gate 2 — hosting-only Minecraft adapter
 
-**Engine-link substep:** complete as reported; `JNI_OnLoad` invocation, lifecycle and title screen remain pending.
+**Engine-link and JVM-managed bootstrap substeps:** complete as reported. [PID 12037 / UID 11072](JVM_BOOTSTRAP_DEVICE_TEST.md) returned original class initialization with the hash-matched engine already mapped; ART mediates JNI loading, without separate callback instrumentation. Activity/Application/resources/lifecycle/Surface and title screen remain pending. [Next implementation stage](ACTIVITY_HOSTING.md).
 
 After Gate 1, build a separate adapter for the original installed base/split APKs. Do not loosen the demo trust policy into an unrestricted plugin loader; Minecraft requires its own explicit package/trust and lifecycle design.
 

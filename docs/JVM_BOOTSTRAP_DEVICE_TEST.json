@@ -1,0 +1,119 @@
+{
+  "evidence": "User-pasted successful phone report, not independent device capture. HTML arrows/slashes normalized; randomized installation directory components omitted. Full reported GameActivity metadata retained.",
+  "edition": "Minecraft Bedrock for Android",
+  "associated_delivery": "Host 0.4.3; associated by conversation sequence. The pasted report does not print a host version/build identifier.",
+  "probe_pid": 12037,
+  "probe_uid": 11072,
+  "version_name": "1.26.50.4",
+  "version_code": 972605004,
+  "apk_paths": 1,
+  "engine_hash_matched": true,
+  "result": "JVM_BOOTSTRAP_RETURNED (not game startup)",
+  "class_initialization": "Real MainActivity class initialization returned; JVM-managed native loads used the same guest loader.",
+  "engine_selection": "Supplied engine fingerprint verified at the loader-selected installed path; no import needed.",
+  "jni_boundary": "JNI_OnLoad is mediated by ART, not manually called or separately instrumented by this probe.",
+  "mapping": {
+    "result": "ENGINE_ALREADY_MAPPED",
+    "operation": "RTLD_NOLOAD lookup only",
+    "jni_onload_owner_package": "com.mojang.minecraftpe",
+    "jni_onload_owner_library": "lib/arm64/libminecraftpe.so",
+    "mapping_base_this_run_only": "0x7169c74000",
+    "lookup_called_jni_onload_or_game_entrypoint": false
+  },
+  "native_library_lookups_not_separate_callback_receipts": [
+    {
+      "name": "c++_shared",
+      "owner_package": "com.mojang.minecraftpe",
+      "library": "libc++_shared.so"
+    },
+    {
+      "name": "maesdk",
+      "owner_package": "com.mojang.minecraftpe",
+      "library": "libmaesdk.so"
+    },
+    {
+      "name": "HttpClient.Android",
+      "owner_package": "com.mojang.minecraftpe",
+      "library": "libHttpClient.Android.so"
+    },
+    {
+      "name": "PlayFabMultiplayer",
+      "owner_package": "com.mojang.minecraftpe",
+      "library": "libPlayFabMultiplayer.so"
+    },
+    {
+      "name": "fmod",
+      "owner_package": "com.mojang.minecraftpe",
+      "library": "libfmod.so"
+    },
+    {
+      "name": "minecraftpe",
+      "owner_package": "com.mojang.minecraftpe",
+      "library": "libminecraftpe.so"
+    },
+    {
+      "name": "clientbase_engineprobe",
+      "owner_package": "dev.zips.clientbase.host",
+      "library": "libclientbase_engineprobe.so"
+    }
+  ],
+  "main_activity_initializer": "Matched reported 45-unit load sequence.",
+  "game_activity": {
+    "class": "Lcom/google/androidgamesdk/GameActivity;",
+    "superclass": "Landroidx/appcompat/app/AppCompatActivity;",
+    "native_methods": [
+      "Lcom/google/androidgamesdk/GameActivity;->getDlError()Ljava/lang/String;",
+      "Lcom/google/androidgamesdk/GameActivity;->initializeNativeCode(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/content/res/AssetManager;[BLandroid/content/res/Configuration;)J",
+      "Lcom/google/androidgamesdk/GameActivity;->onConfigurationChangedNative(JLandroid/content/res/Configuration;)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onContentRectChangedNative(JIIII)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onEditorActionNative(JI)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onKeyDownNative(JLandroid/view/KeyEvent;)Z",
+      "Lcom/google/androidgamesdk/GameActivity;->onKeyUpNative(JLandroid/view/KeyEvent;)Z",
+      "Lcom/google/androidgamesdk/GameActivity;->onPauseNative(J)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onResumeNative(J)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onSaveInstanceStateNative(J)[B",
+      "Lcom/google/androidgamesdk/GameActivity;->onSoftwareKeyboardVisibilityChangedNative(JZ)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onStartNative(J)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onStopNative(J)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onSurfaceChangedNative(JLandroid/view/Surface;III)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onSurfaceCreatedNative(JLandroid/view/Surface;)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onSurfaceDestroyedNative(J)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onSurfaceRedrawNeededNative(JLandroid/view/Surface;)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onTextInputEventNative(JLcom/google/androidgamesdk/gametextinput/State;)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onTouchEventNative(JLandroid/view/MotionEvent;IIIIIJJIIIIIIFF)Z",
+      "Lcom/google/androidgamesdk/GameActivity;->onTrimMemoryNative(JI)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onWindowFocusChangedNative(JZ)V",
+      "Lcom/google/androidgamesdk/GameActivity;->onWindowInsetsChangedNative(J)V",
+      "Lcom/google/androidgamesdk/GameActivity;->setInputConnectionNative(JLcom/google/androidgamesdk/gametextinput/InputConnection;)V",
+      "Lcom/google/androidgamesdk/GameActivity;->terminateNativeCode(J)V"
+    ],
+    "clinit": {
+      "registers": 0,
+      "code_units_total": 1,
+      "code_units_hex": "000e",
+      "truncated": false,
+      "references": [],
+      "reference_scan_complete": true
+    },
+    "native_method_count": 24,
+    "native_methods_truncated": false,
+    "apk_index": 0,
+    "dex_entry": "classes2.dex",
+    "dex_bytes": 1655112,
+    "dex_crc": 3014425259
+  },
+  "not_created": [
+    "Minecraft Activity instance",
+    "Application/provider environment",
+    "lifecycle",
+    "surface",
+    "title screen"
+  ],
+  "not_established": [
+    "Separately instrumented engine JNI_OnLoad return value or call count",
+    "Long-running SDK/game stability",
+    "Full Minecraft hosting / Gate 2",
+    "Access to the installed game private data"
+  ],
+  "next_step": "Activity/resources/context/lifecycle hosting, not a repeated demo, link or bootstrap test."
+}

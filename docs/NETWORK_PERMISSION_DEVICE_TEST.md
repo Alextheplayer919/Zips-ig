@@ -1,5 +1,9 @@
 # Confirmed initialization abort: missing host network-state permission
 
+## Later corrected phone result
+
+The subsequent [Bedrock bootstrap report](JVM_BOOTSTRAP_DEVICE_TEST.md), PID 12037 / UID 11072, returned class initialization normally with the hash-matched installed engine already mapped. This completes the bootstrap substep as reported, not Activity/title-screen hosting. The failed attempt below remains historical evidence; no repeat of the successful test is needed.
+
 ## Phone evidence
 
 The user supplied host 0.4.2's Android exit diagnostic for **PID 31985 / UID 11070**, Minecraft **1.26.50.4 / 972605004**, one APK and matched engine hash. This is user-provided system diagnostic output, not independent device access. [Normalized selected evidence](NETWORK_PERMISSION_DEVICE_TEST.json) omits installation-specific path components and retains the relevant exception and frames.

@@ -1,6 +1,6 @@
 # Building and testing APKs
 
-**Current phone test: host 0.4.3 only.** Use **Initialize Minecraft Java / JNI (no Activity)** once and share the result; see [the permission correction](NETWORK_PERMISSION_DEVICE_TEST.md). Keep Minecraft unchanged. The demo-install and earlier-version instructions below describe previous milestones, not tests to repeat.
+**Latest phone test completed:** [Bedrock bootstrap returned successfully](JVM_BOOTSTRAP_DEVICE_TEST.md). No new installation or repeated demo/link/bootstrap test is needed. The next development stage is [Activity/resources/lifecycle hosting](ACTIVITY_HOSTING.md); no Activity-launch APK is available yet. Installation steps below document earlier milestones.
 
 ## GitHub Actions
 
@@ -77,6 +77,6 @@ Use **host 0.4.1** for the next initialization attempt. Host 0.4 stopped on a pr
 
 Use **host 0.4.2** and see [EXIT_DIAGNOSTICS.md](EXIT_DIAGNOSTICS.md). If the update preserves host data/UID, try **Collect last probe exit details** first. A new debug key may require uninstalling only Client Base host and lose old crash-history access; then make one new initialization attempt, leave the host open for automatic exit collection, and share the full report. Retry the diagnostic button if details are delayed; it never starts game code. No demo/link test or engine import is required. Do not uninstall Minecraft.
 
-### Current initialization correction: host network-state permission
+### Host 0.4.3 correction — completed phone test
 
 Use **host 0.4.3**. The new phone diagnostic identified a `SecurityException` for missing `ACCESS_NETWORK_STATE`, followed by a checked-JNI abort. This patch adds only that normal permission and checks it before initialization. Install the new host only, tap **Initialize Minecraft Java / JNI (no Activity)** once and share the result. There is no runtime permission prompt, engine import or demo/link/static test to repeat. Keep Minecraft unchanged. If another exit occurs, the existing automatic/manual exit diagnostics remain available. See [the recorded cause and correction](NETWORK_PERMISSION_DEVICE_TEST.md).

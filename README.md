@@ -4,7 +4,7 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 
 **Current implementation: a host plus a cooperative demo guest, not a working Minecraft launcher.**
 
-**Current phone test:** [host 0.4.3 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39959687156/artifacts/12505205745). Install only `client-base-host-debug.apk`, keep Minecraft unchanged, run **Initialize Minecraft Java / JNI (no Activity)** once and share the result. The Android 13 build/regression suite passed; corrected phone initialization is not yet established. No demo, import or link test needs repeating.
+**Latest phone result:** [Bedrock bootstrap returned successfully](docs/JVM_BOOTSTRAP_DEVICE_TEST.md) (PID 12037 / UID 11072). Original MainActivity initialization completed with JVM-managed native loading and the hash-matched engine already mapped. No Activity/title screen yet. **Do not repeat the bootstrap test**; next is the [Activity/resources/lifecycle adapter](docs/ACTIVITY_HOSTING.md).
 
 ## Documentation
 
@@ -12,12 +12,13 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 - [Current implementation and roadmap](docs/STATUS.md) — what is implemented versus tested, and our next acceptance gates.
 - [First phone-test result](docs/DEVICE_TEST.md) — initial load, repeated loads and rotation passed as reported; cooperative-demo gate complete.
 - [Build and install APKs from your phone](docs/BUILDING.md).
-- [Engine phone-test result](docs/ENGINE_DEVICE_TEST.md) — linking passed as reported for the hash-matched Minecraft 1.26.50.4 engine; JNI/game startup pending.
+- [Engine phone-test result](docs/ENGINE_DEVICE_TEST.md) — earlier link-only result for the hash-matched Minecraft 1.26.50.4 engine; superseded for bootstrap by the successful report above.
 - [Try the supplied engine](docs/ENGINE_PROBE.md) — optional hash-checked import and private-process link diagnostic.
 - [Phone Java bootstrap result](docs/BOOTSTRAP_DEVICE_TEST.md) — original MainActivity loads the dependencies and engine itself.
 - [Confirmed permission abort and correction](docs/NETWORK_PERMISSION_DEVICE_TEST.md) — host 0.4.3 adds the missing network-state permission and checks it before JNI.
 - [Initialization disconnect / exit diagnostics](docs/EXIT_DIAGNOSTICS.md) — host 0.4.2 added own-process exit reasons and available crash evidence; its phone report identified the permission failure above.
 - [GameActivity phone preflight](docs/GAMEACTIVITY_DEVICE_TEST.md) — empty superclass initializer identified; host 0.4.1 corrects the overly strict gate.
+- [Successful Bedrock bootstrap](docs/JVM_BOOTSTRAP_DEVICE_TEST.md) — original class initialization returned; Activity hosting remains next.
 - [Controlled Java/JNI initialization](docs/JVM_INITIALIZATION.md) — host 0.4 experiment; not an Activity launch.
 - [JNI bootstrap inspection](docs/JNI_BOOTSTRAP.md) — native prerequisites and the no-execution installed-DEX diagnostic.
 - [Engine input provenance](docs/ENGINE_INPUT.json).

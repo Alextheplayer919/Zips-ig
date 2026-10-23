@@ -1,6 +1,10 @@
 # Host 0.4.3 — controlled original Java / JNI initialization
 
-## Current failure and correction
+## Latest phone result
+
+[Bedrock bootstrap succeeded as user-reported](JVM_BOOTSTRAP_DEVICE_TEST.md): PID 12037 / UID 11072, real MainActivity class initialization returned, all six original libraries were looked up, and the hash-matched installed engine was already mapped. ART mediates JNI loading; its callback return/count are not separately instrumented. No Activity/title screen was created. This substep is complete; do not repeat it. Next: [Activity/resources/lifecycle hosting](ACTIVITY_HOSTING.md).
+
+## Previous failure and correction
 
 Host 0.4.2's phone diagnostic now identifies the initialization exit: missing host `ACCESS_NETWORK_STATE` during Xbox `NetworkObserver.Initialize` left a pending `SecurityException`, followed by PlayFab JNI `FindClass` and ART SIGABRT. [Selected evidence](NETWORK_PERMISSION_DEVICE_TEST.md). Host 0.4.3 declares that normal permission and checks it before game class loading. It does not change load order, disable CheckJNI, add Internet access or claim later initialization succeeds. Existing [exit diagnostics](EXIT_DIAGNOSTICS.md) remain available for a different subsequent failure.
 
@@ -32,7 +36,7 @@ No Minecraft Activity instance, original Application/providers, lifecycle callba
 
 Initialization/SDK callbacks can crash or hang. Stages are saved before entering it and before native-library lookup returns to the JVM. If the child's main thread hangs, its `onDestroy` cannot run: the UI controller can kill only the current, reported **own-UID child PID**, never its own PID or a PID remembered from a previous run. The 180-second controller timeout remains active. The child is also terminated after a result; no invented Minecraft shutdown sequence or engine unloading is attempted.
 
-## Phone steps
+## Phone steps — completed experiment
 
 1. Install **host 0.4.3** from the validated APK artifact. No demo/test APK is needed for this experiment. If the debug key changed, uninstall **Client Base host only**, not Minecraft.
 2. Tap **Initialize Minecraft Java / JNI (no Activity)** and read/accept the execution consent. Keep the host open.
@@ -44,7 +48,7 @@ Do **not** repeat the demo or link test. No archive import is needed: the loader
 
 The new emulator fixture runs **our own copied native bridge**, not Minecraft: a fresh child loader owns its Java class and native library; ART invokes our JNI callback exactly once; JNI calls resolve through that loader; and `RTLD_NOLOAD` can inspect the loaded copy but must not load another existing copy. Additional tests accept the reported initializer metadata and reject changed code/references, truncation and unreviewed superclass initializers.
 
-These are meaningful JVM/loader checks, not a Minecraft execution result. Actual installed GameActivity and real JNI initialization still need the phone report. Build/workflow success must be recorded separately, not assumed from the presence of this implementation.
+These are meaningful JVM/loader checks, not a Minecraft execution result. The actual GameActivity and returned real class-initialization report are now [recorded](JVM_BOOTSTRAP_DEVICE_TEST.md); this is user-reported evidence, not execution of Minecraft by the emulator. Build/workflow success must be recorded separately, not assumed from the presence of this implementation.
 
 ### Validated host 0.4 build
 
