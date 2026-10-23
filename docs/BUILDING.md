@@ -1,8 +1,6 @@
 # Building and testing APKs
 
-**Current integration build:** [host 0.6.0 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39993673423/artifacts/12518682891), build/APK and 54 Android 13 regressions passed. [External controls/memory architecture and phone steps](MEMORY_CONTROLS.md#first-phone-integration-check). Keep the user-confirmed working 0.5.4 APK as the reference baseline. Install only the new host; controls have their own task, no GUI is rendered inside Minecraft. No demo/import/link/bootstrap repeat. Split-screen is optional and device-dependent, not guaranteed. Earlier phone instructions are historical.
-
-**0.6.1 overlay candidate:** source is implemented, Android validation pending; see [architecture/permissions](EXTERNAL_OVERLAY.md). Do not substitute an artifact from an unfinished or failed run. Overlay permission is optional and separate Controls still works without it.
+**Current integration build:** [host 0.6.1 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39998204360/artifacts/12520922597), [Android 13 build/APK and full 59-case emulator suite passed](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39998204360). Install only **client-base-host-debug.apk**. [Overlay permissions and phone steps](EXTERNAL_OVERLAY.md#validated-overlay-build-and-phone-steps). Optional Java external overlay uses explicit draw-over-apps permission and a foreground service; separate Controls is the permission-free fallback. No game-renderer GUI or startup/backend change. Actual Minecraft overlay input/focus behavior remains a phone acceptance test. Keep the user-confirmed working 0.5.4 APK as rollback/reference, plus the validated [0.6.0 screen-only build](MEMORY_CONTROLS.md#validated-integration-build). No demo/import/link/bootstrap repeat. Earlier phone instructions below are historical.
 
 ## GitHub Actions
 
