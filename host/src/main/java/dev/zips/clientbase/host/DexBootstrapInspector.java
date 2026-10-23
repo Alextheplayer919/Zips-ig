@@ -51,6 +51,9 @@ public final class DexBootstrapInspector {
     private int table(int header, int count, int stride) throws IOException {
         if (count > 2000000) throw new IOException("Oversized DEX table");
         int offset = u32(header);
+        if ((count == 0 && offset != 0) || (count > 0 && (offset < 112 || offset % 4 != 0))) {
+            throw new IOException("Invalid DEX table offset/alignment");
+        }
         bounds(offset, (long) count * stride);
         return offset;
     }
