@@ -19,11 +19,11 @@ import java.util.function.Consumer;
 /** One prepared loader/session in :game_host only. Never initialized by a restored component. */
 final class GameActivityRuntime {
     static final String WRAPPER = "dev.zips.clientbase.host.MinecraftHostedActivity";
-    private static MinecraftBootstrap.Prepared prepared;
+    private static volatile MinecraftBootstrap.Prepared prepared;
     private static Context resources;
     private static int theme;
     private static Consumer<String> progress;
-    private static boolean created;
+    private static volatile boolean created;
 
     static boolean hasCreatedActivity() { return created; }
     static boolean isPrepared() { return prepared != null; }

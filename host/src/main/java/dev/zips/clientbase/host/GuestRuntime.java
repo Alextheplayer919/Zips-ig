@@ -77,7 +77,15 @@ public final class GuestRuntime {
         // Parent-first loading preserves one GuestEntry interface identity. Both APKs
         // contain the contract so the guest also works when opened independently.
         DexClassLoader loader = new DexClassLoader(dexPath, optimized.getAbsolutePath(),
-                info.nativeLibraryDir, app.getClassLoader());
+                info.nativeLibraryDir, app.getClassLoader()) {
+            @Override protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+                if (!GuestNamespaces.owns(name)) return super.loadClass(name, resolve);
+                Class<?> found = findLoadedClass(name);
+                if (found == null) found = findClass(name);
+                if (resolve) resolveClass(found);
+                return found;
+            }
+        };
         Object instance = Class.forName(ENTRY_CLASS, true, loader).getDeclaredConstructor().newInstance();
         if (!(instance instanceof GuestEntry)) {
             throw new IllegalStateException("Guest contract/class-loader identity mismatch.");

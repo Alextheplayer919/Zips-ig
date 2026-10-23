@@ -96,6 +96,9 @@ public final class FrameworkActivityTest {
             GuestRuntime.LoadedGuest guest = GuestRuntime.load(context());
             assertSame(guest.loader, activity.getClass().getClassLoader());
             assertSame(guest.loader, activity.getClassLoader());
+            assertSame(guest.loader, Class.forName("androidx.appcompat.app.AppCompatActivity", false, guest.loader).getClassLoader());
+            assertSame(guest.loader, Class.forName("androidx.lifecycle.LifecycleRegistry", false, guest.loader).getClassLoader());
+            assertSame(guest.loader, Class.forName("androidx.lifecycle.Lifecycling", false, guest.loader).getClassLoader());
             assertEquals(context().getPackageName(), activity.getPackageName());
             assertEquals(context().getApplicationInfo().uid, activity.getApplicationInfo().uid);
             assertEquals(context().getFilesDir(), activity.getFilesDir());

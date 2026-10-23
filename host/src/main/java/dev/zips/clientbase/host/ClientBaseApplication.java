@@ -5,8 +5,8 @@ import android.app.Application;
 /** Normal host Application; no guest providers, package spoofing or hidden APIs. */
 public final class ClientBaseApplication extends Application {
     private static ClientBaseApplication instance;
-    private android.content.Context gameResources;
-    private ClassLoader gameLoader;
+    private volatile android.content.Context gameResources;
+    private volatile ClassLoader gameLoader;
     void installGameResources(android.content.Context resources, ClassLoader loader) {
         GameActivityRuntime.requireGameProcess(this);
         gameResources = resources; gameLoader = loader;
