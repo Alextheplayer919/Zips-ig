@@ -186,12 +186,28 @@ final class ProbeExitDiagnostics {
             for (int n; (n = input.read(buffer)) != -1;) output.write(buffer, 0, n);
         }
     }
+    static synchronized String summarizeGame(Context context, Run run, String stages, String details) {
+        // Reuse the identity-checked full stream, not just its small on-screen tail.
+        try {
+            File file = fullLogFile(context, run);
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(
+                    new AtomicFile(file).openRead(), StandardCharsets.UTF_8))) {
+                if (!("FULL_AVAILABLE_OWN_PID_LOGCAT").equals(reader.readLine())
+                        || !("PID: " + run.pid + " UID: " + run.uid + " Started: " + run.startedAt).equals(reader.readLine()))
+                    throw new IOException("Different log attempt");
+                return GameFailureSummary.summarize(stages, details, reader);
+            }
+        } catch (IOException error) {
+            try { return GameFailureSummary.summarize(stages, details, new java.io.StringReader("")); }
+            catch (IOException impossible) { return "Failure summary unavailable"; }
+        }
+    }
     private static String logcat(Context context, Run run) {
         java.lang.Process process = null;
         try {
             process = new ProcessBuilder("logcat", "-d", "-b", "main", "-b", "crash", "--pid=" + run.pid,
                     "-T", String.format(java.util.Locale.ROOT, "%d.%03d", run.startedAt / 1000, run.startedAt % 1000),
-                    "-v", "threadtime").redirectErrorStream(true).start();
+                    "-v", "threadtime", "*:W").redirectErrorStream(true).start();
             InputStream input = process.getInputStream();
             FutureTask<String> task = new FutureTask<>(() -> {
                 synchronized (ProbeExitDiagnostics.class) {

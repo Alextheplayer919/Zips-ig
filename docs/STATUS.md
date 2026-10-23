@@ -2,7 +2,7 @@
 
 ## Current direction
 
-**Latest phone milestone:** [original native android_main started and original MainActivity onCreate returned](ACTIVITY_ONCREATE_DEVICE_TEST.md), PID 17899 / UID 11075. Our subsequent passive observer crashed with a wrapper/anonymous-class loader IllegalAccessError. Host **0.5.1** repairs exact helper-family ownership, registers the actual wrapper component and adds compact/saved-TXT reports. [Android 13 repair validation](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39978758524) passed (build, packaging and the 33-case regression suite); no rendered Surface/title-screen success is claimed. Do not rerun unchanged 0.5.0 or repeat bootstrap/import/demo.
+**Latest phone milestone:** [original onResume returned and a 2400×1080 Surface was created](ACTIVITY_SURFACE_DEVICE_TEST.md), PID 27870 / UID 11077; native graphics context/init/setSize logged. Then SIGABRT (6), host cleanup none. The old collector lost the late evidence by retaining the first 24 KiB. Host **0.5.2** removes the saved warning/error/fatal log export byte cap through file streaming, retaining only a small tail preview in the UI. A WHAT WENT WRONG summary separates last stage, exit, affected area and confidence. Android validation pending. Original abort cause/title-screen success remain unproven; do not infer Swappy causality or request another engine import.
 
 We are building a clean, independent hosting client, not porting the original protected native VM. The current repository contains only the retained engine archive and the source/documentation/build infrastructure needed for the new base.
 

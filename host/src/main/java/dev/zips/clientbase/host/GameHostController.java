@@ -137,8 +137,9 @@ public final class GameHostController {
     public static void refresh() {
         if (app == null) return;
         File stage = GameHostReport.stageFile(app), exit = exitFile();
-        if (stage.isFile()) show(GameHostReport.read(stage) + (exit.isFile() && exit.lastModified() >= stage.lastModified()
-                ? "\n\n" + GameHostReport.read(exit) : ""));
+        if (stage.isFile()) show(exit.isFile() && exit.lastModified() >= stage.lastModified()
+                ? GameHostReport.read(exit) + "\n\nLifecycle milestones:\n" + GameHostReport.read(stage)
+                : GameHostReport.read(stage));
     }
     public static void collect() {
         if (app == null || collecting) return;
@@ -156,6 +157,8 @@ public final class GameHostController {
                 ProbeExitDiagnostics.Run identity = new ProbeExitDiagnostics.Run(run.getInt("pid"), run.getInt("uid"),
                         run.getLong("started_at"), run.getString("cleanup"), ":game_host");
                 details = ProbeExitDiagnostics.collect(app, identity);
+                details = ProbeExitDiagnostics.summarizeGame(app, identity,
+                        GameHostReport.read(GameHostReport.stageFile(app)), details) + "\n" + details;
             } catch (Exception e) { details = "GAME_EXIT_UNAVAILABLE\n" + e; }
             final String result = details;
             MAIN.post(() -> {
