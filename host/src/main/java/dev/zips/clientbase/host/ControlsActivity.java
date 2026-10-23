@@ -26,7 +26,15 @@ public final class ControlsActivity extends Activity {
         LinearLayout page=ClientUi.column(this);int p=ClientUi.dp(this,20);page.setPadding(p,p,p,p);scroll.addView(page);
         page.addView(ClientUi.label(this,"Z I P S   /   C O N T R O L S",13,ClientUi.ACCENT));
         page.addView(ClientUi.label(this,"Outside the game.\nConnected to the engine.",28,ClientUi.TEXT));
-        page.addView(ClientUi.label(this,"0.6.0  ·  separate UI process  ·  read-only integration",13,ClientUi.MUTED));
+        page.addView(ClientUi.label(this,"0.6.1  ·  separate UI process  ·  read-only integration",13,ClientUi.MUTED));
+        LinearLayout overlay=ClientUi.card(this);page.addView(overlay);
+        overlay.addView(ClientUi.label(this,"OPTIONAL / EXTERNAL OVERLAY",12,ClientUi.ACCENT));
+        overlay.addView(ClientUi.label(this,"A floating menu, not a game renderer.",20,ClientUi.TEXT));
+        overlay.addView(ClientUi.label(this,"Explicit Android permission required. The non-focusable window may keep the game focused, but OEM/game behavior still needs testing. It remains visible over other apps until stopped. Close hides the menu; Stop removes everything.",14,ClientUi.MUTED));
+        Button enable=ClientUi.button(this,"Enable external overlay",true);enable.setId(R.id.overlay_enable);overlay.addView(enable);
+        enable.setOnClickListener(v->OverlayPermission.requestStart(this));
+        Button disable=ClientUi.button(this,"Stop overlay",false);disable.setId(R.id.overlay_disable);overlay.addView(disable);disable.setOnClickListener(v->OverlayService.stop(this));
+        ClientUi.gap(page,16);
         mode=ClientUi.label(this,"",12,ClientUi.ACCENT);page.addView(mode);updateMode();
         LinearLayout card=ClientUi.card(this);page.addView(card);
         card.addView(ClientUi.label(this,"ENGINE / MEMORY",12,ClientUi.ACCENT));

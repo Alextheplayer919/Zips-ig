@@ -22,7 +22,9 @@ class ClientBaseSourceTests(unittest.TestCase):
     def test_manifest_xml_and_least_privilege_permissions(self):
         for module in ('host', 'demo-guest', 'contract'):
             root = self.manifest(module)
-            expected = (['android.permission.ACCESS_NETWORK_STATE', 'android.permission.INTERNET'] if module == 'host'
+            expected = (['android.permission.ACCESS_NETWORK_STATE', 'android.permission.INTERNET',
+                         'android.permission.SYSTEM_ALERT_WINDOW', 'android.permission.FOREGROUND_SERVICE',
+                         'android.permission.POST_NOTIFICATIONS'] if module == 'host'
                         else ['dev.zips.clientbase.guest.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'] if module == 'demo-guest' else [])
             self.assertEqual(expected, [permission.get(ANDROID + 'name') for permission in root.findall('uses-permission')])
         for path in BASE.glob('*/src/main/res/**/*.xml'):
@@ -305,6 +307,23 @@ class ClientBaseSourceTests(unittest.TestCase):
         client = (BASE / 'host/src/main/java/dev/zips/clientbase/host/MemoryClient.java').read_text()
         self.assertIn('8000', client)
         self.assertNotIn('GameHostController.start()', client)
+
+    def test_overlay_is_optional_external_nonsticky_and_not_game_renderer(self):
+        service = self.manifest('host').find("application/service[@" + ANDROID + "name='.OverlayService']")
+        self.assertEqual('false', service.get(ANDROID + 'exported'))
+        self.assertIsNone(service.get(ANDROID + 'process'))
+        self.assertEqual('true', service.get(ANDROID + 'stopWithTask'))
+        source = (BASE / 'host/src/main/java/dev/zips/clientbase/host/OverlayService.java').read_text()
+        for required in ('START_NOT_STICKY', 'startForeground(', 'Settings.canDrawOverlays', 'stopWatchingMode', 'STOP_FOREGROUND_REMOVE'):
+            self.assertIn(required, source)
+        self.assertNotIn('return START_STICKY', source)
+        window = (BASE / 'host/src/main/java/dev/zips/clientbase/host/OverlayWindow.java').read_text()
+        for required in ('TYPE_APPLICATION_OVERLAY', 'FLAG_NOT_FOCUSABLE', 'FLAG_NOT_TOUCH_MODAL', 'new MemoryClient(', 'client.cancel()'):
+            self.assertIn(required, window)
+        for forbidden in ('MATCH_PARENT', 'FLAG_LAYOUT_NO_LIMITS', 'GameHostController.start()', 'setFocusableInTouchMode(true)'):
+            self.assertNotIn(forbidden, window)
+        self.assertFalse(any((BASE / 'host/src').rglob('*.kt')))
+        self.assertNotIn('compose', (BASE / 'host/build.gradle').read_text().lower())
 
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):

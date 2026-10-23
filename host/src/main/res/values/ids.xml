@@ -8,4 +8,12 @@
     <item name="developer_tools" type="id" />
     <item name="open_controls" type="id" />
     <item name="controls_guide" type="id" />
+    <item name="overlay_enable" type="id" />
+    <item name="overlay_disable" type="id" />
+    <item name="overlay_chip" type="id" />
+    <item name="overlay_panel" type="id" />
+    <item name="overlay_close" type="id" />
+    <item name="overlay_refresh" type="id" />
+    <item name="overlay_report" type="id" />
+    <item name="overlay_stop" type="id" />
 </resources>

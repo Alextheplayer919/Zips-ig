@@ -3,6 +3,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Real Activity startup configures networked SDKs under OUR UID, not the game's. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Optional, user-authorized external overlay; foreground lifecycle and visible Stop controls. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <queries>
         <package android:name="dev.zips.clientbase.guest" />
         <package android:name="com.mojang.minecraftpe" />
@@ -10,6 +14,7 @@
     <application android:name=".ClientBaseApplication" android:appComponentFactory=".HostComponentFactory" android:label="Client Base" android:allowBackup="false"
         android:extractNativeLibs="true" android:supportsRtl="true" android:theme="@style/AppTheme">
         <service android:name=".EngineProbeService" android:process=":engine_probe" android:exported="false" />
+        <service android:name=".OverlayService" android:exported="false" android:stopWithTask="true" />
         <service android:name=".GameHostService" android:process=":game_host" android:exported="false" />
         <!-- Original SDK discovery uses ComponentName(host package, this SDK class).
              Metadata only in normal startup; any framework creation is strictly factory-gated. -->
