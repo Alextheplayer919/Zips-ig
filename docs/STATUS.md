@@ -63,11 +63,11 @@ The [first Activity/resource bridge](ACTIVITY_BRIDGE.md) is implemented, not jus
 
 [Android 13 run 39966947699](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39966947699) passed for commit `3cd8f7f1e705de3892952d58230b3b7c862cfb7c`, job `120459176807` (5m2s), with all retained coverage; 20 local source/native guards pass. Real Minecraft is not executed by CI. The actual original Activity/subclass attachment, AppCompat/SplashScreen and Application/provider/SDK environment, separate-game-process lifetime/diagnostics, and user-facing launch are still pending. Bounded inspection found the supplied MainActivity exits its process from `onDestroy`; original-game hosting must therefore never use the host UI process. No additional file or phone test is currently requested.
 
-### Host 0.5.0 — original Activity adapter implemented; validation pending
+### Host 0.5.0 — original Activity adapter and Android validation complete; phone launch pending
 
 The [first original Bedrock Activity adapter](BEDROCK_ACTIVITY_ATTEMPT.md) adds a dedicated `:game_host` session/service/factory, an exact same-loader host subclass of the installed MainActivity, original resource/theme views and native-library metadata, passive lifecycle/Surface stages, separate reports, own-process exit collection and explicit stop/startup timeout. All uploaded manifest/DEX/resource bytes are pinned before preparing classes, as is the selected engine. A compile-only superclass-signature JAR is excluded from APKs; the packaging guard checks actual DEX class definitions. No proprietary runtime class is bundled or patched.
 
-Original providers and all SDK/package environments are not recreated. INTERNET is deliberately added for original networked startup; no runtime/broad storage/location/log grant or entitlement bypass. The automated fixture now uses AppCompat, with the app-specific signature permission its private receiver fallback declares. New policy/manifest/process/rejection tests and retained regression coverage require Android validation before delivery. The actual Bedrock title screen remains unproven. No extra user file is needed at this point.
+Original providers and all SDK/package environments are not recreated. INTERNET is deliberately added for original networked startup; no runtime/broad storage/location/log grant or entitlement bypass. The automated fixture now uses AppCompat, with the app-specific signature permission its private receiver fallback declares. [Android 13 CI run 39973150833](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39973150833) passed for app/test commit `d3e49030c6ddf9aaaa6d31b52c572ad2f032b49d`, job `120481541654` (4m41s): all 30 regression cases plus APK class-definition/engine exclusion checks. Twenty-two local guards pass. The fixture validates AppCompat with consistent guest AndroidX/Kotlin ownership; original ARM64 game execution is not performed in CI. [Host 0.5.0 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39973150833/artifacts/12509773681), `client-base-debug-66`. The actual Bedrock title screen remains unproven. No extra user file is needed at this point.
 
 ### Validation boundary
 
@@ -86,7 +86,7 @@ The engine build also passed [CI run 39851721708](https://github.com/Alextheplay
 
 ### Not implemented
 
-- Minecraft launch or a general guest Activity/Application/provider environment. Installed package discovery also supports the now-successful bounded class-initialization probe.
+- Proven original Bedrock title-screen launch and a general guest Application/provider environment. The original Activity adapter is now experimental in 0.5.0; its first phone launch result is pending.
 - Minecraft native-engine startup, resolver reconstruction or hooks.
 - Access to the separately installed game's private data.
 - Game features/modules or an update-compatible engine integration layer.

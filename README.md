@@ -4,12 +4,12 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 
 **Current implementation: hosting prototype with a successful reported Bedrock bootstrap and a new experimental Activity adapter; not a proven Minecraft launcher.**
 
-**Latest phone result:** [Bedrock bootstrap returned successfully](docs/JVM_BOOTSTRAP_DEVICE_TEST.md) (PID 12037 / UID 11072). Original MainActivity initialization completed with JVM-managed native loading and the hash-matched engine already mapped. No Activity/title screen yet. **Do not repeat the bootstrap test**; the [host 0.5.0 Activity adapter](docs/BEDROCK_ACTIVITY_ATTEMPT.md) is now implemented and awaiting Android validation and its first phone result.
+**Latest phone result:** [Bedrock bootstrap returned successfully](docs/JVM_BOOTSTRAP_DEVICE_TEST.md) (PID 12037 / UID 11072). Original MainActivity initialization completed with JVM-managed native loading and the hash-matched engine already mapped. No Activity/title screen yet. **Do not repeat the bootstrap test**; the [host 0.5.0 Activity adapter](docs/BEDROCK_ACTIVITY_ATTEMPT.md) passed Android 13 validation and is ready for its first phone launch attempt: [host 0.5.0 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39973150833/artifacts/12509773681). Install only the host, then use **Launch Bedrock Activity (experimental)** once; no demo/import/link/bootstrap repeat.
 
 ## Documentation
 
 - [Original Bedrock Activity attempt](docs/BEDROCK_ACTIVITY_ATTEMPT.md) — dedicated-process adapter, exact startup pins, consent and separate diagnostics.
-- [Activity bridge implementation](docs/ACTIVITY_BRIDGE.md) — framework Activity/resources/lifecycle/Surface work and automated coverage; not yet a Minecraft-launch build.
+- [Activity bridge implementation](docs/ACTIVITY_BRIDGE.md) — framework Activity/resources/lifecycle/Surface foundation; see the 0.5.0 original-game attempt above for the current build.
 
 - [How we think the original client works](docs/THEORY.md) — evidence, hypotheses and unresolved engine integration.
 - [Current implementation and roadmap](docs/STATUS.md) — what is implemented versus tested, and our next acceptance gates.

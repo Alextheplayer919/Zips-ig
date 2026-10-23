@@ -1,6 +1,6 @@
 # Building and testing APKs
 
-**Latest phone test completed:** [Bedrock bootstrap returned successfully](JVM_BOOTSTRAP_DEVICE_TEST.md). No new installation or repeated demo/link/bootstrap test is needed. The next development stage is [Activity/resources/lifecycle hosting](ACTIVITY_HOSTING.md); no Activity-launch APK is available yet. Installation steps below document earlier milestones.
+**Current phone step:** [host 0.5.0 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39973150833/artifacts/12509773681), validated on Android 13. Install only `client-base-host-debug.apk`; keep Minecraft unchanged. Tap **Launch Bedrock Activity (experimental)** once and share **Bedrock Activity report**. No demo, archive import, link or bootstrap repeat. If debug signatures conflict, uninstall only Client Base host, not Minecraft. [Full boundaries and exit-collection instructions](BEDROCK_ACTIVITY_ATTEMPT.md). Earlier milestone instructions below are historical.
 
 ## GitHub Actions
 
