@@ -21,7 +21,8 @@
   "fly": {
     "attachment": "MotionFly.kt (1).txt",
     "sha256": "aa51460ab146afc7f2d792084754fcb3e07eb556fa322cb21dd4661b671d1e99",
-    "bytes": 6298
+    "bytes": 6298,
+    "scope_update": "User explicitly removed CollisionGuard and MovementCompliance; direct movement output without collision/adaptive governor"
   },
   "target": {
     "platform": "Android ARM64",
@@ -29,5 +30,11 @@
     "minecraft": "26.50 / 1.26.50.4 / 972605004",
     "engine_build_id": "afa62bd3385161f1facfe36aad58ac63998f46d2"
   },
-  "status": "Portable logic ports and host-native tests only; no native engine adapter or proxy transport connected"
+  "status": "Portable logic ports and host-native tests only; no native engine adapter or proxy transport connected",
+  "entity_tracker": {
+    "attachment": "EntityTracker.kt (1).txt",
+    "sha256": "d16da8a2b197ce6597d8186711e3bcd43dd5668021327bf4772e1dc7088020c7",
+    "bytes": 40665,
+    "adapted_subset": "self runtime/unique ID, raw position/rotation, StartGame/AuthInput/MovePlayer/respawn/dimension lifecycle; no account/inventory/agent dependencies"
+  }
 }

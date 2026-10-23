@@ -12,7 +12,7 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 
 **Latest — 0.6.2 category click GUI:** [Movement / Combat / Visual / Misc](docs/CLICK_GUI.md), no fake module toggles. Memory refresh/copy/report options are outside the floating menu in Controls; the user reports the preceding overlay works on their phone. [Android build/APK and full 60-case emulator suite passed](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40000628335); [download host APK](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40000628335/artifacts/12522700433). No extra upload is needed for this UI. Next module work starts with a concrete module/interface, not guessed offsets or another giant dump.
 
-**Module work in progress:** [Melody KillAura adaptation + supplied MotionFly](docs/MODULE_PORTS.md). Portable selection/movement policies are ported and host-native tested; **not yet connected to Minecraft or a packet transport**, so there are no working module toggles/new module APK yet. Custom packet handling is scoped to Fly only.
+**Module work in progress:** [Melody KillAura adaptation + supplied MotionFly](docs/MODULE_PORTS.md). Portable selection/movement policies and the supplied tracker’s self-state subset are adapted and host-native tested; collision/adaptive-governor helpers are removed at the user’s request; **not yet connected to Minecraft or a packet transport**, so there are no working module toggles/new module APK yet. Custom packet handling is scoped to Fly only.
 
 ## Documentation
 

@@ -12,7 +12,7 @@ We are building a clean, independent hosting client, not porting the original pr
 
 **Current — 0.6.2:** [Category click GUI](CLICK_GUI.md): Movement, Combat, Visual and Misc, honestly empty pending real modules. Technical memory/copy controls stay only in separate host Controls. [Build/APK and full 60-case Android 13 suite passed](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40000628335); [host APK](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40000628335/artifacts/12522700433); 28 local source/native guards. Original startup/native backend/service unchanged. The user has now chosen Melody KillAura plus the supplied MotionFly; see the module-port work below.
 
-**Active module work:** [Native KillAura adaptation / packet-only MotionFly](MODULE_PORTS.md), [input provenance](MODULE_INPUTS.json). Portable logic ports and tests are in source; no engine adapter, native attack hook, proxy transport or functional module toggle is connected yet. 29 source/native tests pass. Preserve the working 0.6.2 app.
+**Active module work:** [Native KillAura adaptation / packet-only MotionFly](MODULE_PORTS.md), [input provenance](MODULE_INPUTS.json). Portable logic ports and tests are in source; no engine adapter, native attack hook, proxy transport or functional module toggle is connected yet. 30 source/native tests pass. The user supplied EntityTracker; its self-state subset is adapted with session lifecycle tests. CollisionGuard/MovementCompliance dependencies are removed at the user’s request. Packet event/session delivery and native engine adapters remain unconnected. Preserve the working 0.6.2 app.
 
 ### Implemented
 

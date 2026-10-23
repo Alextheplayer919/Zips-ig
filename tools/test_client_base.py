@@ -349,6 +349,19 @@ class ClientBaseSourceTests(unittest.TestCase):
             subprocess.run([binary], check=True, timeout=10)
 
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
+    def test_self_tracker_and_fly_session_lifecycle(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binary = str(Path(directory) / 'self-tracker-test')
+            subprocess.run(['g++', '-std=c++17', '-Wall', '-Wextra', '-Werror',
+                            '-I', str(BASE / 'host/src/main/cpp/modules'),
+                            str(BASE / 'tests/native/self_tracker_test.cpp'), '-o', binary],
+                           check=True, timeout=30)
+            subprocess.run([binary], check=True, timeout=10)
+        source = (BASE / 'host/src/main/cpp/modules/module_policies.h').read_text()
+        for removed in ('FlyDependencies', 'collisionClamp', 'adaptiveGovernor', 'bool adaptive'):
+            self.assertNotIn(removed, source)
+
+    @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

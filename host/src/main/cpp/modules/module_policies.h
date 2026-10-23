@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <functional>
-#include <optional>
 #include <unordered_set>
 #include <vector>
 
@@ -96,19 +94,12 @@ struct FlyInput {
 struct FlySettings {
     float horizontalBps{46}, upBps{19.8f}, downBps{46}, glide{-0.02f};
     float upHorizontalFactor{0.55f}, downHorizontalFactor{0.55f};
-    bool adaptive{};
     bool valid() const {
         auto between = [](float v, float low, float high) { return std::isfinite(v) && v >= low && v <= high; };
         return between(horizontalBps,1,100) && between(upBps,1,60) && between(downBps,1,60)
             && between(glide,-0.3f,0) && between(upHorizontalFactor,0.1f,1)
             && between(downHorizontalFactor,0.1f,1);
     }
-};
-struct GovernedSpeed { float horizontal{}, vertical{}; };
-struct FlyDependencies {
-    // Must be supplied by real world/proxy state. No invented collision/governor fallback.
-    std::function<std::optional<Vec3>(const Self&, const Vec3&)> collisionClamp;
-    std::function<std::optional<GovernedSpeed>(float, float, float)> adaptiveGovernor;
 };
 enum class FlyStatus { Ignored, Unavailable, CorrectionSkipped, EmitClientMotion };
 struct FlyResult {
@@ -122,8 +113,7 @@ class MotionFlyPolicy {
 public:
     bool enable(const Self& self) { disable(); if (!self.valid()) return false; last_ = self; enabled_ = true; return true; }
     void disable() { enabled_ = false; last_ = {}; }
-    FlyResult onPacket(const Self& self, const FlyInput& input, const FlySettings& settings,
-                       const FlyDependencies& dependencies) {
+    FlyResult onPacket(const Self& self, const FlyInput& input, const FlySettings& settings) {
         if (!enabled_ || input.kind != PacketKind::PlayerAuthInput || input.direction != Direction::ClientToServer)
             return {};
         FlyResult result; result.status = FlyStatus::Unavailable;
@@ -137,28 +127,21 @@ public:
         if (!up && !down && input.strafe == 0 && input.forward == 0 && settings.glide == 0) {
             last_ = self; return {};
         }
-        if (!dependencies.collisionClamp || (settings.adaptive && !dependencies.adaptiveGovernor)) return result;
         float horizontal = std::min(settings.horizontalBps / 20.f, float(std::sqrt(5.99)));
         if (up) horizontal *= settings.upHorizontalFactor;
         if (down) horizontal *= settings.downHorizontalFactor;
         float vertical = up ? settings.upBps / 20.f : down ? -settings.downBps / 20.f + settings.glide : settings.glide;
-        if (settings.adaptive) {
-            auto governed = dependencies.adaptiveGovernor(horizontal, vertical, settings.glide);
-            if (!governed || !std::isfinite(governed->horizontal) || governed->horizontal < 0
-                || !std::isfinite(governed->vertical)) return result;
-            horizontal = governed->horizontal; vertical = governed->vertical;
-        }
         const double yaw = std::remainder(double(input.yawDegrees), 360.0) * 3.14159265358979323846 / 180.0;
         double x = double(input.strafe) * std::cos(yaw) - double(input.forward) * std::sin(yaw);
         double z = double(input.forward) * std::cos(yaw) + double(input.strafe) * std::sin(yaw);
         const double length = std::hypot(x,z);
         if (length > 0.001) { x = x / length * horizontal; z = z / length * horizontal; }
         else { x = z = 0; }
-        auto clamped = dependencies.collisionClamp(self, {float(x),vertical,float(z)});
-        if (!clamped || !clamped->finite()) return result;
+        Vec3 motion{float(x),vertical,float(z)};
+        if (!motion.finite()) return result;
         last_ = self;
         result.status = FlyStatus::EmitClientMotion; result.session = self.session;
-        result.runtimeId = self.id; result.motion = *clamped;
+        result.runtimeId = self.id; result.motion = motion;
         return result; // Intent for client-bound SetEntityMotion; no socket/JNI/network side effect here.
     }
 };

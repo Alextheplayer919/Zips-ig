@@ -35,43 +35,38 @@ int main() {
     config.targetRange=std::numeric_limits<float>::infinity();
     assert(aura.tick(self,{nearPlayer},config).targets.empty());
 
-    MotionFlyPolicy fly; FlySettings settings; FlyDependencies dependencies;
+    MotionFlyPolicy fly; FlySettings settings;
     FlyInput input;input.kind=PacketKind::PlayerAuthInput;input.direction=Direction::ClientToServer;input.forward=1;
-    assert(fly.onPacket(self,input,settings,dependencies).status==FlyStatus::Ignored);
+    assert(fly.onPacket(self,input,settings).status==FlyStatus::Ignored);
     assert(fly.enable(self));
-    assert(fly.onPacket(self,input,settings,dependencies).status==FlyStatus::Unavailable);
-    int collisionCalls=0;
-    // Test fixture only: production must supply real collision data; not a collision implementation.
-    dependencies.collisionClamp=[&](const Self&,const Vec3& motion)->std::optional<Vec3>{++collisionCalls;return motion;};
     auto other=input;other.kind=PacketKind::Other;
-    assert(fly.onPacket(self,other,settings,dependencies).status==FlyStatus::Ignored);
+    assert(fly.onPacket(self,other,settings).status==FlyStatus::Ignored);
     other=input;other.direction=Direction::ServerToClient;
-    assert(fly.onPacket(self,other,settings,dependencies).status==FlyStatus::Ignored);assert(collisionCalls==0);
-    auto result=fly.onPacket(self,input,settings,dependencies);
+    assert(fly.onPacket(self,other,settings).status==FlyStatus::Ignored);
+    auto result=fly.onPacket(self,input,settings);
     assert(result.status==FlyStatus::EmitClientMotion && result.runtimeId==10 && result.session==1);
     assert(near(result.motion.z,2.3f) && near(result.motion.x,0) && near(result.motion.y,-0.02f));
-    input.yawDegrees=90;result=fly.onPacket(self,input,settings,dependencies);
+    input.yawDegrees=90;result=fly.onPacket(self,input,settings);
     assert(near(result.motion.x,-2.3f) && near(result.motion.z,0));
-    input.jumping=true;result=fly.onPacket(self,input,settings,dependencies);
+    input.jumping=true;result=fly.onPacket(self,input,settings);
     assert(near(result.motion.x,-2.3f*0.55f) && near(result.motion.y,0.99f));
-    input.jumping=false;input.sneaking=true;result=fly.onPacket(self,input,settings,dependencies);
+    input.jumping=false;input.sneaking=true;result=fly.onPacket(self,input,settings);
     assert(near(result.motion.y,-2.32f));input.sneaking=false;
     settings.horizontalBps=100;input.yawDegrees=0;input.strafe=1;
-    result=fly.onPacket(self,input,settings,dependencies);
+    result=fly.onPacket(self,input,settings);
     assert(near(std::hypot(result.motion.x,result.motion.z),float(std::sqrt(5.99))));
     Self corrected=self;corrected.position.x=5;
-    assert(fly.onPacket(corrected,input,settings,dependencies).status==FlyStatus::CorrectionSkipped);
-    assert(fly.onPacket(corrected,input,settings,dependencies).status==FlyStatus::EmitClientMotion);
-    settings.adaptive=true;
-    assert(fly.onPacket(corrected,input,settings,dependencies).status==FlyStatus::Unavailable);
-    dependencies.adaptiveGovernor=[](float,float,float)->std::optional<GovernedSpeed>{return GovernedSpeed{0.5f,-0.1f};};
-    result=fly.onPacket(corrected,input,settings,dependencies);
-    assert(near(std::hypot(result.motion.x,result.motion.z),0.5f) && near(result.motion.y,-0.1f));
-    dependencies.collisionClamp=[](const Self&,const Vec3&)->std::optional<Vec3>{return std::nullopt;};
-    assert(fly.onPacket(corrected,input,settings,dependencies).status==FlyStatus::Unavailable);
-    assert(fly.onPacket(nextWorld,input,settings,dependencies).status==FlyStatus::Unavailable);
-    assert(fly.onPacket(self,input,settings,dependencies).status==FlyStatus::Ignored); // world change disables
+    assert(fly.onPacket(corrected,input,settings).status==FlyStatus::CorrectionSkipped);
+    assert(fly.onPacket(corrected,input,settings).status==FlyStatus::EmitClientMotion);
+    // No collision/governor dependency or clamp: computed settings are used directly.
+    assert(near(fly.onPacket(corrected,input,settings).motion.y,settings.glide));
+    assert(fly.onPacket(nextWorld,input,settings).status==FlyStatus::Unavailable);
+    assert(fly.onPacket(self,input,settings).status==FlyStatus::Ignored); // world change disables
     assert(fly.enable(self));input.forward=std::numeric_limits<float>::infinity();
-    assert(fly.onPacket(self,input,settings,dependencies).status==FlyStatus::Unavailable);
-    fly.disable();assert(fly.onPacket(self,input,settings,dependencies).status==FlyStatus::Ignored);
+    assert(fly.onPacket(self,input,settings).status==FlyStatus::Unavailable);
+    input.forward=0;input.strafe=0;settings.glide=0;
+    assert(fly.onPacket(self,input,settings).status==FlyStatus::Ignored);
+    input.wantUp=true;
+    assert(fly.onPacket(self,input,settings).status==FlyStatus::EmitClientMotion);
+    fly.disable();assert(fly.onPacket(self,input,settings).status==FlyStatus::Ignored);
 }
