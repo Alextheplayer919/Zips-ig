@@ -87,6 +87,11 @@ public final class OverlayTest {
                 for(ModuleCategory category:ModuleCategory.values()) {
                     first.panel().findViewById(category.viewId).performClick();
                     assertEquals(category.title,((TextView)first.panel().findViewById(R.id.overlay_category_title)).getText().toString());
+                    for(ModuleRegistry.Entry entry:ModuleRegistry.forCategory(category)) {
+                        View registered=first.panel().findViewById(entry.viewId);
+                        assertNotNull(registered);assertFalse(registered.isClickable());
+                        assertEquals(entry.name,((TextView)registered).getText().toString());
+                    }
                     for(ModuleCategory item:ModuleCategory.values())
                         assertEquals(item==category,first.panel().findViewById(item.viewId).isSelected());
                 }

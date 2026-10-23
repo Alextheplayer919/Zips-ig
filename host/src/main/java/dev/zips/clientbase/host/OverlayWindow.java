@@ -103,7 +103,7 @@ final class OverlayWindow {
         select(selected);
         LinearLayout footer = new LinearLayout(context);
         footer.setGravity(Gravity.CENTER_VERTICAL);
-        footer.addView(ClientUi.label(context, "0 MODULES", 11, ClientUi.MUTED), new LinearLayout.LayoutParams(0,-2,1));
+        footer.addView(ClientUi.label(context, ModuleRegistry.all().size()+" REGISTERED", 11, ClientUi.MUTED), new LinearLayout.LayoutParams(0,-2,1));
         Button halt=ClientUi.button(context,"Stop overlay",false);
         halt.setId(R.id.overlay_stop);halt.setOnClickListener(v->stop.run());
         footer.addView(halt, new LinearLayout.LayoutParams(ClientUi.dp(context,120),ClientUi.dp(context,44)));
@@ -125,9 +125,22 @@ final class OverlayWindow {
         title.setId(R.id.overlay_category_title);
         title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         categoryBody.addView(title);
-        categoryBody.addView(ClientUi.label(context, "No modules yet", 15, ClientUi.MUTED));
-        categoryBody.addView(ClientUi.label(context,
-                "Modules will appear here as they are implemented.", 13, ClientUi.MUTED));
+        java.util.List<ModuleRegistry.Entry> entries=ModuleRegistry.forCategory(category);
+        if(entries.isEmpty()) {
+            categoryBody.addView(ClientUi.label(context, "No modules yet", 15, ClientUi.MUTED));
+            return;
+        }
+        for(ModuleRegistry.Entry entry:entries) {
+            LinearLayout row=ClientUi.card(context);
+            TextView name=ClientUi.label(context,entry.name,17,ClientUi.TEXT);
+            name.setId(entry.viewId);name.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+            row.addView(name);
+            row.addView(ClientUi.label(context,entry.description,12,ClientUi.MUTED));
+            row.addView(ClientUi.label(context,entry.blocker,12,ClientUi.MUTED));
+            // No clickable toggle until a real live backend acknowledges enablement.
+            categoryBody.addView(row);
+            ClientUi.gap(categoryBody,8);
+        }
     }
     private void drag(View handle,View window,WindowManager.LayoutParams p){
         handle.setOnTouchListener(new View.OnTouchListener(){

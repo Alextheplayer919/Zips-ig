@@ -14,6 +14,8 @@ We are building a clean, independent hosting client, not porting the original pr
 
 **Active module work:** [Native KillAura adaptation / packet-only MotionFly](MODULE_PORTS.md), [input provenance](MODULE_INPUTS.json). Portable logic ports and tests are in source; no engine adapter, native attack hook, proxy transport or functional module toggle is connected yet. 30 source/native tests pass. The user supplied EntityTracker; its self-state subset is adapted with session lifecycle tests. CollisionGuard/MovementCompliance dependencies are removed at the user’s request. Packet event/session delivery and native engine adapters remain unconnected. Preserve the working 0.6.2 app.
 
+**Next integration step — 0.6.3 preview:** [Runtime drivers / module registration](MODULE_RUNTIME.md) add real decoded event dispatch around Fly and a native-only combat driver, compiled by NDK; concrete live adapter implementations remain missing. Registered rows are visibly unavailable, no fake enablement. 32 local source/native tests pass; Android validation pending. [Bounded exact-engine export check](ENGINE_MODULE_ABI.json) found no named player/packet/attack interface among searched fragments.
+
 ### Implemented
 
 - Host UI with explicit demo loading and readable failure messages.

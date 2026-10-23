@@ -14,6 +14,8 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 
 **Module work in progress:** [Melody KillAura adaptation + supplied MotionFly](docs/MODULE_PORTS.md). Portable selection/movement policies and the supplied tracker’s self-state subset are adapted and host-native tested; collision/adaptive-governor helpers are removed at the user’s request; **not yet connected to Minecraft or a packet transport**, so there are no working module toggles/new module APK yet. Custom packet handling is scoped to Fly only.
 
+**0.6.3 integration preview in development:** [registered module rows + decoded packet/native runtime drivers](docs/MODULE_RUNTIME.md). **No live transport or verified native engine adapters yet**; rows show unavailable, not working toggles. Android validation pending.
+
 ## Documentation
 
 - [Original Bedrock Activity attempt](docs/BEDROCK_ACTIVITY_ATTEMPT.md) — dedicated-process adapter, exact startup pins, consent and separate diagnostics.

@@ -22,4 +22,6 @@
     <item name="category_misc" type="id" />
     <item name="overlay_category_title" type="id" />
     <item name="memory_copy" type="id" />
+    <item name="module_motion_fly" type="id" />
+    <item name="module_kill_aura" type="id" />
 </resources>

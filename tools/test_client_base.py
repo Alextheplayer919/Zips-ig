@@ -362,6 +362,24 @@ class ClientBaseSourceTests(unittest.TestCase):
             self.assertNotIn(removed, source)
 
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
+    def test_module_runtimes_dispatch_only_fly_packets_and_native_combat_actions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binary = str(Path(directory) / 'module-runtime-test')
+            subprocess.run(['g++', '-std=c++17', '-pthread', '-Wall', '-Wextra', '-Werror',
+                            '-I', str(BASE / 'host/src/main/cpp/modules'),
+                            str(BASE / 'tests/native/module_runtime_test.cpp'), '-o', binary],
+                           check=True, timeout=30)
+            subprocess.run([binary], check=True, timeout=10)
+
+    def test_registered_modules_remain_unavailable_without_live_adapters(self):
+        source = (BASE / 'host/src/main/java/dev/zips/clientbase/host/ModuleRegistry.java').read_text()
+        for required in ('"MotionFly"', '"KillAura"', 'Unavailable', 'Collections.unmodifiableList'):
+            self.assertIn(required, source)
+        self.assertNotIn('setEnabled(true)', source)
+        cmake = (BASE / 'host/src/main/cpp/CMakeLists.txt').read_text()
+        self.assertIn('modules/module_runtime.cpp', cmake)
+
+    @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

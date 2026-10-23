@@ -24,9 +24,11 @@ The new `EntityTracker.kt (1).txt` is recorded in input provenance. `self_tracke
 
 The original code ignores server-boundary self MovePlayer corrections and leaves some origin flags/reset state stale; the subset accepts authoritative self corrections, validates finite values and direction, ignores other runtime IDs, retains explicit position-source tags without assuming an eye/feet offset, and issues new session generations at world/reconnect/respawn boundaries. Feed it on one packet/session executor, update the tracker **before** invoking Fly for AuthInput, and do not invoke Fly if the tracker rejects that update. The codec adapter must select the relevant respawn state. Keep tracker ownership across connections, reset on disconnect and disable Fly when tearing down/replacing the transport; methods remain decoded-state policy, not actual packet delivery.
 
+> **Next implementation step:** [0.6.3 runtime/registration preview](MODULE_RUNTIME.md) adds decoded dispatch, native execution-adapter drivers and category registrations. Concrete live network/engine adapters are still not connected; no working gameplay claim.
+
 ## What is still unimplemented
 
-These are **logic ports, not completed working modules**. They are not connected to native Minecraft, compiled into its engine, exposed via JNI/IPC, installed as packet hooks, or shown as usable toggles. No new module APK is being delivered. The last validated application remains 0.6.2; categories stay empty rather than pretending a backend exists.
+These are **logic ports, not completed working modules**. They are not connected to native Minecraft, compiled into its engine, exposed via JNI/IPC, installed as packet hooks, or shown as usable toggles. The subsequent preview registers unavailable rows only. No new module APK is being delivered. The last validated application remains 0.6.2; categories stay empty rather than pretending a backend exists.
 
 KillAura still needs verified Android26.50 local-player/world/entity access, tick integration, native attack/swing entrypoints, target/session revalidation and a dedicated module-control IPC operation (the existing memory opcode remains read-only). None is derived by reusing Melody's Windows signatures. The engine input/version is unchanged; no unrelated bootstrap repeat is needed.
 
