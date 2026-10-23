@@ -11,6 +11,14 @@
         android:extractNativeLibs="true" android:supportsRtl="true" android:theme="@style/AppTheme">
         <service android:name=".EngineProbeService" android:process=":engine_probe" android:exported="false" />
         <service android:name=".GameHostService" android:process=":game_host" android:exported="false" />
+        <!-- Original SDK discovery uses ComponentName(host package, this SDK class).
+             Metadata only in normal startup; any framework creation is strictly factory-gated. -->
+        <service android:name="com.google.firebase.components.ComponentDiscoveryService"
+            android:process=":game_host" android:exported="false" android:directBootAware="true">
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar" android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar" android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar" />
+        </service>
         <activity android:name=".MinecraftHostedActivity" android:process=":game_host" android:exported="false"
             android:theme="@android:style/Theme.Material.NoActionBar" android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape" android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|fontScale" android:excludeFromRecents="true">

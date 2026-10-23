@@ -272,6 +272,22 @@ class ClientBaseSourceTests(unittest.TestCase):
         self.assertNotIn('com.google.android.gms.games.provider.PlayGamesInitProvider',
                          (BASE / 'host/src/main/AndroidManifest.xml').read_text())
 
+    def test_firebase_startup_has_discovery_and_blocks_missing_default_before_jni(self):
+        runtime = (BASE / 'host/src/main/java/dev/zips/clientbase/host/GameActivityRuntime.java').read_text()
+        self.assertLess(runtime.index('FirebaseStartup.initialize('), runtime.index('PlayGamesStartup.initialize('))
+        self.assertLess(runtime.index('FirebaseStartup.initialize('), runtime.index('Class.forName(WRAPPER, true'))
+        startup = (BASE / 'host/src/main/java/dev/zips/clientbase/host/FirebaseStartup.java').read_text()
+        for required in ('GameActivityRuntime.requireGameProcess(application)', 'initializeApp',
+                         'initialized == null', 'initialized != getDefault.invoke(null)',
+                         'getMessaging.invoke(null) == null', 'app.getClassLoader() != loader',
+                         'finally { Thread.currentThread().setContextClassLoader(previous); }'):
+            self.assertIn(required, startup)
+        service = self.manifest('host').find("application/service[@" + ANDROID + "name='com.google.firebase.components.ComponentDiscoveryService']")
+        self.assertIsNotNone(service)
+        self.assertEqual('false', service.get(ANDROID + 'exported'))
+        self.assertEqual(':game_host', service.get(ANDROID + 'process'))
+        self.assertEqual(3, len(service.findall('meta-data')))
+
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:

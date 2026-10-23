@@ -57,6 +57,14 @@ final class GameActivityRuntime {
         prepared = candidate;
         report.accept("GAME_ENVIRONMENT_PREPARED\nExact supplied startup bytes and engine matched. Original providers are NOT installed; later SDK failures remain possible.");
     }
+    static android.app.Service createFirebaseDiscoveryService(Context context) throws Exception {
+        requireGameProcess(context);
+        if (prepared == null) throw new IOException("Firebase service requires the pinned prepared game session");
+        Class<?> type = Class.forName(FirebaseStartup.DISCOVERY, true, prepared.loader);
+        if (type.getClassLoader() != prepared.loader || !android.app.Service.class.isAssignableFrom(type))
+            throw new IOException("Unexpected Firebase discovery service identity");
+        return (android.app.Service) type.getDeclaredConstructor().newInstance();
+    }
     static Activity create(Context context) throws Exception {
         requireGameProcess(context);
         if (prepared == null || created) throw new IOException("No fresh prepared game session (no automatic relaunch/recreation)");
@@ -66,6 +74,8 @@ final class GameActivityRuntime {
         try {
             // Before construction/lifecycle: the SDK registers Application lifecycle callbacks.
             // Use the already pinned original SDK, not a parent copy or synthetic provider authority.
+            // Original provider initOrder: Firebase 100, Play Games 99.
+            FirebaseStartup.initialize(ClientBaseApplication.current(), prepared.loader, progress);
             PlayGamesStartup.initialize(ClientBaseApplication.current(), prepared.loader, progress);
             progress.accept("ORIGINAL_CLASS_INITIALIZATION_AND_CONSTRUCTION_ENTERED");
             Class<?> wrapper = Class.forName(WRAPPER, true, prepared.loader);
