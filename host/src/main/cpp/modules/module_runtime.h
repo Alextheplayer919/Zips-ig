@@ -135,6 +135,7 @@ public:
     bool setEnabled(bool value) {
         if(!adapter_ || !adapter_->onGameThread())return false;
         if(!value){enabled_=false;policy_.reset();session_=self_=0;return true;}
+        if(enabled_ && adapter_->engineBuildId()==supportedEngineBuild)return true;
         enabled_=false;policy_.reset();
         if(adapter_->engineBuildId()!=supportedEngineBuild)return false;
         try {

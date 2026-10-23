@@ -371,13 +371,40 @@ class ClientBaseSourceTests(unittest.TestCase):
                            check=True, timeout=30)
             subprocess.run([binary], check=True, timeout=10)
 
-    def test_registered_modules_remain_unavailable_without_live_adapters(self):
-        source = (BASE / 'host/src/main/java/dev/zips/clientbase/host/ModuleRegistry.java').read_text()
-        for required in ('"MotionFly"', '"KillAura"', 'Unavailable', 'Collections.unmodifiableList'):
-            self.assertIn(required, source)
-        self.assertNotIn('setEnabled(true)', source)
+    def test_registered_modules_use_backend_acknowledged_toggles_and_live_engine(self):
+        registry = (BASE / 'host/src/main/java/dev/zips/clientbase/host/ModuleRegistry.java').read_text()
+        for required in ('"MotionFly"', '"KillAura"', 'OFF · Launch Bedrock', 'Collections.unmodifiableList'):
+            self.assertIn(required, registry)
+        state = (BASE / 'host/src/main/java/dev/zips/clientbase/host/ModuleState.java').read_text()
+        for badge in ('"OFF"', '"ARMED"', '"ON"'):
+            self.assertIn(badge, state)
+        protocol = (BASE / 'host/src/main/java/dev/zips/clientbase/host/ModuleProtocol.java').read_text()
+        self.assertIn('Process.myUid()', protocol)
         cmake = (BASE / 'host/src/main/cpp/CMakeLists.txt').read_text()
+        self.assertIn('native_module_engine.cpp', cmake)
         self.assertIn('modules/module_runtime.cpp', cmake)
+
+    @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
+    def test_slot_patch_install_restore_and_rejection(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binary = str(Path(directory) / 'slot-patch-test')
+            subprocess.run(['g++', '-std=c++17', '-Wall', '-Wextra', '-Werror',
+                            '-I', str(BASE / 'host/src/main/cpp/modules'),
+                            str(BASE / 'tests/native/slot_patch_test.cpp'), '-o', binary],
+                           check=True, timeout=30)
+            subprocess.run([binary], check=True, timeout=10)
+
+    @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
+    def test_internal_module_coordinator_and_abi_decoders(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binary = str(Path(directory) / 'native-module-engine-test')
+            subprocess.run(['g++', '-std=c++17', '-pthread', '-Wall', '-Wextra', '-Werror',
+                            '-I', str(BASE / 'host/src/main/cpp/modules'),
+                            str(BASE / 'tests/native/native_module_engine_test.cpp'),
+                            str(BASE / 'host/src/main/cpp/modules/module_runtime.cpp'),
+                            '-o', binary],
+                           check=True, timeout=30)
+            subprocess.run([binary], check=True, timeout=10)
 
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):

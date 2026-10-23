@@ -23,5 +23,16 @@
     <item name="overlay_category_title" type="id" />
     <item name="memory_copy" type="id" />
     <item name="module_motion_fly" type="id" />
+    <item name="module_motion_fly_toggle" type="id" />
+    <item name="module_motion_fly_status" type="id" />
     <item name="module_kill_aura" type="id" />
+    <item name="module_kill_aura_toggle" type="id" />
+    <item name="module_kill_aura_status" type="id" />
+    <item name="aura_opt_mobs" type="id" />
+    <item name="aura_opt_multi" type="id" />
+    <item name="aura_opt_hurt" type="id" />
+    <item name="module_engine_refresh" type="id" />
+    <item name="module_engine_disarm" type="id" />
+    <item name="module_engine_copy" type="id" />
+    <item name="module_engine_report" type="id" />
 </resources>

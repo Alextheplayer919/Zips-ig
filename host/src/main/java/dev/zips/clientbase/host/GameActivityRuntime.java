@@ -65,6 +65,21 @@ final class GameActivityRuntime {
             throw new IOException("Unexpected Firebase discovery service identity");
         return (android.app.Service) type.getDeclaredConstructor().newInstance();
     }
+    static String moduleControl(Context context, int op,
+                                boolean flyDesired, boolean auraDesired,
+                                boolean attackMobs, boolean multiTarget, boolean checkHurtTime) throws Exception {
+        requireGameProcess(context);
+        if (op < 0 || op > 2) throw new IOException("Unknown module operation");
+        MinecraftBootstrap.Prepared session = prepared;
+        if (session == null || !created) throw new IOException("No live prepared Activity session");
+        Class<?> bridge = Class.forName("dev.zips.clientbase.host.EngineNativeBridge", true, session.loader);
+        if (bridge.getClassLoader() != session.loader) throw new IOException("Module bridge owner mismatch");
+        return (String) bridge.getMethod("moduleControl",
+                String.class, int.class, boolean.class, boolean.class,
+                boolean.class, boolean.class, boolean.class)
+                .invoke(null, session.enginePath, op, flyDesired, auraDesired,
+                        attackMobs, multiTarget, checkHurtTime);
+    }
     static String memorySnapshot(Context context) throws Exception {
         requireGameProcess(context);
         MinecraftBootstrap.Prepared session = prepared;

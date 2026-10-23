@@ -24,9 +24,9 @@ The new `EntityTracker.kt (1).txt` is recorded in input provenance. `self_tracke
 
 The original code ignores server-boundary self MovePlayer corrections and leaves some origin flags/reset state stale; the subset accepts authoritative self corrections, validates finite values and direction, ignores other runtime IDs, retains explicit position-source tags without assuming an eye/feet offset, and issues new session generations at world/reconnect/respawn boundaries. Feed it on one packet/session executor, update the tracker **before** invoking Fly for AuthInput, and do not invoke Fly if the tracker rejects that update. The codec adapter must select the relevant respawn state. Keep tracker ownership across connections, reset on disconnect and disable Fly when tearing down/replacing the transport; methods remain decoded-state policy, not actual packet delivery.
 
-> **Next implementation step:** [0.6.3 runtime/registration preview](MODULE_RUNTIME.md) adds decoded dispatch, native execution-adapter drivers and category registrations. Concrete live network/engine adapters are still not connected; no working gameplay claim.
+> **Live internal integration (`0.6.4`):** [MODULE_RUNTIME.md](MODULE_RUNTIME.md) connects both modules inside the hosted ARM64 `1.26.50.4` game process (`LoopbackPacketSender` + `LegacyClientNetworkHandler` for MotionFly, `GameMode`/`SurvivalMode` + `LocalPlayer` + `ILevel` for KillAura) with backend-acknowledged `OFF` / `ARMED` / `ON` toggles in the external overlay.
 
-## What is still unimplemented
+## Historical port baseline (pre-0.6.4)
 
 These are **logic ports, not completed working modules**. They are not connected to native Minecraft, compiled into its engine, exposed via JNI/IPC, installed as packet hooks, or shown as usable toggles. The subsequent preview registers unavailable rows only. No new module APK is being delivered. The last validated application remains 0.6.2; categories stay empty rather than pretending a backend exists.
 

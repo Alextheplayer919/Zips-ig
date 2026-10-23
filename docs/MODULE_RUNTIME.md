@@ -1,31 +1,33 @@
-# 0.6.3 integration preview — registered, not live gameplay modules
+# 0.6.4 internal live module engine — MotionFly & KillAura
 
-The user asked to add the missing integration pieces ourselves. This is a bounded implementation step, **not completion of working Fly/KillAura** and not another request for the old project.
+Following the user's choice of **in-process internal handling** inside the hosted game (covering both local single-player worlds and remote multiplayer servers without an external proxy), `0.6.4` (`versionCode 17`) implements the concrete ARM64 `1.26.50.4` bindings, thread-safe coordinator, dedicated module IPC, and backend-acknowledged overlay toggles.
 
-## Implemented
+## Architecture
 
-- A native C++ registry declares **MotionFly / Movement** and **KillAura / Combat**. Java build-time registrations show both in the existing overlay, with their exact missing-live-backend status and **no fake interactive ON switches**. Visual/Misc stay empty. Memory/report/copy remain outside the overlay. These entries are build-time metadata, not dynamic capability discovery or native IPC acknowledgement.
-- `FlyPacketRuntime` implements decoded packet dispatch and session lifecycle around the tracker/Fly policy: StartGame before enablement; update self from AuthInput before calculating motion; reject wrong executor/invalid state; server self-correction tracking; respawn/dimension/disconnect reset and disable; incompatible/closed sessions rejected. Only outgoing AuthInput can cause a Fly motion injection. Unrelated packets are left alone. Output declares original forwarding, never cancels/edits the original; **the actual transport is still responsible for forwarding it once**. Motion sends use the separate `PacketSession.clientBoundMotion` adapter and failure/exception disables Fly. CollisionGuard and MovementCompliance stay removed.
-- `KillAuraRuntime` implements native-adapter binding, exact supplied engine-build gate, game-thread requirement, explicit enable/disable, tick scheduling, world/player identity checks, target revalidation before each attack, attack/swing execution via native adapter, and disconnect/error/reentrant-stop handling. It has **no packet/proxy interface**. Adapters must re-resolve IDs and check real actor validity at the actual call; they must remain alive during callbacks and detach on their executor before destruction.
-- Runtime factories and policy code are now part of the Android NDK build through `modules/module_runtime.cpp`, not only host compiler tests. They are not automatically attached to Minecraft. Melody MIT notice is included in APK assets because its adapted logic is now compiled.
-- 0.6.3/code16 is a **registration/runtime preview**, not a completed feature release. Original engine, startup/lifecycle, UI-process separation, permission/foreground Stop flow and read-only memory opcode remain unchanged. No external socket, auth request, new permission, guessed engine offset or renderer hook is installed.
+1. **Fingerprint-gated RELRO vtable interception (`slot_patch.h`, `native_engine_abi.h`, `native_module_engine.cpp`)**
+   - Before installing any hook in `:game_host`, the engine verifies via `/proc/self/mem` (`pread`):
+     - Loaded `libminecraftpe.so` ELF64 `EM_AARCH64` GNU Build ID `afa62bd3385161f1facfe36aad58ac63998f46d2`.
+     - Exact RTTI `offset_to_top == 0` and `typeinfo` pointers on all 7 required vtables (`LoopbackPacketSender`, `LegacyClientNetworkHandler`, `GameMode`, `SurvivalMode`, `LocalPlayer`, `PlayerAuthInputPacket`, `SetActorMotionPacket`).
+     - Exact vtable slot target offsets and first two 32-bit ARM64 instructions (`uint32_t[2]`) on all 17 virtual methods and 7 direct helper functions.
+   - Only 8-byte aligned `.data.rel.ro` pointer slots (14 slots) are atomically swapped (`SlotPatch`), restoring `PROT_READ` after each swap and rolling back all slots if any single swap fails. Executable `.text` instructions are never modified.
+   - On non-ARM64 environments or when Minecraft `1.26.50.4` is not loaded, hook installation fails closed and modules remain `OFF`.
 
-## Real integration still outstanding
+2. **Internal packet path — scoped strictly to MotionFly**
+   - Outbound `LoopbackPacketSender::sendToServer(Packet&)` (`slot 5`) checks `mSenderType == 0` (client sender, ignoring any integrated-server instance) and exact `PlayerAuthInputPacket` vtable identity (`0x12e86ab0`).
+   - Extracts `mRot` (`+0x30`), `mPos` (`+0x38`), `mMove` (`+0x64`), and `mInputData` (`+0x88`: `Jumping=6`, `Sneaking=8`, `WantUp=16`, `WantDown=17`), forwards the **untouched original `PlayerAuthInputPacket` first**, and routes the decoded event into `InternalModuleCoordinator` -> `FlyPacketRuntime`.
+   - Inbound `LegacyClientNetworkHandler` handlers (`StartGame`, `MovePlayer`, `ChangeDimension`, `Respawn`, `Disconnect`, and destructors) feed session lifecycle and self-tracking events; mid-world enablement also seeds self state from the live `LocalPlayer` on the client game thread so MotionFly does not require rejoining a world.
+   - When `MotionFlyPolicy` emits `EmitClientMotion`, `Arm64EngineBackend` constructs a stack `SetActorMotionPacket` via the engine's own `0xd14042c` constructor (`mRuntimeId` `+0x30`, `mMotion` `+0x38`, `mTick = 0` `+0x48`) and dispatches it through `LegacyClientNetworkHandler::handle(SetActorMotionPacket)` (`0xad76d18`, resolved live via `IClientInstance -> Minecraft -> GameSession` `NonOwnerPointer<NetEventCallback>` with `LocalPlayer::lerpMotion` fallback). `CollisionGuard` and `MovementCompliance` remain removed.
 
-`PacketSession` and `NativeCombatAdapter` are abstract interfaces, not concrete implementations. There is still no live RakNet/Bedrock decoder/encoder, session/connection hookup, native player/world provider, game tick hook or verified attack/swing ABI. A decoded event runtime cannot intercept encrypted/compressed traffic by itself. A native callback contract cannot discover engine functions by itself. Registering the modules is not evidence that either can function in-game. No account data or raw addresses can be supplied through the UI to bypass this.
+3. **Native combat path — KillAura (zero custom packet/proxy handling)**
+   - `GameMode::tick` and `SurvivalMode::tick` (`slot 10`) check that `[gm + 0x8]` has exact `LocalPlayer` vtable identity (`0x12d08918`), ignoring integrated-server `ServerPlayer` ticks in local worlds.
+   - `Arm64EngineBackend` enumerates actors via `ILevel::getRuntimeActorList()` (`vtable +0xa30`, freeing the returned buffer via the engine's `_ZdlPv` PLT), filters `ActorCategory` (`Player=1`, `Mob=2`) and alive state (`vtable +0x178`), pre-filters by range before raycasting `Actor::canSee` (`0xf5841c0`, `ShapeType::Collision=1`), and reads `Actor::getHurtTime` (`0xf590ef4`).
+   - Selected targets are re-resolved by `ActorRuntimeID` via `ILevel::getRuntimeEntity` (`vtable +0x208`) immediately before calling `GameMode::attack(Actor&, Vec3 const&)` (`vtable +0x80`) and `LocalPlayer::swing(ActorSwingSource::Attack=4, false)` (`vtable +0x370`).
 
-A targeted static check of the **exact original engine** is recorded in [ENGINE_MODULE_ABI.json](ENGINE_MODULE_ABI.json): 26 ELF sections, no full symtab, 90,653 defined dynsym symbols, but none of the searched player/GameMode/packet/RakNet name fragments. This shows direct lookup under those names is unavailable, **not** that the engine lacks those internal functions. We did not call or guess any address or reuse Windows layouts. Internal integration still requires bounded ARM64 analysis and real-device verification; it is not solved by this preview.
+4. **UI & IPC separation (`ModuleProtocol`, `ModuleClient`, `ModuleState`, `OverlayWindow`, `ControlsActivity`)**
+   - Dedicated `ModuleProtocol` opcodes (`6..8`) keep `MemoryProtocol` opcode `2` strictly read-only and never auto-launch or prepare Minecraft.
+   - `OverlayWindow` exposes interactive **MotionFly** (`Movement`) and **KillAura** (`Combat`, with `Mobs` / `Multi` / `Hurt` option chips) buttons whose state (`OFF`, `ARMED`, `ON`) comes strictly from `:game_host` replies—never optimistic local flips. `Visual` and `Misc` remain empty; diagnostic counters and `Disarm native hooks` stay in `ControlsActivity`.
 
-## Validation
+## Validation & scope
 
-32 local source/native tests pass. The new runtime executable tests session/tracker ordering, untouched-original disposition, Fly-only injection/direction, wrong executor, invalid inputs, failed/throwing sends, world reset/reconnect, build/thread gating, native attack/swing actions, disappearing targets, errors and stopping during callbacks. Real ASan/UBSan execution also passes. The packet/combat adapters used in those tests are clearly test fixtures, **not production implementations**.
-
-New Android regressions check immutable category registration/readiness labels and retained separate diagnostics. The actual overlay test checks each registered row exists and is not clickable. Existing mapped-memory/native/IPC/overlay/startup coverage remains. Android build/emulator validation passed for this registration/runtime preview below; no finished gameplay-module APK is claimed.
-
-## Validated preview artifact
-
-[Android 13 CI run 40006774087](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40006774087) **passed**, job **120597247317**, **7m24s**, app/test **4f7dec6339a61c7b8876f767464aec10c64f3127**, host **0.6.3 / code16**. Android NDK ARM64/x86_64 build and APK exclusion checks passed, as did the full **62-case Android13 x86_64 suite**. **32 local source/native tests** pass; the runtime regression also passed local ASan/UBSan. Original ARM64 Minecraft is not executed in CI. Report XML not parsed locally; successful Actions job is the validation source.
-
-- [Optional registration-preview APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40006774087/artifacts/12524767242): **client-base-debug-102**, **6,255,189 bytes**. Install only **client-base-host-debug.apk**. **This does not enable working Fly/KillAura.** Both rows accurately show unavailable. Keep the preceding 0.6.2 APK if you do not need to inspect registrations; no Minecraft reimport/bootstrap repeat.
-- [Device reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40006774087/artifacts/12524183914): **client-base-device-tests-102**, **384,836 bytes**.
-- Unchanged archive blob **c78f6e8642d334916d247487897eb871ad27c160**. Startup/wrapper/SDK, memory IPC and overlay service unchanged. Working 0.5.4/0.6.1 references preserved. PR#1 remains open, no merge/release/history rewrite.
+- **34 local source/native tests pass**, including `-Wall -Wextra -Werror` and ASan/UBSan execution of `module_policies_test`, `self_tracker_test`, `module_runtime_test`, `slot_patch_test`, and `native_module_engine_test`, plus byte-for-byte static verification of all 7 vtables, 17 virtual methods, and 7 helper functions against the hash-verified `libminecraftpe.so`.
+- Android 13 x86_64 CI validates compilation of both `arm64-v8a` and `x86_64` NDK targets, UI/overlay controls, classloader isolation, and closed-fail IPC rejection when no ARM64 `1.26.50.4` session is active. Actual ARM64 Minecraft gameplay execution requires testing on the target Android 13 phone.

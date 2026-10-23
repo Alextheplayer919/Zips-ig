@@ -14,11 +14,43 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class GameHostService extends Service {
     private final AtomicBoolean started = new AtomicBoolean();
     private final AtomicBoolean memoryBusy = new AtomicBoolean();
+    private final AtomicBoolean moduleBusy = new AtomicBoolean();
     private Messenger client;
     private int id;
     private final long processStartedAt = System.currentTimeMillis();
     private boolean reattached;
     private final Messenger endpoint = new Messenger(new Handler(android.os.Looper.getMainLooper(), message -> {
+        if (ModuleProtocol.operation(message.what)) {
+            if (!ModuleProtocol.accepts(message)) return true;
+            final Messenger receiver = message.replyTo;
+            final int request = message.arg1;
+            final int what = message.what;
+            final Bundle input = message.getData();
+            final boolean fly = input.getBoolean("fly", false);
+            final boolean aura = input.getBoolean("aura", false);
+            final boolean mobs = input.getBoolean("mobs", true);
+            final boolean multi = input.getBoolean("multi", false);
+            final boolean hurt = input.getBoolean("hurt", false);
+            if (!moduleBusy.compareAndSet(false, true)) {
+                sendModule(receiver, what, request,
+                        ModuleState.unavailablePayload("Module engine busy · try again", mobs, multi, hurt));
+                return true;
+            }
+            new Thread(() -> {
+                String payload;
+                try {
+                    int nativeOp = what == ModuleProtocol.DISARM ? 2 : (what == ModuleProtocol.APPLY ? 1 : 0);
+                    payload = GameActivityRuntime.moduleControl(this, nativeOp, fly, aura, mobs, multi, hurt);
+                } catch (Exception | LinkageError error) {
+                    payload = ModuleState.unavailablePayload(
+                            "Unavailable · " + error.getMessage(), mobs, multi, hurt);
+                } finally {
+                    moduleBusy.set(false);
+                }
+                sendModule(receiver, what, request, payload);
+            }, "game-module-control").start();
+            return true; // Never prepares or launches Minecraft.
+        }
         if (message.what == MemoryProtocol.SNAPSHOT) {
             if (!MemoryProtocol.accepts(message)) return true;
             final Messenger receiver=message.replyTo; final int request=message.arg1;
@@ -57,6 +89,9 @@ public final class GameHostService extends Service {
     }));
     private static void sendMemory(Messenger receiver,int request,String report) {
         try { receiver.send(MemoryProtocol.response(request,report)); } catch(android.os.RemoteException ignored) { }
+    }
+    private static void sendModule(Messenger receiver, int what, int request, String payload) {
+        try { receiver.send(ModuleProtocol.response(what, request, payload)); } catch(android.os.RemoteException ignored) { }
     }
     @Override public IBinder onBind(Intent intent) { return endpoint.getBinder(); }
     @Override public void onDestroy() {

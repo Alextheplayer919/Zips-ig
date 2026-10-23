@@ -1,4 +1,5 @@
 #include <jni.h>
+#include "loaded_identity.h"
 #include <link.h>
 #include <elf.h>
 #include <fcntl.h>
@@ -76,6 +77,23 @@ std::string buildId(const std::vector<unsigned char>& notes) {
         offset += size_t(name + desc);
     }
     return "unavailable";
+}
+}
+namespace clientbase {
+LoadedIdentity loadedIdentity(const std::string& path) {
+    Module module;module.path=path;module.canonical=canonicalPath(path.c_str());
+    dl_iterate_phdr(findModule,&module);
+    LoadedIdentity result;
+    if(!module.found || !module.header || !module.noteSize)return result;
+    int fd=open("/proc/self/mem",O_RDONLY|O_CLOEXEC);
+    if(fd<0)return result;
+    unsigned char header[64]{};std::vector<unsigned char> notes(module.noteSize);
+    bool ok=pread(fd,header,sizeof(header),static_cast<off_t>(module.header))==static_cast<ssize_t>(sizeof(header))
+        && pread(fd,notes.data(),notes.size(),static_cast<off_t>(module.note))==static_cast<ssize_t>(notes.size());
+    close(fd);
+    if(!ok || std::memcmp(header,ELFMAG,SELFMAG)!=0 || header[EI_CLASS]!=ELFCLASS64 || header[EI_DATA]!=ELFDATA2LSB)return result;
+    result.machine=unsigned(header[18])|(unsigned(header[19])<<8);
+    result.buildId=buildId(notes);result.bias=module.bias;result.confirmed=true;return result;
 }
 }
 extern "C" JNIEXPORT jstring JNICALL
