@@ -11,10 +11,11 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <cstdlib>
 
 namespace {
 struct Module {
-    std::string path;
+    std::string path, canonical;
     bool found = false;
     uintptr_t bias = 0, header = 0, note = 0;
     size_t noteSize = 0;
@@ -24,9 +25,14 @@ bool address(uintptr_t bias, ElfW(Addr) relative, uintptr_t* result) {
     if (relative > std::numeric_limits<uintptr_t>::max() - bias) return false;
     *result = bias + relative; return true;
 }
+std::string canonicalPath(const char* path) {
+    char* resolved = realpath(path, nullptr);
+    if (!resolved) return path;
+    std::string value(resolved); std::free(resolved); return value;
+}
 int findModule(dl_phdr_info* info, size_t, void* data) {
     auto& module = *static_cast<Module*>(data);
-    if (!info->dlpi_name || module.path != info->dlpi_name) return 0;
+    if (!info->dlpi_name || (module.path != info->dlpi_name && module.canonical != canonicalPath(info->dlpi_name))) return 0;
     module.found = true; module.bias = info->dlpi_addr;
     std::ostringstream segments;
     unsigned count = 0;
@@ -76,7 +82,7 @@ extern "C" JNIEXPORT jstring JNICALL
 Java_dev_zips_clientbase_host_EngineNativeBridge_nativeMemorySnapshot(JNIEnv* env, jclass, jstring path) {
     const char* raw = env->GetStringUTFChars(path, nullptr);
     if (!raw) return nullptr;
-    Module module; module.path = raw; env->ReleaseStringUTFChars(path, raw);
+    Module module; module.path = raw; module.canonical = canonicalPath(raw); env->ReleaseStringUTFChars(path, raw);
     // Inspect already loaded objects only. Never dlopen, dlsym/call an engine entrypoint, or accept an address.
     dl_iterate_phdr(findModule, &module);
     std::ostringstream out;

@@ -16,7 +16,7 @@ Only a manual **Refresh memory snapshot** issues the fixed Messenger operation *
 
 The backend requires the dedicated game process and a prepared created session. It resolves **EngineNativeBridge through that same prepared guest loader**, preserving the single native-library owner. The bridge's new function:
 
-- Inspects **already loaded** modules via `dl_iterate_phdr`, matches the exact selected engine path; does **not** dlopen/dlsym/call an engine function.
+- Inspects **already loaded** modules via `dl_iterate_phdr`, matches the exact selected engine path or its canonical filesystem alias; does **not** dlopen/dlsym/call an engine function.
 - Reports process PID/UID, module load bias (ASLR/run-specific) and up to 16 **ELF PT_LOAD segment ranges/flags**, not a claimed live page-permission audit (RELRO may differ).
 - Uses kernel-mediated **read-only /proc/self/mem pread** to read the 64-byte mapped ELF header and a mapped readable PT_NOTE region of at most 64 KiB. No unsafe game-pointer dereference or arbitrary address API. If platform policy or reads deny access, report unavailable without patching permissions/crashing deliberately.
 - Parses the GNU build ID from memory with bounds checks. Compare it with the known supplied engine **afa62bd3385161f1facfe36aad58ac63998f46d2** and require an ELF64 header read before displaying **ENGINE IDENTITY VERIFIED**. The unchanged file SHA-256 was verified at startup; the report does not pretend to hash the entire current memory image.
@@ -30,3 +30,8 @@ Original wrapper/lifecycle and SDK init order remain unchanged; no new permissio
 Six new Android regressions: actual JNI header/build-ID/segment reads of our own copied library and rejection of an unloaded candidate without loading it; UI-process game-reader rejection; malformed/foreign protocol checks; real memory IPC with no game does not change game preparation stages; independent controls task/UI identity and recreation; collapsed retained developer tools. Existing coverage remains enabled. No fake Minecraft implementation or real ARM64 game runs in CI.
 
 Android compilation/APK/emulator validation pending. Do not deliver an unvalidated integration build. Next phone acceptance after validation: launch still works; external controls open in their own task; refresh reports the **game** PID and verified in-memory engine identity or an explicit unavailable error. Copy/share that memory report, not another giant log. Split-screen is an optional compatibility test, not a prerequisite for the first memory snapshot.
+
+
+### First emulator result
+
+Run 39992531136 built and passed APK checks, but the new real-library memory regression found the lookup missed the loaded copied library through Android's data-directory path alias. The implementation now compares canonical filesystem identities as well as raw paths; it still never loads a missing candidate. The same production test checks both absolute and canonical paths. No test is skipped or relaxed; this first artifact is not the deliverable. Corrected validation pending.

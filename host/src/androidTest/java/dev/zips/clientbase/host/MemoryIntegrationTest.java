@@ -35,6 +35,7 @@ public final class MemoryIntegrationTest {
             String value=(String)bridge.getMethod("memorySnapshot",String.class).invoke(null,loaded.getAbsolutePath());
             assertTrue(value,value.contains("PID: "+Process.myPid()));
             assertTrue(value,value.contains("ELF64_HEADER_READ_OK"));
+            assertTrue(((String)bridge.getMethod("memorySnapshot",String.class).invoke(null,loaded.getCanonicalPath())).contains("ELF64_HEADER_READ_OK"));
             assertTrue(value,value.contains("7f454c46"));
             assertTrue(value,value.matches("(?s).*Build ID: [0-9a-f]{8,128}\\n.*"));
             assertTrue(value,value.contains("ELF load segment"));
