@@ -40,6 +40,12 @@ public final class GameHostService extends Service {
         return true;
     }));
     @Override public IBinder onBind(Intent intent) { return endpoint.getBinder(); }
+    @Override public void onDestroy() {
+        super.onDestroy();
+        // Abandoned preparation has no Activity owner; terminate only our own process.
+        // Never apply the one-shot probe's unconditional kill to a running game Activity.
+        if (!GameActivityRuntime.hasCreatedActivity()) Process.killProcess(Process.myPid());
+    }
     private synchronized void report(String text, boolean ready, boolean blocked) {
         String saved = GameHostReport.stage(this, text);
         Message response = Message.obtain(); Bundle data = new Bundle();

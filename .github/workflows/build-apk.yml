@@ -61,7 +61,13 @@ jobs:
       - name: Source and native identity checks
         run: python3 tools/test_client_base.py
       - name: Build host, guest and device tests
-        run: ./gradlew :host:assembleDebug :demo-guest:assembleDebug :host:assembleDebugAndroidTest --stacktrace
+        run: |
+          if ! ./gradlew :host:assembleDebug :demo-guest:assembleDebug :host:assembleDebugAndroidTest --stacktrace > build-gradle.log 2>&1; then
+            grep -iE 'error:|what went wrong|^> |caused by:|execution failed|could not|manifest merger|uses-sdk|android resource|aapt|androidx|dependency' build-gradle.log | head -n 24 | sed 's/^/::error::Build diagnostic: /' || true
+            tail -n 8 build-gradle.log | sed 's/^/::error::Build tail: /'
+            exit 1
+          fi
+          cat build-gradle.log
       - name: Collect installable APKs
         run: |
           mkdir -p build/apks
@@ -104,5 +110,6 @@ jobs:
             emulator-install.log
             emulator-create.log
             sdk-install.log
+            build-gradle.log
             device-tests.log
           if-no-files-found: warn
