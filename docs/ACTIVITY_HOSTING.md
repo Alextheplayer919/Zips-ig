@@ -1,6 +1,6 @@
 # Next stage: a real Bedrock Android Activity environment
 
-**Status: the prior framework bridge passed Android 13 integration. The [first original-game adapter](BEDROCK_ACTIVITY_ATTEMPT.md) is now implemented; its build/packaging and Android 13 checks passed; the first real-game Activity launch result is pending.** See [the first implementation and bounded startup findings](ACTIVITY_BRIDGE.md). The [phone bootstrap success](JVM_BOOTSTRAP_DEVICE_TEST.md) completes the class-initialization substep. The next acceptance target remains the original, unmodified Bedrock **1.26.50.4 / 972605004** title screen in our own process/UID on Android 13. No hooks or gameplay features in this stage.
+**Status: the original-game adapter passed Android 13 CI and was tested on the phone. Original native android_main started and onCreate returned, then our wrapper callback hit a loader IllegalAccessError. [Selected evidence and 0.5.1 repair](ACTIVITY_ONCREATE_DEVICE_TEST.md). [Corrected Android 13 build/regressions](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39978758524) passed; the corrected original-game phone result is pending.** See [the Activity attempt](BEDROCK_ACTIVITY_ATTEMPT.md) for build status and [the first implementation](ACTIVITY_BRIDGE.md) for the framework seam. The next acceptance target remains the original, unmodified Bedrock **1.26.50.4 / 972605004** title screen in our own process/UID on Android 13. No hooks or gameplay features in this stage.
 
 ## Startup input now available
 

@@ -1,12 +1,14 @@
-# Host 0.5.0 — first original Bedrock Activity attempt
+# Host 0.5.1 — original Bedrock Activity loader repair
 
-**Implementation status: Android build, APK packaging checks and Android 13 regression suite passed. First original-game Activity launch result remains pending.** [Validated host APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39973150833/artifacts/12509773681). This is the next controlled step after [the returned bootstrap](JVM_BOOTSTRAP_DEVICE_TEST.md), not a repeated link/demo test.
+**Phone result:** host 0.5.0 reached original native android_main and returned original onCreate, then our observer's nested class split across loaders and crashed. [Normalized evidence and repair](ACTIVITY_ONCREATE_DEVICE_TEST.md). The original input/library passed; no further file is needed for this known host defect. No Surface/title-screen success is claimed.
+
+**Repair status:** exact root-plus-`$` host helper families, actual wrapper manifest name, compact timeline and saved-TXT export are implemented. [Android 13 repair validation](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39978758524) passed; [download host 0.5.1 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39978758524/artifacts/12511559632). The corrected phone result is pending. Do not rerun old 0.5.0 as this correction. No demo/import/link/bootstrap repeat.
 
 ## What changed
 
 - A separate, private **`:game_host`** process owns preparation, one loader and the original Activity. Bedrock's `System.exit(0)` shutdown cannot close the host UI. The working one-shot bootstrap remains separate.
 - Preparation checks ARM64, exact **1.26.50.4 / 972605004**, reviewed Application/factory/Activity metadata, the supplied manifest, **all five DEX files and resource table SHA-256**, and the exact selected installed engine. The first adapter accepts only the reported single-APK layout. Supplied DEX bytes, including their header discrepancies, are never repaired.
-- A host-side subclass extends the original installed `com.mojang.minecraftpe.MainActivity`. Only our wrapper/bridge are child-defined specially; actual MainActivity/GameActivity and native libraries share the prepared loader. A tiny **compile-only JAR** supplies superclass signatures during compilation, never runtime code. CI checks actual APK DEX class definitions to reject bundled Minecraft/GameActivity stubs, engine libraries or input archives.
+- A host-side subclass extends the original installed `com.mojang.minecraftpe.MainActivity`. Only our wrapper/bridge/observer exact roots and nested families are child-defined specially; actual MainActivity/GameActivity and native libraries share the prepared loader. A tiny **compile-only JAR** supplies superclass signatures during compilation, never runtime code. CI checks actual APK DEX class definitions to reject bundled Minecraft/GameActivity stubs, engine libraries or input archives.
 - The host's private AppComponentFactory returns the configured subclass to Android. Android performs attachment, window/lifecycle and Surface delivery; original superclass/native calls remain untouched. No manual `Activity.attach`, `onCreate` invocation or native function pointer is used.
 - Activity and dedicated-process Application resource views use original installed game assets/resources. UID, package identity, permissions, services and storage remain the host's; the installed game's private worlds/accounts are not read. Host component metadata supplies `android.app.lib_name=minecraftpe`, and the framework placeholder theme maps to the reviewed game theme. Later original theme changes are retained.
 - A separate controller/report records stages, process identity, creation/resume and passive Surface observations, handles user stop/startup timeout, and collects same-UID/PID/process/time-filtered Android exit diagnostics. It reuses the existing bounded tombstone/logcat collector with an explicit `:game_host` allowlist, without overwriting probe run metadata. No auto-relaunch/recreation or reconnect execution loop.
@@ -33,11 +35,11 @@ Startup has a 180-second bound until original onResume returns; diagnostic UI wa
 
 Install only the new host, keep Minecraft unchanged. Tap **Launch Bedrock Activity (experimental)** once and accept execution consent. If preparation finishes while the host is backgrounded, return to the host to continue the already-consented launch. No import, demo, link or bootstrap repeat is needed.
 
-If the game window appears, report what is actually visible. Return to Client Base and **Share Bedrock Activity report**. If it exits, allow automatic exit collection; **Collect last game exit (no game execution)** retries without launching. Use **Stop hosted game process** for a hang (cleanup is labelled). Review reports before sharing. Do not confuse the old probe's share/diagnostic buttons with the separate Activity report.
+If the game window appears, report what is actually visible. Return to Client Base and **Save Bedrock Activity report (.txt)** using the system document picker, then attach that saved file (review it first). **Share Bedrock Activity report** remains available. If it exits, allow automatic exit collection; **Collect last game exit (no game execution)** retries without launching. Use **Stop hosted game process** for a hang (cleanup is labelled). Review reports before sharing. Do not confuse the old probe's share/diagnostic buttons with the separate Activity report.
 
 No new file from the user is currently required. A corrected phone startup result, not CI alone, determines the next missing prerequisite.
 
-## Validated build
+## Previous validated 0.5.0 build (known phone wrapper crash; do not retest unchanged)
 
 [CI run 39973150833](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39973150833) passed for app/test commit **`d3e49030c6ddf9aaaa6d31b52c572ad2f032b49d`**, job **`120481541654`**, **4m41s**. Host version **0.5.0 / code 8**. Android 13 x86_64 runs the 30-case regression suite (retained coverage, AppCompat Activity/resource/configuration/Surface cases, reviewed manifest policy, dedicated-process component metadata/rejection and cross-process exit filtering); all passed. Twenty-two local source/native guards pass. Actual original ARM64 Bedrock Activity/SDK execution is **not** performed by this emulator suite.
 
@@ -47,3 +49,13 @@ No new file from the user is currently required. A corrected phone startup resul
 - The original supplied engine archive blob is unchanged: `c78f6e8642d334916d247487897eb871ad27c160`.
 
 Build iterations fixed a Java forward reference in the startup timer, aligned AppCompat's transitive Kotlin stdlib variants using BOM 1.8.22, and corrected the AndroidX split-package runtime failure above. No tests were disabled. Bounded Gradle failure annotations were added because raw CI-log downloads are blocked in this sandbox. The passing artifact above includes the corrected implementation, not the earlier failed builds.
+
+## Validated 0.5.1 repair
+
+[Run 39978758524](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39978758524) passed for app/test commit **`cd5182e852869890a05cf8d00cf8e8c20cc8661b`**, job **`120500905199`**, **5m38s**. Version **0.5.1 / code 9**. Build, APK definition-exclusion guard and the Android 13 x86_64 **33-case regression suite** passed, including the production nested/private callback access, narrow family/shared-contract policy, compact stages, actual manifest wrapper lookup and framework-delivered production Surface observer checks. Twenty-three local guards pass; no test disabled. The duplicate push run was canceled in favor of this same-head PR run, not a code/test failure.
+
+- [APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39978758524/artifacts/12511559632): **`client-base-debug-69`**, **6,194,989 bytes**. Install only `client-base-host-debug.apk`.
+- [CI reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39978758524/artifacts/12512209593): **`client-base-device-tests-69`**, **205,191 bytes**. The CI passing conclusion is recorded; independent local artifact XML parsing is not claimed.
+- Engine archive blob remains `c78f6e8642d334916d247487897eb871ad27c160`; original Minecraft/startup bytes are unchanged. Native Swappy follow-up remains unproven either way.
+
+Phone acceptance is still outstanding: install corrected host, launch once, report visible output, collect exit if needed and save/share the TXT. This build is not an assertion that the original game already resumes, renders or reaches its title screen.

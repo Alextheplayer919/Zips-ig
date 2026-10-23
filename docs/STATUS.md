@@ -2,7 +2,7 @@
 
 ## Current direction
 
-**Latest phone milestone:** [original Bedrock class initialization returned](JVM_BOOTSTRAP_DEVICE_TEST.md), PID 12037 / UID 11072, hash-matched installed engine already mapped after JVM-managed loading. Bootstrap substep complete as reported; Activity/title-screen hosting remains incomplete. [Next bounded stage](ACTIVITY_HOSTING.md).
+**Latest phone milestone:** [original native android_main started and original MainActivity onCreate returned](ACTIVITY_ONCREATE_DEVICE_TEST.md), PID 17899 / UID 11075. Our subsequent passive observer crashed with a wrapper/anonymous-class loader IllegalAccessError. Host **0.5.1** repairs exact helper-family ownership, registers the actual wrapper component and adds compact/saved-TXT reports. [Android 13 repair validation](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39978758524) passed (build, packaging and the 33-case regression suite); no rendered Surface/title-screen success is claimed. Do not rerun unchanged 0.5.0 or repeat bootstrap/import/demo.
 
 We are building a clean, independent hosting client, not porting the original protected native VM. The current repository contains only the retained engine archive and the source/documentation/build infrastructure needed for the new base.
 
@@ -103,7 +103,7 @@ The original client's successful Android 13 / Minecraft 26.50 launch is **user-r
 
 ## Gate 2 — hosting-only Minecraft adapter
 
-**Engine-link and JVM-managed bootstrap substeps:** complete as reported. [PID 12037 / UID 11072](JVM_BOOTSTRAP_DEVICE_TEST.md) returned original class initialization with the hash-matched engine already mapped; ART mediates JNI loading, without separate callback instrumentation. Activity/Application/resources/lifecycle/Surface and title screen remain pending. [Next implementation stage](ACTIVITY_HOSTING.md).
+**Engine-link and JVM-managed bootstrap substeps:** complete as reported. [PID 12037 / UID 11072](JVM_BOOTSTRAP_DEVICE_TEST.md) returned original class initialization with the hash-matched engine already mapped; ART mediates JNI loading, without separate callback instrumentation. Later original Activity attachment/onCreate and native startup are now evidenced in [PID 17899 / UID 11075](ACTIVITY_ONCREATE_DEVICE_TEST.md), followed by our observer loader crash. Completed resume/rendering, full SDK/provider environment and title screen remain incomplete. [Current stage](ACTIVITY_HOSTING.md).
 
 After Gate 1, build a separate adapter for the original installed base/split APKs. Do not loosen the demo trust policy into an unrestricted plugin loader; Minecraft requires its own explicit package/trust and lifecycle design.
 

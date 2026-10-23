@@ -1,6 +1,6 @@
 # Building and testing APKs
 
-**Current phone step:** [host 0.5.0 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39973150833/artifacts/12509773681), validated on Android 13. Install only `client-base-host-debug.apk`; keep Minecraft unchanged. Tap **Launch Bedrock Activity (experimental)** once and share **Bedrock Activity report**. No demo, archive import, link or bootstrap repeat. If debug signatures conflict, uninstall only Client Base host, not Minecraft. [Full boundaries and exit-collection instructions](BEDROCK_ACTIVITY_ATTEMPT.md). Earlier milestone instructions below are historical.
+**Current phone step:** use the validated [**host 0.5.1 APK ZIP**](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39978758524/artifacts/12511559632) ([Android 13 run](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39978758524)). The prior 0.5.0 ran original onCreate but then [our wrapper callback crashed](ACTIVITY_ONCREATE_DEVICE_TEST.md); do not rerun that artifact. Install only `client-base-host-debug.apk`; keep Minecraft unchanged. Use **Launch Bedrock Activity (experimental)** once, then **Save Bedrock Activity report (.txt)**. No demo, archive import, link or bootstrap repeat. If debug signatures conflict, preserve reports and uninstall only Client Base host, not Minecraft. [Full boundaries and exit-collection instructions](BEDROCK_ACTIVITY_ATTEMPT.md). Earlier milestone instructions below are historical.
 
 ## GitHub Actions
 
@@ -26,7 +26,7 @@ No secrets/signing credentials are required. These are **debug** APKs, not produ
 6. Rotate and load again; tap repeatedly. There should be no duplicate-native-library error.
 7. Open **Client Base Demo** separately to compare execution under the guest app's own UID.
 
-Do not uninstall Minecraft or ProtoHax for this experiment. No wireless ADB, rooting, game files, credentials or private worlds are needed. Host 0.5.0 requests normal `ACCESS_NETWORK_STATE` and `INTERNET` (no runtime prompt); the developer AppCompat demo also has its own signature-only private-receiver permission. Contract requests none. Older builds requested no permissions, which caused the confirmed Xbox network-observer initialization abort.
+Do not uninstall Minecraft or ProtoHax for this experiment. No wireless ADB, rooting, game files, credentials or private worlds are needed. Host 0.5.x requests normal `ACCESS_NETWORK_STATE` and `INTERNET` (no runtime prompt); the developer AppCompat demo also has its own signature-only private-receiver permission. Contract requests none. Older builds requested no permissions, which caused the confirmed Xbox network-observer initialization abort.
 
 Both APKs must have matching signing certificates. GitHub runners can generate different debug keys across runs, so updating an older pair may require uninstalling **our host/demo only**, deleting their own data. Do not mix APKs from different runs. Force-stop/reopen the host after updating the demo.
 
