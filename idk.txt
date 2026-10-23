@@ -1,0 +1,239 @@
+BEDROCK_ACTIVITY_ATTEMPT (not title-screen proof)
+Game PID: 27870
+Game UID: 11077
+GAME_PREPARATION_STARTED
+---
+Verifying all supplied manifest/DEX/resource bytes before defining game classes
+---
+HOST_NETWORK_STATE_PERMISSION_GRANTED: android.permission.ACCESS_NETWORK_STATE
+---
+JAVA_BOOTSTRAP_PREFLIGHT: inspecting original initializer metadata (validation follows)
+---
+JAVA_BOOTSTRAP_PREFLIGHT: inspecting original initializer metadata (validation follows)
+---
+SELECTED_ENGINE_VERIFIED
+/data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libminecraftpe.so
+---
+GAME_ENVIRONMENT_PREPARED
+Exact supplied startup bytes and engine matched. Original providers are NOT installed; later SDK failures remain possible.
+---
+READY_FOR_FRAMEWORK_LAUNCH
+---
+ORIGINAL_CLASS_INITIALIZATION_AND_CONSTRUCTION_ENTERED
+---
+NATIVE_LIBRARY_LOOKUP (not load completion)
+c++_shared -> /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libc++_shared.so
+---
+NATIVE_LIBRARY_LOOKUP (not load completion)
+maesdk -> /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libmaesdk.so
+---
+NATIVE_LIBRARY_LOOKUP (not load completion)
+HttpClient.Android -> /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libHttpClient.Android.so
+---
+NATIVE_LIBRARY_LOOKUP (not load completion)
+PlayFabMultiplayer -> /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libPlayFabMultiplayer.so
+---
+NATIVE_LIBRARY_LOOKUP (not load completion)
+fmod -> /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libfmod.so
+---
+NATIVE_LIBRARY_LOOKUP (not load completion)
+minecraftpe -> /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libminecraftpe.so
+---
+FRAMEWORK_ACTIVITY_CREATED (not attached or title-screen proof)
+---
+ACTIVITY_ATTACHED
+---
+ORIGINAL_ON_CREATE_ENTERED
+---
+NATIVE_LIBRARY_LOOKUP (not load completion)
+minecraftpe -> /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libminecraftpe.so
+---
+NATIVE_LIBRARY_LOOKUP (not load completion)
+minecraftpe -> /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libminecraftpe.so
+---
+ORIGINAL_ON_CREATE_RETURNED (not title screen)
+---
+ORIGINAL_ON_START_ENTERED
+---
+ORIGINAL_ON_START_RETURNED
+---
+ORIGINAL_ON_RESUME_ENTERED
+---
+ORIGINAL_ON_RESUME_RETURNED
+---
+ORIGINAL_ON_PAUSE_ENTERED
+---
+SURFACE_CREATED (not title screen)
+---
+SURFACE_CHANGED 2400x1080
+---
+ORIGINAL_ON_RESUME_ENTERED
+---
+ORIGINAL_ON_RESUME_RETURNED
+
+ANDROID_OWN_PROCESS_EXIT_DIAGNOSTIC
+Expected child PID: 27870 UID: 11077
+Host cleanup note: none
+Cleanup/unbind can produce SIGKILL; that alone does not identify the original failure.
+Exit reason: SIGNALED (2)
+Exit status/signal: 6
+Exit timestamp (ms): 1792769989497
+Description: null
+No native protobuf trace requested for this reason/API.
+
+Best-effort own-PID logcat (may be restricted; review before sharing):
+--------- beginning of main
+10-23 17:39:42.951 27870 27876 W .host:game_host: userfaultfd: MOVE ioctl seems unsupported: Connection timed out
+10-23 17:39:43.001 27870 27876 I .host:game_host: NativeAlloc concurrent mark compact GC freed 28MB AllocSpace bytes, 19(4088KB) LOS objects, 49% free, 6943KB/13MB, paused 444us,4.844ms total 195.921ms
+10-23 17:39:43.933 27870 27885 W .host:game_host: Unsupported class loader: java.lang.Class<dev.zips.clientbase.host.BootstrapClassLoader>
+10-23 17:39:43.952 27870 27885 W .host:game_host: Unsupported class loader: java.lang.Class<dev.zips.clientbase.host.BootstrapClassLoader>
+10-23 17:39:44.234 27870 27885 W .host:game_host: Unsupported class loader: java.lang.Class<dev.zips.clientbase.host.BootstrapClassLoader>
+10-23 17:39:44.267 27870 27876 I .host:game_host: Background young concurrent mark compact GC freed 2276KB AllocSpace bytes, 2(136KB) LOS objects, 53% free, 2251KB/4886KB, paused 1.217ms,6.385ms total 31.092ms
+10-23 17:39:45.342 27870 27882 D AppScoutStateMachine: 27870-ScoutStateMachinecreated
+10-23 17:39:45.398 27870 27870 D nativeloader: Configuring clns-5 for other apk . target_sdk_version=33, uses_libraries=ALL, library_path=/data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64:/data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/base.apk!/lib/arm64-v8a:/data/app/~~lOWiZ6cNYXAmtup3clbS1Q==/dev.zips.clientbase.host-mLF1gvAj78B8QtRNzN6AUQ==/lib/arm64, permitted_path=/data:/mnt/expand
+10-23 17:39:45.398 27870 27870 D nativeloader: Extending system_exposed_libraries: libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libQOC.qti.so:libmisys_jni.xiaomi.so:libupdateprof.qti.so:libthermalclient.qti.so:libQOC.qti.so:libdiag_system.qti.so:libqape.qti.so:liblistenjni.qti.so
+10-23 17:39:45.407 27870 27870 D nativeloader: Load /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libc++_shared.so using isolated ns clns-5 (caller=/data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/base.apk!classes3.dex): ok
+10-23 17:39:45.450 27870 27870 D nativeloader: Load /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libmaesdk.so using class loader ns clns-5 (caller=/data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/base.apk!classes3.dex): ok
+10-23 17:39:45.457 27870 27870 D nativeloader: Load /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libHttpClient.Android.so using class loader ns clns-5 (caller=/data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/base.apk!classes3.dex): ok
+10-23 17:39:45.480 27870 27870 D nativeloader: Load /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libPlayFabMultiplayer.so using class loader ns clns-5 (caller=/data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/base.apk!classes3.dex): ok
+10-23 17:39:45.509 27870 27870 D nativeloader: Load /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libfmod.so using class loader ns clns-5 (caller=/data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/base.apk!classes3.dex): ok
+10-23 17:39:45.665 27870 27870 D nativeloader: Load /data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/lib/arm64/libminecraftpe.so using class loader ns clns-5 (caller=/data/app/~~qswrJQhC-pm98AOaZ_HXdg==/com.mojang.minecraftpe-xwfCvJEdvsSk0dP1u5uTbA==/base.apk!classes3.dex): ok
+10-23 17:39:45.666 27870 27870 V Minecraft: Entering JNI_OnLoad 0x734a1684f8
+10-23 17:39:45.666 27870 27870 V Minecraft: JNI_OnLoad completed
+10-23 17:39:45.740 27870 27870 I MinecraftPlatform: MainActivity::onCreate
+10-23 17:39:45.756 27870 27870 D IS_CTS_MODE: false
+10-23 17:39:45.756 27870 27870 D MULTI_WINDOW_ENABLED: false
+10-23 17:39:45.760 27870 27870 D DecorView[]: getWindowModeFromSystem  windowmode is 1
+10-23 17:39:45.779 27870 27870 D gti.InputConnection: InputConnection created
+10-23 17:39:45.779 27870 27870 D gti.InputConnection: setEditorInfo
+10-23 17:39:45.800 27870 27870 I .host:game_host: hiddenapi: Accessing hidden method Landroid/view/View;->computeFitSystemWindows(Landroid/graphics/Rect;Landroid/graphics/Rect;)Z (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/appcompat/widget/ViewUtils; (domain=app, TargetSdkVersion=33) using reflection: allowed
+10-23 17:39:45.800 27870 27870 I .host:game_host: hiddenapi: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/appcompat/widget/ViewUtils; (domain=app, TargetSdkVersion=33) using reflection: allowed
+10-23 17:39:45.803 27870 27870 I GameActivity: Looking for library libminecraftpe.so
+10-23 17:39:45.808 27870 27870 I GameActivity: Found library libminecraftpe.so. Loading...
+10-23 17:39:45.827 27870 27870 D GameActivity: GameActivity_register
+10-23 17:39:45.828 27870 27870 D GameActivity: SDK version: 33
+10-23 17:39:45.835 27870 27898 I Minecraft: android_main starting. internalDataPath is '/data/user/0/dev.zips.clientbase.host/files', externalDataPath is '/storage/emulated/0/Android/data/dev.zips.clientbase.host/files'
+10-23 17:39:45.855 27870 27898 E MCPE    : *** setCachedDeviceId(7ee44d08a9314032a5c120a3447c968a)
+10-23 17:39:45.865 27870 27898 I Bedrock : Breakpad config: directory is: /data/user/0/dev.zips.clientbase.host/crash, sessionid is: 381fc049-0aeb-46ec-a28f-ba823a15b6af
+10-23 17:39:45.877 27870 27870 W libc    : Access denied finding property "ro.vendor.df.effect.conflict"
+10-23 17:39:45.878 27870 27898 W libc    : Access denied finding property "ro.hardware.chipname"
+10-23 17:39:45.873 27870 27870 W .host:game_host: type=1400 audit(0.0:237577): avc: denied { read } for name="u:object_r:vendor_displayfeature_prop:s0" dev="tmpfs" ino=394 scontext=u:r:untrusted_app:s0:c53,c260,c512,c768 tcontext=u:object_r:vendor_displayfeature_prop:s0 tclass=file permissive=0 app=dev.zips.clientbase.host
+10-23 17:39:45.895 27870 27898 I System.out: getwidth: 2176
+10-23 17:39:45.895 27870 27898 I System.out: getheight: 1080
+10-23 17:39:45.951 27870 27898 I Minecraft: NO LOG FILE! - AppPlatform_android::setStorageDirectory - using AppData dir - CurrentFileStoragePath is now '/data/user/0/dev.zips.clientbase.host'
+10-23 17:39:45.951 27870 27898 I Minecraft: 
+10-23 17:39:46.081 27870 27870 I AppExitInfoHelper: Registering session ID for ApplicationExitInfo: 381fc049-0aeb-46ec-a28f-ba823a15b6af
+10-23 17:39:46.143 27870 27878 W System  : A resource failed to call close. 
+10-23 17:39:46.184 27870 27870 I Braze v25.0.0 .Braze: Braze.configure() called with configuration: Builder(apiKey=7e90f2bd-d27b-4010-a501-a8e30021418a, serverTarget=null, smallNotificationIconName=drawable/notification_icon_small, largeNotificationIconName=null, customEndpoint=null, defaultNotificationChannelName=null, defaultNotificationChannelDescription=null, pushDeepLinkBackStackActivityClassName=null, firebaseCloudMessagingSenderIdKey=null, customHtmlWebViewActivityClassName=null, sdkFlavor=null, sessionTimeout=10, defaultNotificationAccentColor=5415989, triggerActionMinimumTimeIntervalSeconds=5, badNetworkInterval=120, goodNetworkInterval=60, greatNetworkInterval=10, inAppMessageWebViewClientMaxOnPageFinishedWaitMs=null, admMessagingRegistrationEnabled=false, handlePushDeepLinksAutomatically=true, isLocationCollectionEnabled=false, isNewsFeedVisualIndicatorOn=false, isPushDeepLinkBackStackActivityEnabled=null, isSessionStartBasedTimeoutEnabled=null, isFirebaseCloudMessagingRegistrationEnabled=false, isContentCardsUnreadVisualIndicatorEnabled=null, isInAppMessageAccessibilityExclusiveModeEnabled=null, isPushWakeScreenForNotificationEnabled=false, isPushHtmlRenderingEnabled=null, isGeofencesEnabled=false, inAppMessageTestPushEagerDisplayEnabled=null, automaticGeofenceRequestsEnabled=null, isFirebaseMessagingServiceOnNewTokenRegistrationEnabled=false, isTouchModeRequiredForHtmlInAppMessages=null, isSdkAuthEnabled=null, deviceObjectAllowlist=null, isDeviceObjectAllowlistEnabled=null, brazeSdkMetadata=null, customLocationProviderNames=null, isHtmlInAppMessageApplyWindowInsetsEnabled=null, doesPushStoryDismissOnClick=null)
+10-23 17:39:46.185 27870 27870 I MinecraftPlatform: MainActivity::requestPushPermission
+10-23 17:39:46.188 27870 27898 I SwappyDisplayManager: Using internal com/google/androidgamesdk/SwappyDisplayManager class from dex bytes.
+10-23 17:39:46.191 27870 27898 E SwappyDisplayManager: dalvik.system.InMemoryDexClassLoader[DexPathList[[dex file "InMemoryDexFile[cookie=[0, -5476376654765385312]]"],nativeLibraryDirectories=[/system/lib64, /system_ext/lib64]]] couldn't find "libminecraftpe.so"
+10-23 17:39:46.193 27870 27903 I SwappyDisplayManager: Starting looper thread
+10-23 17:39:46.324 27870 27870 I TextToSpeech: Sucessfully bound to com.google.android.tts
+10-23 17:39:46.329 27870 27882 I TextToSpeech: Connected to TTS engine
+10-23 17:39:46.349 27870 27870 D MinecraftPE: onStart
+10-23 17:39:46.361 27870 27898 W Minecraft: NO LOG FILE! - [Graphics] The graphics context was gained
+10-23 17:39:46.361 27870 27898 W Minecraft: 
+10-23 17:39:46.373 27870 27870 W Minecraft: INPUT device id -1- is Crete Controller: false
+10-23 17:39:46.373 27870 27870 W Minecraft: INPUT device id 2- is Crete Controller: false
+10-23 17:39:46.373 27870 27870 W Minecraft: INPUT device id 3- is Crete Controller: false
+10-23 17:39:46.373 27870 27870 W Minecraft: INPUT device id 4- is Crete Controller: false
+10-23 17:39:46.373 27870 27870 W Minecraft: INPUT device id 5- is Crete Controller: false
+10-23 17:39:46.373 27870 27870 W Minecraft: INPUT device id 6- is Crete Controller: false
+10-23 17:39:46.373 27870 27870 W Minecraft: INPUT device id 7- is Crete Controller: false
+10-23 17:39:46.373 27870 27870 W Minecraft: INPUT device id 8- is Crete Controller: false
+10-23 17:39:46.373 27870 27870 W Minecraft: INPUT device id 9- is Crete Controller: false
+10-23 17:39:46.373 27870 27870 W Minecraft: INPUT device id 10- is Crete Controller: false
+10-23 17:39:46.374 27870 27870 W Minecraft: No Xbox Controller Found
+10-23 17:39:46.374 27870 27870 W Minecraft: No Playstation Controller Found
+10-23 17:39:46.374 27870 27870 W Minecraft: No PS Dualsense Controller Found
+10-23 17:39:46.386 27870 27870 D MinecraftPE: onResume
+10-23 17:39:46.435 27870 27870 V Braze v25.0.0 .BrazeInAppMessageManager: Registering InAppMessageManager with activity: MinecraftHostedActivity
+10-23 17:39:46.444 27870 27870 D Braze v25.0.0 .BrazeInAppMessageManager: Subscribing in-app message event subscriber
+10-23 17:39:46.444 27870 27870 V Braze v25.0.0 .Braze: The instance is null. Allowing instance initialization
+10-23 17:39:46.444 27870 27870 V Braze v25.0.0 .Braze: The instance is null. Allowing instance initialization
+10-23 17:39:46.444 27870 27870 D Braze v25.0.0 .Braze: Braze SDK Initializing
+10-23 17:39:46.481 27870 27922 D Braze v25.0.0 .com.braze.images.DefaultBrazeImageLoader: Initializing disk cache
+10-23 17:39:46.491 27870 27922 D Braze v25.0.0 .com.braze.images.DefaultBrazeImageLoader: Disk cache initialized
+10-23 17:39:46.503 27870 27870 D Braze v25.0.0 .Braze: Braze SDK loaded in 59 ms.
+10-23 17:39:46.504 27870 27870 V Braze v25.0.0 .BrazeInAppMessageManager: Subscribing sdk data wipe subscriber
+10-23 17:39:46.507 27870 27926 D Braze v25.0.0 .Braze: Applying any pending runtime configuration values
+10-23 17:39:46.508 27870 27926 V Braze v25.0.0 .Braze: Setting pending config object: Builder(apiKey=7e90f2bd-d27b-4010-a501-a8e30021418a, serverTarget=null, smallNotificationIconName=drawable/notification_icon_small, largeNotificationIconName=null, customEndpoint=null, defaultNotificationChannelName=null, defaultNotificationChannelDescription=null, pushDeepLinkBackStackActivityClassName=null, firebaseCloudMessagingSenderIdKey=null, customHtmlWebViewActivityClassName=null, sdkFlavor=null, sessionTimeout=10, defaultNotificationAccentColor=5415989, triggerActionMinimumTimeIntervalSeconds=5, badNetworkInterval=120, goodNetworkInterval=60, greatNetworkInterval=10, inAppMessageWebViewClientMaxOnPageFinishedWaitMs=null, admMessagingRegistrationEnabled=false, handlePushDeepLinksAutomatically=true, isLocationCollectionEnabled=false, isNewsFeedVisualIndicatorOn=false, isPushDeepLinkBackStackActivityEnabled=null, isSessionStartBasedTimeoutEnabled=null, isFirebaseCloudMessagingRegistrationEnabled=false, isContentCardsUnreadVisualIndicatorEnabled=null, isInAppMessageAccessibilityExclusiveModeEnabled=null, isPushWakeScreenForNotificationEnabled=false, isPushHtmlRenderingEnabled=null, isGeofencesEnabled=false, inAppMessageTestPushEagerDisplayEnabled=null, automaticGeofenceRequestsEnabled=null, isFirebaseMessagingServiceOnNewTokenRegistrationEnabled=false, isTouchModeRequiredForHtmlInAppMessages=null, isSdkAuthEnabled=null, deviceObjectAllowlist=null, isDeviceObjectAllowlistEnabled=null, brazeSdkMetadata=null, customLocationProviderNames=null, isHtmlInAppMessageApplyWindowInsetsEnabled=null, doesPushStoryDismissOnClick=null)
+10-23 17:39:46.508 27870 27926 I Braze v25.0.0 .RuntimeAppConfigurationProvider: Setting Braze Override configuration with config: Builder(apiKey=7e90f2bd-d27b-4010-a501-a8e30021418a, serverTarget=null, smallNotificationIconName=drawable/notification_icon_small, largeNotificationIconName=null, customEndpoint=null, defaultNotificationChannelName=null, defaultNotificationChannelDescription=null, pushDeepLinkBackStackActivityClassName=null, firebaseCloudMessagingSenderIdKey=null, customHtmlWebViewActivityClassName=null, sdkFlavor=null, sessionTimeout=10, defaultNotificationAccentColor=5415989, triggerActionMinimumTimeIntervalSeconds=5, badNetworkInterval=120, goodNetworkInterval=60, greatNetworkInterval=10, inAppMessageWebViewClientMaxOnPageFinishedWaitMs=null, admMessagingRegistrationEnabled=false, handlePushDeepLinksAutomatically=true, isLocationCollectionEnabled=false, isNewsFeedVisualIndicatorOn=false, isPushDeepLinkBackStackActivityEnabled=null, isSessionStartBasedTimeoutEnabled=null, isFirebaseCloudMessagingRegistrationEnabled=false, isContentCardsUnreadVisualIndicatorEnabled=null, isInAppMessageAccessibilityExclusiveModeEnabled=null, isPushWakeScreenForNotificationEnabled=false, isPushHtmlRenderingEnabled=null, isGeofencesEnabled=false, inAppMessageTestPushEagerDisplayEnabled=null, automaticGeofenceRequestsEnabled=null, isFirebaseMessagingServiceOnNewTokenRegistrationEnabled=false, isTouchModeRequiredForHtmlInAppMessages=null, isSdkAuthEnabled=null, deviceObjectAllowlist=null, isDeviceObjectAllowlistEnabled=null, brazeSdkMetadata=null, customLocationProviderNames=null, isHtmlInAppMessageApplyWindowInsetsEnabled=null, doesPushStoryDismissOnClick=null)
+10-23 17:39:46.517 27870 27926 I Braze v25.0.0 .BrazeConfigurationProvider: Found an override api key. Using it to configure the Braze SDK
+10-23 17:39:46.518 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Unable to find the xml INTEGER configuration value with primary key 'com_braze_logger_initial_log_level'. Using default value '4'.
+10-23 17:39:46.518 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Using resources value for key: 'com_braze_logger_initial_log_level' and value: '4'
+10-23 17:39:46.567 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Unable to find the xml STRING configuration value with primary key 'com_braze_custom_endpoint'. Using default value 'null'.
+10-23 17:39:46.567 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Using resources value for key: 'com_braze_custom_endpoint' and value: 'null'
+10-23 17:39:46.568 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Using runtime override value for key: 'com_braze_firebase_cloud_messaging_registration_enabled' and value: 'false'
+10-23 17:39:46.568 27870 27926 I Braze v25.0.0 .Braze: Automatic Firebase Cloud Messaging registration not enabled in configuration. Braze will not register for Firebase Cloud Messaging.
+10-23 17:39:46.568 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Using runtime override value for key: 'com_braze_push_adm_messaging_registration_enabled' and value: 'false'
+10-23 17:39:46.568 27870 27926 I Braze v25.0.0 .Braze: Automatic ADM registration not enabled in configuration. Braze will not register for ADM.
+10-23 17:39:46.572 27870 27870 D DecorView[]: getWindowModeFromSystem  windowmode is 1
+10-23 17:39:46.573 27870 27870 D DecorView[]: updateDecorCaptionStatus windowMode is 1
+10-23 17:39:46.580 27870 27926 V Braze v25.0.0 .Braze: Starting up a new user dependency manager
+10-23 17:39:46.596 27870 27870 D GameActivity: ************** mainWorkCallback *********
+10-23 17:39:46.596 27870 27926 V Braze v25.0.0 .SharedPrefUtils: Detected SDK update from '' -> '25.0.0'. Clearing com.braze.storage.server_config.7e90f2bd-d27b-4010-a501-a8e30021418a storage.
+10-23 17:39:46.596 27870 27870 D gti.InputConnection: setState: '', selection=(0,0), composing region=(0,0)
+10-23 17:39:46.597 27870 27870 D gti.InputConnection: setSelection: 0:0
+10-23 17:39:46.597 27870 27870 D gti.InputConnection: getEditable
+10-23 17:39:46.605 27870 27870 D MinecraftPE: onPause
+10-23 17:39:46.606 27870 27870 V Braze v25.0.0 .BrazeInAppMessageManager: Unregistering InAppMessageManager from activity: MinecraftHostedActivity
+10-23 17:39:46.609 27870 27926 V Braze v25.0.0 .StringUtils: Generating MD5 for user id:  apiKey: 7e90f2bd-d27b-4010-a501-a8e30021418a
+10-23 17:39:46.636 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Using runtime override value for key: 'com_braze_session_timeout' and value: '10'
+10-23 17:39:46.636 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Unable to find the xml BOOLEAN configuration value with primary key 'com_braze_session_start_based_timeout_enabled'. Using default value 'false'.
+10-23 17:39:46.636 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Using resources value for key: 'com_braze_session_start_based_timeout_enabled' and value: 'false'
+10-23 17:39:46.654 27870 27870 V GameActivity: onImeInsetsChanged from Text Listener
+10-23 17:39:46.688 27870 27870 D DecorView[]: getWindowModeFromSystem  windowmode is 1
+10-23 17:39:46.688 27870 27870 D DecorView[]: updateDecorCaptionStatus windowMode is 1
+10-23 17:39:46.696 27870 27876 I .host:game_host: Background concurrent mark compact GC freed 1993KB AllocSpace bytes, 9(436KB) LOS objects, 49% free, 3353KB/6707KB, paused 2.403ms,15.167ms total 64.438ms
+10-23 17:39:46.758 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Using runtime override value for key: 'com_braze_trigger_action_minimum_time_interval_seconds' and value: '5'
+10-23 17:39:46.779 27870 27870 V GameActivity: onImeInsetsChanged from Text Listener
+10-23 17:39:46.780 27870 27890 I AdrenoGLES-0: QUALCOMM build                   : 67600309f5, I34f73d0972
+10-23 17:39:46.780 27870 27890 I AdrenoGLES-0: Build Date                       : 07/10/23
+10-23 17:39:46.780 27870 27890 I AdrenoGLES-0: OpenGL ES Shader Compiler Version: EV031.36.08.23
+10-23 17:39:46.780 27870 27890 I AdrenoGLES-0: Local Branch                     : 
+10-23 17:39:46.780 27870 27890 I AdrenoGLES-0: Remote Branch                    : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.1.0.11.00.00.766.892
+10-23 17:39:46.780 27870 27890 I AdrenoGLES-0: Remote Branch                    : NONE
+10-23 17:39:46.780 27870 27890 I AdrenoGLES-0: Reconstruct Branch               : NOTHING
+10-23 17:39:46.780 27870 27890 I AdrenoGLES-0: Build Config                     : S P 12.1.1 AArch64
+10-23 17:39:46.780 27870 27890 I AdrenoGLES-0: Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+10-23 17:39:46.780 27870 27890 I AdrenoGLES-0: Driver Version                   : 0615.72
+10-23 17:39:46.794 27870 27926 V Braze v25.0.0 .bo.app.h6: Subscribing to trigger dispatch events.
+10-23 17:39:46.795 27870 27870 D VRI[MinecraftHostedActivity]: vri.reportNextDraw android.view.ViewRootImpl.performTraversals:3895 android.view.ViewRootImpl.doTraversal:2627 android.view.ViewRootImpl$TraversalRunnable.run:9680 android.view.Choreographer$CallbackRecord.run:1524 android.view.Choreographer$CallbackRecord.run:1532 
+10-23 17:39:46.795 27870 27870 D SurfaceView: UPDATE null, mIsCastMode = false
+10-23 17:39:46.796 27870 27890 I AdrenoGLES-0: PFP: 0x016ee206, ME: 0x00000000
+10-23 17:39:46.817 27870 27898 W Minecraft: NO LOG FILE! - [Graphics] The graphics context was gained
+10-23 17:39:46.817 27870 27898 W Minecraft: 
+10-23 17:39:46.817 27870 27898 W Minecraft: MinecraftGame::init && MinecraftGame::setSize!
+10-23 17:39:46.843 27870 27890 W libc    : Access denied finding property "vendor.migl.debug"
+10-23 17:39:46.850 27870 27890 E libEGL  : pre_cache appList: ,,
+10-23 17:39:46.858 27870 27870 D VRI[MinecraftHostedActivity]: vri.Setup new sync id=0 syncSeqId=0
+10-23 17:39:46.858 27870 27870 E SurfaceSyncer: Failed to find sync for id=0
+10-23 17:39:46.877 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Unable to find the xml STRING_ARRAY configuration value with primary key 'com_braze_custom_location_providers_list'. Using default value '[]'.
+10-23 17:39:46.877 27870 27926 D Braze v25.0.0 .BrazeConfigurationProvider: Using resources value for key: 'com_braze_custom_location_providers_list' and value: '[]'
+10-23 17:39:46.883 27870 27890 D .host:game_host: MiuiProcessManagerServiceStub setSchedFifo
+10-23 17:39:46.883 27870 27890 I MiuiProcessManagerImpl: setSchedFifo pid:27870, mode:3
+10-23 17:39:46.911 27870 27926 D Braze v25.0.0 .BrazeGeofenceManager: Did not find stored geofences.
+10-23 17:39:46.927 27870 27890 E libboost: fail to open file: No such file or directory
+10-23 17:39:46.927 27870 27890 E libboost: fail to open node: No such file or directory
+10-23 17:39:46.933 27870 27890 E perf_hint: Session creation failed, mPreferredRateNanos: -1
+10-23 17:39:46.935 27870 27870 D VRI[MinecraftHostedActivity]: vri.reportDrawFinished syncSeqId=0 android.view.ViewRootImpl.lambda$createSyncIfNeeded$4$android-view-ViewRootImpl:3963 android.view.ViewRootImpl$$ExternalSyntheticLambda1.run:6 android.os.Handler.handleCallback:942 android.os.Handler.dispatchMessage:99 android.os.Looper.loopOnce:211 
+10-23 17:39:46.945 27870 27870 D SurfaceView: UPDATE Surface(name=SurfaceView[dev.zips.clientbase.host/dev.zips.clientbase.host.MinecraftHostedActivity])/@0x4a42ca4, mIsProjectionMode = false
+10-23 17:39:46.945 27870 27870 D SurfaceControl: nativeSetScreenProjection ===> setScreenProjection
+10-23 17:39:46.955 27870 27870 D SurfaceControl: nativeSetScreenProjection ===> setScreenProjection
+10-23 17:39:46.956 27870 27870 D SurfaceControl: nativeSetScreenProjection ===> setScreenProjection
+10-23 17:39:46.965 27870 27926 I Braze v25.0.0 .BrazeGeofenceManager: Geofences implicitly disabled via server configuration.
+10-23 17:39:46.966 27870 27926 I Braze v25.0.0 .BrazeGeofenceManager: ***Geofence API not found. Please include the android-sdk-location module***
+10-23 17:39:46.966 27870 27926 D Braze v25.0.0 .BrazeGeofenceManager: Braze geofences not enabled. Geofences not set up.
+10-23 17:39:46.968 27870 27926 I Braze v25.0.0 .o: ***Location API not found. Please include android-sdk-location module***
+10-23 17:39:46.997 27870 27926 D Braze v25.0.0 .g1: Did not find stored Feature Flags.
+10-23 17:39:47.037 27870 27870 D CompatibilityChangeReporter: Compat change id reported: 78294732; UID 11077; state: ENABLED
+10-23 17:39:47.038 27870 27870 I MinecraftPlatform: MainActivity::onRequestPermissionsResult
+10-23 17:39:47.050 27870 27926 V Braze v25.0.0 .SharedPrefUtils: Detected SDK update from '' -> '25.0.0'. Clearing com.braze.storage.content_cards_storage_provider.metadata.d41d8cd98f00b204e9800998ecf8427e.7e90f2bd-d27b-4010-a501-a8e30021418a storage.
+10-23 17:39:47.053 27870 27870 D MinecraftPE: onResume
+10-23 17:39:47.056 27870 27870 V Braze v25.0.0 .BrazeInAppMessageManager: Registering InAppMessageManager with activity: MinecraftHostedActivity
+10-23 17:39:47.057 27870 27870 D Braze v25.0.0 .BrazeInAppMessageManager: Removing existing in-app message event subscriber before subscribing a new one.
+10-23 17:39:47.057 27870 27870 D Braze v25.0.0 .BrazeInAppMessageManager: Subscribing in-app message event subscriber
+10-23 17:39:47.058 27870 27870 V Braze v25.0.0 .BrazeInAppMessageManager: Removing existing sdk data wipe event subscriber before 
+[logcat cap reached]
