@@ -1,6 +1,6 @@
 # Original Bedrock Activity attempts
 
-**Latest: [host 0.5.2 warning/error/fatal diagnostics and WHAT WENT WRONG summary](ACTIVITY_SURFACE_DEVICE_TEST.md#validated-focused-diagnostics-build), validated on Android 13.** The 0.5.1 phone attempt resumed and received a Surface, then SIGABRT without captured cause. The sections below record the preceding wrapper repair.
+**Latest: [host 0.5.3 Play Games startup correction](PLAY_GAMES_DEVICE_TEST.md), [Android 13 build/APK checks and 43-case regressions passed](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39986653012). [Host 0.5.3 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39986653012/artifacts/12515634180).** The new fatal excerpt identifies the missing SDK initializer. Earlier 0.5.1 resume/Surface evidence and 0.5.2 focused diagnostics remain valid milestones; they are not title-screen success. The sections below record the preceding wrapper repair.
 
 ## Host 0.5.1 — original Bedrock Activity loader repair
 

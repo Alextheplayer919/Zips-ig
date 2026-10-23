@@ -43,4 +43,12 @@ Tests exercise the actual invocation code using **our own named demo initializer
 
 This recreates one verified missing startup effect. **Initialization is not Play Games sign-in, achievement success, original-package/signing registration, provider parity or a hosted title screen.** Host package identity, SDK resolution Activities, account/services and other SDK/provider requirements may still fail legitimately. No further input file is currently needed.
 
-Android compilation/regression validation pending; do not deliver until it passes.
+## Validated correction
+
+[Android 13 run 39986653012](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39986653012) passed for app/test commit **a018aa6f9946aef0597512e09e7066d08d1ea96d**, job **120528153382**, **5m32s**, host **0.5.3 / code 11**. Build, actual APK definition-exclusion scan and **43 Android 13 x86_64 regression cases** passed, including four new invocation tests. **24 local source/native guards** pass. No tests disabled. CI tests our actual startup-invocation seam with an explicitly named demo fixture, not the original Play Games code or ARM64 Bedrock. Static DEX review establishes the equivalence; the corrected original SDK initialization/phone outcome remains pending.
+
+- [APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39986653012/artifacts/12515634180): **client-base-debug-77**, **6,202,909 bytes**. Install only **client-base-host-debug.apk**.
+- [CI reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39986653012/artifacts/12516067781): **client-base-device-tests-77**, **295,126 bytes**. CI conclusion recorded; independent local XML parsing not claimed.
+- Engine archive unchanged: blob **c78f6e8642d334916d247487897eb871ad27c160**. No new SDK/engine dependency or manifest provider added.
+
+Phone next step: update only the host, keep Minecraft unchanged, **Launch Bedrock Activity (experimental)** once, report visible output and **Save Bedrock Activity report (.txt)** after exit collection if needed. No import, demo/link/bootstrap repeat or new input file. If debug keys conflict, preserve diagnostics before uninstalling only the host. This is a real missing startup correction, not a claim of authentication/title-screen success.
