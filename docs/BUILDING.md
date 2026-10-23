@@ -1,5 +1,7 @@
 # Building and testing APKs
 
+**Current phone test: host 0.4.3 only.** Use **Initialize Minecraft Java / JNI (no Activity)** once and share the result; see [the permission correction](NETWORK_PERMISSION_DEVICE_TEST.md). Keep Minecraft unchanged. The demo-install and earlier-version instructions below describe previous milestones, not tests to repeat.
+
 ## GitHub Actions
 
 [Build APK](https://github.com/Alextheplayer919/Zips-ig/actions/workflows/build-apk.yml) runs for app/build changes on pushes and pull requests. It can also be dispatched manually once GitHub registers the workflow on the default branch. Push/PR runs include Android 13 emulator tests; manual dispatch offers an emulator-test toggle.

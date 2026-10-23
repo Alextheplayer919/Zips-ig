@@ -4,6 +4,8 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 
 **Current implementation: a host plus a cooperative demo guest, not a working Minecraft launcher.**
 
+**Current phone test:** [host 0.4.3 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39959687156/artifacts/12505205745). Install only `client-base-host-debug.apk`, keep Minecraft unchanged, run **Initialize Minecraft Java / JNI (no Activity)** once and share the result. The Android 13 build/regression suite passed; corrected phone initialization is not yet established. No demo, import or link test needs repeating.
+
 ## Documentation
 
 - [How we think the original client works](docs/THEORY.md) — evidence, hypotheses and unresolved engine integration.
@@ -14,7 +16,7 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 - [Try the supplied engine](docs/ENGINE_PROBE.md) — optional hash-checked import and private-process link diagnostic.
 - [Phone Java bootstrap result](docs/BOOTSTRAP_DEVICE_TEST.md) — original MainActivity loads the dependencies and engine itself.
 - [Confirmed permission abort and correction](docs/NETWORK_PERMISSION_DEVICE_TEST.md) — host 0.4.3 adds the missing network-state permission and checks it before JNI.
-- [Initialization disconnect / exit diagnostics](docs/EXIT_DIAGNOSTICS.md) — host 0.4.2 collects own-process exit reasons and available crash evidence; cause not yet known.
+- [Initialization disconnect / exit diagnostics](docs/EXIT_DIAGNOSTICS.md) — host 0.4.2 added own-process exit reasons and available crash evidence; its phone report identified the permission failure above.
 - [GameActivity phone preflight](docs/GAMEACTIVITY_DEVICE_TEST.md) — empty superclass initializer identified; host 0.4.1 corrects the overly strict gate.
 - [Controlled Java/JNI initialization](docs/JVM_INITIALIZATION.md) — host 0.4 experiment; not an Activity launch.
 - [JNI bootstrap inspection](docs/JNI_BOOTSTRAP.md) — native prerequisites and the no-execution installed-DEX diagnostic.

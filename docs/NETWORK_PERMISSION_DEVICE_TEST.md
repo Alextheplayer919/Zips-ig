@@ -34,3 +34,12 @@ Android tests check the normal permission's actual grant to the host, rejection 
 After the corrected APK is validated, install host **0.4.3** only, keep Minecraft unchanged, tap **Initialize Minecraft Java / JNI (no Activity)** once and share the result. No archive import, demo/link or static-only test is needed. If it disconnects again, leave the host open for exit collection and use **Collect last probe exit details** to retry diagnostics without rerunning game code.
 
 This fixes the evidenced missing prerequisite, not a claim that all later SDK initialization, lifecycle or title-screen requirements are complete. A new phone result is still required.
+
+## Corrected build validation
+
+[Android 13 CI run 39959687156](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39959687156) passed compilation and the emulator integration suite for app/test commit `9a1d0a20b6c5f1c0ed84ff73b0dea9820b8fcda5`, job `120436542251` (4m19s). The suite includes the three new permission tests above and retains existing archive/hash, own-JNI, initializer-policy and exit-diagnostic coverage. Eighteen local source/native guards pass. The ARM64 Minecraft engine is not executed by these x86_64 emulator tests; actual corrected phone initialization remains pending.
+
+- [Host 0.4.3 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39959687156/artifacts/12505205745): `client-base-debug-44`, 3,474,533 bytes. Install only `client-base-host-debug.apk`.
+- [Android test reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39959687156/artifacts/12504317965): `client-base-device-tests-44`, 193,776 bytes. CI reports success; downloading the report ZIP into this sandbox hit the artifact storage host's EOF/network restriction, so no separate local XML inspection is claimed.
+
+The supplied archive's Git blob remains `c78f6e8642d334916d247487897eb871ad27c160`. PR #1 stays open.
