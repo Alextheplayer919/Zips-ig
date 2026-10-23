@@ -24,9 +24,11 @@ final class ProbeExitDiagnostics {
     static final class Run {
         final int pid, uid;
         final long startedAt;
-        final String cleanup;
-        Run(int pid, int uid, long startedAt, String cleanup) {
-            this.pid = pid; this.uid = uid; this.startedAt = startedAt; this.cleanup = cleanup;
+        final String cleanup, processSuffix;
+        Run(int pid, int uid, long startedAt, String cleanup) { this(pid, uid, startedAt, cleanup, ":engine_probe"); }
+        Run(int pid, int uid, long startedAt, String cleanup, String processSuffix) {
+            if (!":engine_probe".equals(processSuffix) && !":game_host".equals(processSuffix)) throw new IllegalArgumentException("Unknown own process");
+            this.pid = pid; this.uid = uid; this.startedAt = startedAt; this.cleanup = cleanup; this.processSuffix = processSuffix;
         }
     }
     private static File runFile(Context c) { return new File(c.getFilesDir(), "probe-exit-run.json"); }
@@ -80,7 +82,8 @@ final class ProbeExitDiagnostics {
     static void saveDisplay(Context c, String text) throws IOException { write(reportFile(c), text); }
 
     static boolean matches(Run run, int pid, int uid, String process, long timestamp, String packageName) {
-        return run.pid > 0 && pid == run.pid && uid == run.uid && (packageName + ":engine_probe").equals(process)
+        return run.pid > 0 && pid == run.pid && uid == run.uid && (":engine_probe".equals(run.processSuffix) ? (packageName + ":engine_probe").equals(process)
+                    : (packageName + ":game_host").equals(process))
                 && timestamp >= run.startedAt - 1000 && timestamp <= run.startedAt + 15 * 60 * 1000L;
     }
     static String collect(Context context) {

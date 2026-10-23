@@ -12,7 +12,7 @@ import dev.zips.clientbase.contract.ActivityEnvironment;
 import dev.zips.clientbase.contract.HostedActivity;
 
 /** Automated test fixture. Android, not the host, calls this Activity's lifecycle. */
-public final class FrameworkGuestActivity extends Activity implements HostedActivity {
+public final class FrameworkGuestActivity extends androidx.appcompat.app.AppCompatActivity implements HostedActivity {
     private ActivityEnvironment environment;
     private final DemoGuestEntry nativeEntry = new DemoGuestEntry();
 

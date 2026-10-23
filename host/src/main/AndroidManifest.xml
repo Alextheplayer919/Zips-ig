@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Original Xbox HTTP initialization listens for connectivity under the host UID. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Real Activity startup configures networked SDKs under OUR UID, not the game's. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <queries>
         <package android:name="dev.zips.clientbase.guest" />
         <package android:name="com.mojang.minecraftpe" />
@@ -8,6 +10,12 @@
     <application android:name=".ClientBaseApplication" android:appComponentFactory=".HostComponentFactory" android:label="Client Base" android:allowBackup="false"
         android:extractNativeLibs="true" android:supportsRtl="true" android:theme="@style/AppTheme">
         <service android:name=".EngineProbeService" android:process=":engine_probe" android:exported="false" />
+        <service android:name=".GameHostService" android:process=":game_host" android:exported="false" />
+        <activity android:name=".GameActivityPlaceholder" android:process=":game_host" android:exported="false"
+            android:theme="@android:style/Theme.Material.NoActionBar" android:launchMode="singleTask"
+            android:screenOrientation="sensorLandscape" android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|fontScale" android:excludeFromRecents="true">
+            <meta-data android:name="android.app.lib_name" android:value="minecraftpe" />
+        </activity>
         <!-- Developer fixture only; no exported/arbitrary guest launch or Minecraft launch. -->
         <activity android:name=".HostedGuestPlaceholderActivity" android:exported="false"
             android:theme="@android:style/Theme.Material.NoActionBar" android:excludeFromRecents="true" />

@@ -4,4 +4,4 @@ dependencyResolutionManagement {
     repositories { google(); mavenCentral() }
 }
 rootProject.name = 'ClientBase'
-include ':contract', ':host', ':demo-guest'
+include ':contract', ':host', ':demo-guest', ':bedrock-api'

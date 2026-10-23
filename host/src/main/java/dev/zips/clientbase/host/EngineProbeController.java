@@ -117,7 +117,7 @@ public final class EngineProbeController {
     public static void initializeMinecraft() { start(3); }
 
     private static void start(int mode) {
-        if (app == null || running || collecting) return;
+        if (app == null || running || collecting || GameHostController.busy()) return;
         if (android.os.SystemClock.uptimeMillis() - finishedAt < 2000) {
             show("Wait two seconds for the previous probe process to exit.");
             return;
@@ -166,7 +166,7 @@ public final class EngineProbeController {
     }
 
     public static void collectLastExitDetails() {
-        if (app == null || running || collecting) return;
+        if (app == null || running || collecting || GameHostController.busy()) return;
         collectExit("Last saved probe stage:\n" + savedStage());
     }
 

@@ -1,0 +1,10 @@
+plugins { id 'java-library' }
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+// JAR-only signatures, not an Android AAR: compileOnly AAR dependencies are unsupported.
+// Reading the host's boot classpath adds no task/output dependency back to the host.
+dependencies {
+    compileOnly files(providers.provider { project(':host').android.bootClasspath })
+}

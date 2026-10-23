@@ -25,7 +25,7 @@ final class BootstrapClassLoader extends DexClassLoader {
 
     @Override protected synchronized Class<?> loadClass(String name, boolean resolve)
             throws ClassNotFoundException {
-        if (!BRIDGE.equals(name)) return super.loadClass(name, resolve);
+        if (!BRIDGE.equals(name) && !"dev.zips.clientbase.host.MinecraftHostedActivity".equals(name)) return super.loadClass(name, resolve);
         Class<?> found = findLoadedClass(name);
         if (found == null) found = findClass(name);
         if (resolve) resolveClass(found);

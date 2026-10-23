@@ -22,7 +22,8 @@ class ClientBaseSourceTests(unittest.TestCase):
     def test_manifest_xml_and_least_privilege_permissions(self):
         for module in ('host', 'demo-guest', 'contract'):
             root = self.manifest(module)
-            expected = ['android.permission.ACCESS_NETWORK_STATE'] if module == 'host' else []
+            expected = (['android.permission.ACCESS_NETWORK_STATE', 'android.permission.INTERNET'] if module == 'host'
+                        else ['dev.zips.clientbase.guest.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'] if module == 'demo-guest' else [])
             self.assertEqual(expected, [permission.get(ANDROID + 'name') for permission in root.findall('uses-permission')])
         for path in BASE.glob('*/src/main/res/**/*.xml'):
             ET.parse(path)
@@ -215,6 +216,33 @@ class ClientBaseSourceTests(unittest.TestCase):
             self.assertIn(required, source)
         for forbidden in ('getPackageName()', 'getApplicationInfo()', 'getFilesDir()', 'checkPermission(', 'setAccessible'):
             self.assertNotIn(forbidden, source)
+
+    def test_game_adapter_is_separate_process_and_compile_only_api_is_not_packaged(self):
+        app = self.manifest('host').find('application')
+        component = next(a for a in app.findall('activity') if a.get(ANDROID + 'name') == '.GameActivityPlaceholder')
+        self.assertEqual(':game_host', component.get(ANDROID + 'process'))
+        self.assertEqual('false', component.get(ANDROID + 'exported'))
+        gradle = (BASE / 'host/build.gradle').read_text()
+        self.assertIn("compileOnly project(':bedrock-api')", gradle)
+        workflow = (BASE / '.github/workflows/build-apk.yml').read_text()
+        self.assertIn('python3 tools/verify_apks.py build/apks', workflow)
+        source = (BASE / 'host/src/main/java/dev/zips/clientbase/host/GameActivityRuntime.java').read_text()
+        self.assertLess(source.index('BedrockInputPins.verify'), source.index('MinecraftBootstrap.prepare'))
+        self.assertIn('wrapper.getSuperclass() != prepared.mainClass', source)
+        self.assertIn('requireGameProcess(context)', source)
+        self.assertNotIn('.onCreate(', source)
+
+    def test_game_startup_pins_match_supplied_archive_metadata(self):
+        import json
+        data = json.loads((BASE / 'docs/STARTUP_INPUT.json').read_text())
+        source = (BASE / 'host/src/main/java/dev/zips/clientbase/host/BedrockInputPins.java').read_text()
+        for item in data['files']:
+            for value in (item['name'], str(item['bytes']), item['sha256']):
+                self.assertIn(value, source)
+        controller = (BASE / 'host/src/main/java/dev/zips/clientbase/host/GameHostController.java').read_text()
+        for required in ('data.getInt("uid", -1) != Process.myUid()', 'pid != Process.myPid()',
+                         'binder.isBinderAlive()', '12000', 'request != collectionId', 'expected != generation'):
+            self.assertIn(required, controller)
 
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):

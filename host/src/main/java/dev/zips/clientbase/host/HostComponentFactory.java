@@ -8,7 +8,8 @@ import android.content.Intent;
 public final class HostComponentFactory extends AppComponentFactory {
     @Override public Activity instantiateActivity(ClassLoader loader, String name, Intent intent)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-        if (!HostedGuestPlaceholderActivity.class.getName().equals(name)) {
+        boolean game = GameActivityPlaceholder.class.getName().equals(name);
+        if (!game && !HostedGuestPlaceholderActivity.class.getName().equals(name)) {
             return super.instantiateActivity(loader, name, intent);
         }
         try {
@@ -17,7 +18,8 @@ public final class HostComponentFactory extends AppComponentFactory {
                     || !ClientBaseApplication.current().getPackageName().equals(intent.getComponent().getPackageName())) {
                 throw new SecurityException("Expected exact private host component");
             }
-            return FrameworkActivityRuntime.create(ClientBaseApplication.current());
+            return game ? GameActivityRuntime.create(ClientBaseApplication.current())
+                    : FrameworkActivityRuntime.create(ClientBaseApplication.current());
         } catch (Exception | LinkageError error) {
             InstantiationException blocked = new InstantiationException("Guest Activity creation blocked: " + error);
             blocked.initCause(error);

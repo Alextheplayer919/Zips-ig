@@ -1,0 +1,155 @@
+package dev.zips.clientbase.host;
+
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.Process;
+import java.io.File;
+import java.lang.ref.WeakReference;
+import org.json.JSONObject;
+
+/** Single explicit attempt, no crash/relaunch loop. Binding and identity survive UI rotation. */
+public final class GameHostController {
+    public interface Listener { void gameStatus(String text); }
+    private static final Handler MAIN = new Handler(Looper.getMainLooper());
+    private static Context app;
+    private static WeakReference<Listener> listener = new WeakReference<>(null);
+    private static WeakReference<Activity> foreground = new WeakReference<>(null);
+    private static boolean bound, ready, launched, collecting;
+    private static int generation, pid, collectionId;
+    private static long startedAt;
+    private static IBinder binder;
+    private static String latest;
+    private GameHostController() {}
+    private static File runFile() { return new File(app.getFilesDir(), "game-host-run.json"); }
+    private static File exitFile() { return new File(app.getFilesDir(), "game-host-exit.txt"); }
+    public static void attach(Context c, Listener l) {
+        app = c.getApplicationContext(); listener = new WeakReference<>(l);
+        if (latest == null) latest = "No Activity attempt yet. The completed bootstrap need not be repeated.";
+        l.gameStatus(latest);
+    }
+    public static void detach(Listener l) { if (listener.get() == l) listener.clear(); }
+    public static void resumed(Activity a) { foreground = new WeakReference<>(a); refresh(); launchIfReady(); }
+    public static void paused(Activity a) { if (foreground.get() == a) foreground.clear(); }
+    public static boolean busy() { return bound || collecting; }
+    private static void show(String text) { latest = text; Listener l = listener.get(); if (l != null) l.gameStatus(text); }
+    public static String current() { return latest == null ? "No game report" : latest; }
+    private static void saveRun(String cleanup) {
+        try { GameHostReport.write(runFile(), new JSONObject().put("pid", pid).put("uid", Process.myUid())
+                .put("started_at", startedAt).put("cleanup", cleanup).toString()); }
+        catch (Exception e) { show("Could not persist game-run identity: " + e.getMessage()); }
+    }
+    public static void start() {
+        if (app == null || busy() || EngineProbeController.isRunning()) return;
+        ++generation; pid = 0; startedAt = System.currentTimeMillis(); ready = false; launched = false;
+        saveRun("none");
+        try { GameHostReport.write(GameHostReport.stageFile(app), "New explicitly requested game attempt; no game code executed yet."); }
+        catch (Exception ignored) { }
+        show("Preparing original Bedrock Activity in a separate host-owned process...");
+        try {
+            bound = app.bindService(new Intent(app, GameHostService.class), CONNECTION, Context.BIND_AUTO_CREATE);
+            if (!bound) show("Game service binding rejected");
+            else MAIN.postDelayed(TIMEOUT, 180000);
+        } catch (Exception e) { bound = false; show("Game service binding failed: " + e); }
+    }
+    private static final Messenger RECEIVER = new Messenger(new Handler(Looper.getMainLooper(), message -> {
+        Bundle data = message.getData();
+        if (!bound || data.getInt("id") != generation || data.getInt("uid", -1) != Process.myUid()) return true;
+        int child = data.getInt("pid", 0);
+        if (child <= 0 || child == Process.myPid() || (pid != 0 && child != pid)) return true;
+        if (pid == 0) { pid = child; saveRun("none"); }
+        show(data.getString("text", "Empty game stage"));
+        if (data.getBoolean("blocked")) { MAIN.removeCallbacks(TIMEOUT); stop("Preparation blocked; host cleanup requested"); }
+        else if (data.getBoolean("ready")) { ready = true; launchIfReady(); }
+        return true;
+    }));
+    private static final ServiceConnection CONNECTION = new ServiceConnection() {
+        @Override public void onServiceConnected(ComponentName n, IBinder service) {
+            if (!bound) return;
+            binder = service;
+            try { Message request = Message.obtain(null, 1); request.replyTo = RECEIVER;
+                Bundle data = new Bundle(); data.putInt("id", generation); request.setData(data); new Messenger(service).send(request);
+            } catch (Exception e) { stop("IPC preparation failed: " + e); }
+        }
+        @Override public void onServiceDisconnected(ComponentName n) { disconnected(); }
+        @Override public void onBindingDied(ComponentName n) { disconnected(); }
+        @Override public void onNullBinding(ComponentName n) { stop("Null game binding"); }
+    };
+    private static void launchIfReady() {
+        Activity a = foreground.get();
+        if (!bound || !ready || launched || a == null || a.isFinishing() || a.isDestroyed()) return;
+        ready = false; launched = true;
+        try {
+            a.startActivity(new Intent(a, GameActivityPlaceholder.class));
+            // Bound child is now owned by the real Activity, not one-shot service cleanup.
+            // Keep startup timeout until original onResume returns, not merely a successful startActivity call.
+            MAIN.postDelayed(STARTUP_WATCH, 500);
+        } catch (Exception e) { stop("Framework launch rejected: " + e); }
+    }
+    private static final Runnable STARTUP_WATCH = new Runnable() {
+        @Override public void run() {
+            if (!bound || !launched) return;
+            String text = GameHostReport.read(GameHostReport.stageFile(app));
+            if (text.contains("ORIGINAL_ON_RESUME_RETURNED")) { MAIN.removeCallbacks(TIMEOUT); return; }
+            MAIN.postDelayed(this, 500);
+        }
+    };
+    private static final Runnable TIMEOUT = () -> stop("180-second startup timeout; host cleanup requested");
+    private static void unbind() {
+        MAIN.removeCallbacks(TIMEOUT); MAIN.removeCallbacks(STARTUP_WATCH);
+        ready = false; binder = null;
+        if (bound) { bound = false; try { app.unbindService(CONNECTION); } catch (Exception ignored) { } }
+    }
+    private static void disconnected() {
+        if (!bound) return;
+        unbind(); refresh(); collect(); // Never kill/rebind or rerun initialization on unexpected death.
+    }
+    public static void stop() { stop("User requested game-process termination (SIGKILL, not proof of a crash)"); }
+    private static void stop(String note) {
+        if (!bound) return;
+        saveRun(note);
+        boolean ownLiveChild = pid > 0 && pid != Process.myPid() && binder != null && binder.isBinderAlive();
+        if (ownLiveChild) Process.killProcess(pid); // PID came only from current same-UID private-service IPC.
+        unbind(); refresh(); collect();
+    }
+    public static void refresh() {
+        if (app == null) return;
+        File stage = GameHostReport.stageFile(app), exit = exitFile();
+        if (stage.isFile()) show(GameHostReport.read(stage) + (exit.isFile() && exit.lastModified() >= stage.lastModified()
+                ? "\n\n" + GameHostReport.read(exit) : ""));
+    }
+    public static void collect() {
+        if (app == null || collecting) return;
+        collecting = true; final int expected = generation, request = ++collectionId;
+        MAIN.postDelayed(() -> {
+            if (collecting && request == collectionId) {
+                collecting = false; ++collectionId;
+                show(current() + "\nExit collection UI deadline reached; retry collection without relaunching game.");
+            }
+        }, 12000);
+        new Thread(() -> {
+            String details;
+            try {
+                JSONObject run = new JSONObject(GameHostReport.read(runFile()));
+                ProbeExitDiagnostics.Run identity = new ProbeExitDiagnostics.Run(run.getInt("pid"), run.getInt("uid"),
+                        run.getLong("started_at"), run.getString("cleanup"), ":game_host");
+                details = ProbeExitDiagnostics.collect(app, identity);
+            } catch (Exception e) { details = "GAME_EXIT_UNAVAILABLE\n" + e; }
+            final String result = details;
+            MAIN.post(() -> {
+                if (expected != generation || request != collectionId) return;
+                collecting = false;
+                try { GameHostReport.write(exitFile(), result); } catch (Exception ignored) { }
+                refresh();
+            });
+        }, "game-exit-details").start();
+    }
+}

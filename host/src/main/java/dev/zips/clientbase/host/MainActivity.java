@@ -17,8 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-public final class MainActivity extends Activity implements EngineProbeController.Listener {
+public final class MainActivity extends Activity implements EngineProbeController.Listener, GameHostController.Listener {
     private static final int IMPORT_ENGINE = 20;
+    private TextView gameStatus;
     private TextView engineStatus;
     private TextView status;
     private FrameLayout guestPanel;
@@ -31,12 +32,12 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         int padding = (int) (24 * getResources().getDisplayMetrics().density);
         page.setPadding(padding, padding, padding, padding);
         scroll.addView(page);
-        TextView eyebrow = text("CLIENT BASE / 0.4.3", 13);
+        TextView eyebrow = text("CLIENT BASE / 0.5.0", 13);
         eyebrow.setTextColor(Color.rgb(113, 217, 193));
         page.addView(eyebrow);
         page.addView(text("One process.\nA separate guest.", 30));
         page.addView(text("Foundation test: load code, resources and JNI from the installed demo APK. "
-                + "Minecraft hosting and engine hooks are not implemented.", 16));
+                + "Experimental Bedrock Activity hosting is below; engine hooks are not implemented.", 16));
         page.addView(text("Only install the demo built with this host. Loaded code runs with this "
                 + "app's permissions; it is not sandboxed from the host.", 14));
         Button load = new Button(this);
@@ -53,6 +54,35 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         guestPanel = new FrameLayout(this);
         guestPanel.setId(R.id.guest_panel);
         page.addView(guestPanel);
+        page.addView(text("Original Bedrock Activity attempt", 24));
+        page.addView(text("Experimental: starts the original installed Bedrock Activity in a separate host-owned process. "
+                + "This adapter does not install the original providers or reproduce every SDK/package environment. "
+                + "An onCreate/Surface result is not a title-screen success.", 14));
+        Button launchGame = new Button(this);
+        launchGame.setText("Launch Bedrock Activity (experimental)");
+        launchGame.setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setTitle("Run the original Bedrock Activity?")
+                .setMessage("Use only your trusted original Minecraft 1.26.50.4 installation. We verify the supplied "
+                        + "startup files and engine, then execute real constructors, lifecycle and native initialization. "
+                        + "This can crash or hang. It runs with the host UID, network-state and INTERNET permissions, "
+                        + "not Minecraft's UID or private data. Internet is enabled for original networked SDK startup. "
+                        + "No provider/entitlement bypass or title-screen guarantee. Keep Client Base available for the report.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Launch", (dialog, which) -> GameHostController.start()).show());
+        page.addView(launchGame);
+        Button stopGame = new Button(this); stopGame.setText("Stop hosted game process");
+        stopGame.setOnClickListener(v -> GameHostController.stop()); page.addView(stopGame);
+        Button collectGame = new Button(this); collectGame.setText("Collect last game exit (no game execution)");
+        collectGame.setOnClickListener(v -> GameHostController.collect()); page.addView(collectGame);
+        Button shareGame = new Button(this); shareGame.setText("Share Bedrock Activity report");
+        shareGame.setOnClickListener(v -> {
+            GameHostController.refresh();
+            Intent send = new Intent(Intent.ACTION_SEND); send.setType("text/plain");
+            send.putExtra(Intent.EXTRA_TEXT, GameHostController.current());
+            startActivity(Intent.createChooser(send, "Share Activity report"));
+        }); page.addView(shareGame);
+        gameStatus = text("No Activity attempt yet.", 14); gameStatus.setTextIsSelectable(true);
+        gameStatus.setTypeface(Typeface.MONOSPACE); page.addView(gameStatus);
         page.addView(text("Engine linkage experiment", 24));
         page.addView(text("Optional: import your exact engine archive or .so. This is a native link check, "
                 + "not Minecraft startup. Matching dependencies must come from your trusted installed game.", 14));
@@ -115,12 +145,17 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         page.addView(engineStatus);
         setContentView(scroll);
         EngineProbeController.attach(this, this);
+        GameHostController.attach(this, this);
     }
 
+    @Override public void gameStatus(String text) { gameStatus.setText(text); }
+    @Override protected void onResume() { super.onResume(); GameHostController.resumed(this); }
+    @Override protected void onPause() { GameHostController.paused(this); super.onPause(); }
     @Override public void engineStatus(String text) { engineStatus.setText(text); }
 
     @Override protected void onDestroy() {
         EngineProbeController.detach(this);
+        GameHostController.detach(this);
         super.onDestroy();
     }
 

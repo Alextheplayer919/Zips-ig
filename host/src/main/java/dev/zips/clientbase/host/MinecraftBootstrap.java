@@ -105,7 +105,18 @@ final class MinecraftBootstrap {
         throw new IOException("Selected loader engine is not the exact supplied fingerprint at an installed game path");
     }
 
-    static String run(Context context, ApplicationInfo game, PackageInfo pkg, List<String> apks,
+    static final class Prepared {
+        final BootstrapClassLoader loader;
+        final Class<?> mainClass;
+        final String enginePath, evidence;
+        final List<String> lookups;
+        Prepared(BootstrapClassLoader loader, Class<?> mainClass, String enginePath, String evidence, List<String> lookups) {
+            this.loader = loader; this.mainClass = mainClass; this.enginePath = enginePath;
+            this.evidence = evidence; this.lookups = lookups;
+        }
+    }
+
+    static Prepared prepare(Context context, ApplicationInfo game, PackageInfo pkg, List<String> apks,
             Consumer<String> progress) throws Exception {
         if (!"1.26.50.4".equals(pkg.versionName) || pkg.getLongVersionCode() != 972605004L) {
             throw new IOException("This initialization experiment is restricted to reported Minecraft 1.26.50.4 / 972605004");
@@ -147,6 +158,16 @@ final class MinecraftBootstrap {
                 || !PARENT.equals(mainClass.getSuperclass().getName())) {
             throw new IOException("Real game classes are not owned by the intended loader");
         }
+        return new Prepared(loader, mainClass, enginePath, evidence, lookups);
+    }
+
+    static String run(Context context, ApplicationInfo game, PackageInfo pkg, List<String> apks,
+            Consumer<String> progress) throws Exception {
+        Prepared prepared = prepare(context, game, pkg, apks, progress);
+        BootstrapClassLoader loader = prepared.loader;
+        Class<?> mainClass = prepared.mainClass;
+        String enginePath = prepared.enginePath, evidence = prepared.evidence;
+        List<String> lookups = prepared.lookups;
         progress.accept("ABOUT_TO_INITIALIZE_REAL_MAIN_ACTIVITY_CLASS\nNo Activity instance/lifecycle will be created.\n"
                 + "Selected engine: " + enginePath + "\n" + evidence);
         // Original MainActivity calls System.loadLibrary itself. ART handles JNI_OnLoad

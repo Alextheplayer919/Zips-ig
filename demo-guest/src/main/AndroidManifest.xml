@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- AndroidX's private receiver fallback; grants no Android platform capability. -->
+    <permission android:name="dev.zips.clientbase.guest.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" android:protectionLevel="signature" />
+    <uses-permission android:name="dev.zips.clientbase.guest.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
     <application android:label="Client Base Demo" android:allowBackup="false"
         android:extractNativeLibs="true" android:theme="@android:style/Theme.Material.NoActionBar">
         <meta-data android:name="dev.zips.clientbase.API_VERSION" android:value="1" />
