@@ -1,4 +1,8 @@
-# Host 0.5.1 — original Bedrock Activity loader repair
+# Original Bedrock Activity attempts
+
+**Latest: [host 0.5.2 warning/error/fatal diagnostics and WHAT WENT WRONG summary](ACTIVITY_SURFACE_DEVICE_TEST.md#validated-focused-diagnostics-build), validated on Android 13.** The 0.5.1 phone attempt resumed and received a Surface, then SIGABRT without captured cause. The sections below record the preceding wrapper repair.
+
+## Host 0.5.1 — original Bedrock Activity loader repair
 
 **Phone result:** host 0.5.0 reached original native android_main and returned original onCreate, then our observer's nested class split across loaders and crashed. [Normalized evidence and repair](ACTIVITY_ONCREATE_DEVICE_TEST.md). The original input/library passed; no further file is needed for this known host defect. No Surface/title-screen success is claimed.
 
