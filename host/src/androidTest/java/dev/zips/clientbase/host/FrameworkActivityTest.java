@@ -77,6 +77,19 @@ public final class FrameworkActivityTest {
         });
     }
 
+    @Test public void activityResourceConfigurationOverrideIsAppliedOnceBeforeAccess() throws Exception {
+        Context host = context();
+        GuestRuntime.LoadedGuest guest = GuestRuntime.load(host);
+        ActivityResourceContext wrapped = new ActivityResourceContext(host,
+                host.createPackageContext(GuestRuntime.GUEST_PACKAGE, 0), guest.loader, android.R.style.Theme_Material_NoActionBar);
+        Configuration config = new Configuration(); config.fontScale = 1.4f;
+        wrapped.applyOverrideConfiguration(config);
+        assertEquals(1.4f, wrapped.getResources().getConfiguration().fontScale, 0.001f);
+        assertSame(guest.loader, wrapped.getClassLoader());
+        try { wrapped.applyOverrideConfiguration(config); fail("Late/repeated override accepted"); }
+        catch (IllegalStateException expected) { }
+    }
+
     private void assertEnvironment(Activity activity) {
         try {
             assertEquals(FrameworkActivityRuntime.FIXTURE, activity.getClass().getName());
@@ -100,6 +113,7 @@ public final class FrameworkActivityTest {
             Configuration config = new Configuration(); config.fontScale = 1.2f;
             Context configured = activity.createConfigurationContext(config);
             assertSame(guest.loader, configured.getClassLoader());
+            assertEquals(1.2f, configured.getResources().getConfiguration().fontScale, 0.001f);
             int banner = configured.getResources().getIdentifier("guest_banner", "string", GuestRuntime.GUEST_PACKAGE);
             assertEquals("Guest resource loaded from the separate demo APK.", configured.getString(banner));
         } catch (Exception e) { throw new AssertionError(e); }

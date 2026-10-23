@@ -22,10 +22,17 @@ public final class MinecraftHostedActivity extends com.mojang.minecraftpe.MainAc
         event("ACTIVITY_ATTACHED");
     }
     @Override public void setTheme(int theme) { super.setTheme(environment == null ? theme : environment.mapTheme(theme)); }
+    private ClassLoader enterGuestThread() {
+        Thread thread = Thread.currentThread(); ClassLoader previous = thread.getContextClassLoader();
+        thread.setContextClassLoader(getClassLoader()); return previous;
+    }
+    private void leaveGuestThread(ClassLoader previous) { Thread.currentThread().setContextClassLoader(previous); }
     private void event(String label) { environment.event(this, label); }
     @Override public void onCreate(Bundle state) {
         event("ORIGINAL_ON_CREATE_ENTERED");
-        super.onCreate(state); // Android framework delivers this; never called manually by the host.
+        ClassLoader previous = enterGuestThread();
+        try { super.onCreate(state); } // Android framework delivers this; never called manually by the host.
+        finally { leaveGuestThread(previous); }
         event("ORIGINAL_ON_CREATE_RETURNED (not title screen)");
         observeSurfaces(getWindow().getDecorView(), new int[] {256});
     }
@@ -43,9 +50,9 @@ public final class MinecraftHostedActivity extends com.mojang.minecraftpe.MainAc
             for (int i = 0; i < group.getChildCount() && budget[0] > 0; i++) observeSurfaces(group.getChildAt(i), budget);
         }
     }
-    @Override protected void onStart() { event("ORIGINAL_ON_START_ENTERED"); super.onStart(); event("ORIGINAL_ON_START_RETURNED"); }
-    @Override protected void onResume() { event("ORIGINAL_ON_RESUME_ENTERED"); super.onResume(); event("ORIGINAL_ON_RESUME_RETURNED"); }
-    @Override protected void onPause() { event("ORIGINAL_ON_PAUSE_ENTERED"); super.onPause(); }
-    @Override protected void onStop() { event("ORIGINAL_ON_STOP_ENTERED"); super.onStop(); }
-    @Override protected void onDestroy() { event("ORIGINAL_ON_DESTROY_ENTERED (game may exit its process)"); super.onDestroy(); }
+    @Override protected void onStart() { event("ORIGINAL_ON_START_ENTERED"); ClassLoader previous = enterGuestThread(); try { super.onStart(); } finally { leaveGuestThread(previous); } event("ORIGINAL_ON_START_RETURNED"); }
+    @Override protected void onResume() { event("ORIGINAL_ON_RESUME_ENTERED"); ClassLoader previous = enterGuestThread(); try { super.onResume(); } finally { leaveGuestThread(previous); } event("ORIGINAL_ON_RESUME_RETURNED"); }
+    @Override protected void onPause() { event("ORIGINAL_ON_PAUSE_ENTERED"); ClassLoader previous = enterGuestThread(); try { super.onPause(); } finally { leaveGuestThread(previous); } }
+    @Override protected void onStop() { event("ORIGINAL_ON_STOP_ENTERED"); ClassLoader previous = enterGuestThread(); try { super.onStop(); } finally { leaveGuestThread(previous); } }
+    @Override protected void onDestroy() { event("ORIGINAL_ON_DESTROY_ENTERED (game may exit its process)"); ClassLoader previous = enterGuestThread(); try { super.onDestroy(); } finally { leaveGuestThread(previous); } }
 }

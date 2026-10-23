@@ -63,6 +63,12 @@ The [first Activity/resource bridge](ACTIVITY_BRIDGE.md) is implemented, not jus
 
 [Android 13 run 39966947699](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39966947699) passed for commit `3cd8f7f1e705de3892952d58230b3b7c862cfb7c`, job `120459176807` (5m2s), with all retained coverage; 20 local source/native guards pass. Real Minecraft is not executed by CI. The actual original Activity/subclass attachment, AppCompat/SplashScreen and Application/provider/SDK environment, separate-game-process lifetime/diagnostics, and user-facing launch are still pending. Bounded inspection found the supplied MainActivity exits its process from `onDestroy`; original-game hosting must therefore never use the host UI process. No additional file or phone test is currently requested.
 
+### Host 0.5.0 — original Activity adapter implemented; validation pending
+
+The [first original Bedrock Activity adapter](BEDROCK_ACTIVITY_ATTEMPT.md) adds a dedicated `:game_host` session/service/factory, an exact same-loader host subclass of the installed MainActivity, original resource/theme views and native-library metadata, passive lifecycle/Surface stages, separate reports, own-process exit collection and explicit stop/startup timeout. All uploaded manifest/DEX/resource bytes are pinned before preparing classes, as is the selected engine. A compile-only superclass-signature JAR is excluded from APKs; the packaging guard checks actual DEX class definitions. No proprietary runtime class is bundled or patched.
+
+Original providers and all SDK/package environments are not recreated. INTERNET is deliberately added for original networked startup; no runtime/broad storage/location/log grant or entitlement bypass. The automated fixture now uses AppCompat, with the app-specific signature permission its private receiver fallback declares. New policy/manifest/process/rejection tests and retained regression coverage require Android validation before delivery. The actual Bedrock title screen remains unproven. No extra user file is needed at this point.
+
 ### Validation boundary
 
 Eight local checks passed before and after the repository migration; the engine changes expanded the local suite to ten checks; the bootstrap diagnostic added two source guards and JVM initialization adds two more guards (fifteen total, including the reported no-op guard). These are source guards plus an actually compiled/executed **Linux** native PID/UID test. The six Java sources also passed syntax parsing before migration; the Android source was moved unchanged.

@@ -1,6 +1,6 @@
 # Next stage: a real Bedrock Android Activity environment
 
-**Status: framework Activity/resource bridge implemented and Android 13 integration passed (four new Activity cases plus retained coverage). Original Minecraft Activity adapter/launch is not implemented yet.** See [the first implementation and bounded startup findings](ACTIVITY_BRIDGE.md). The [phone bootstrap success](JVM_BOOTSTRAP_DEVICE_TEST.md) completes the class-initialization substep. The next acceptance target remains the original, unmodified Bedrock **1.26.50.4 / 972605004** title screen in our own process/UID on Android 13. No hooks or gameplay features in this stage.
+**Status: the prior framework bridge passed Android 13 integration. The [first original-game adapter](BEDROCK_ACTIVITY_ATTEMPT.md) is now implemented; its new Android checks and first real-game launch are pending.** See [the first implementation and bounded startup findings](ACTIVITY_BRIDGE.md). The [phone bootstrap success](JVM_BOOTSTRAP_DEVICE_TEST.md) completes the class-initialization substep. The next acceptance target remains the original, unmodified Bedrock **1.26.50.4 / 972605004** title screen in our own process/UID on Android 13. No hooks or gameplay features in this stage.
 
 ## Startup input now available
 

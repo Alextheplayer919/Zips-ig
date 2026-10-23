@@ -2,12 +2,13 @@
 
 A clean Android hosting prototype for an independent, rootless client. The intended target is **Android 13 / Minecraft 26.50**, with the original installed Minecraft APK left unchanged.
 
-**Current implementation: a host plus a cooperative demo guest, not a working Minecraft launcher.**
+**Current implementation: hosting prototype with a successful reported Bedrock bootstrap and a new experimental Activity adapter; not a proven Minecraft launcher.**
 
-**Latest phone result:** [Bedrock bootstrap returned successfully](docs/JVM_BOOTSTRAP_DEVICE_TEST.md) (PID 12037 / UID 11072). Original MainActivity initialization completed with JVM-managed native loading and the hash-matched engine already mapped. No Activity/title screen yet. **Do not repeat the bootstrap test**; next is the [Activity/resources/lifecycle adapter](docs/ACTIVITY_HOSTING.md).
+**Latest phone result:** [Bedrock bootstrap returned successfully](docs/JVM_BOOTSTRAP_DEVICE_TEST.md) (PID 12037 / UID 11072). Original MainActivity initialization completed with JVM-managed native loading and the hash-matched engine already mapped. No Activity/title screen yet. **Do not repeat the bootstrap test**; the [host 0.5.0 Activity adapter](docs/BEDROCK_ACTIVITY_ATTEMPT.md) is now implemented and awaiting Android validation and its first phone result.
 
 ## Documentation
 
+- [Original Bedrock Activity attempt](docs/BEDROCK_ACTIVITY_ATTEMPT.md) — dedicated-process adapter, exact startup pins, consent and separate diagnostics.
 - [Activity bridge implementation](docs/ACTIVITY_BRIDGE.md) — framework Activity/resources/lifecycle/Surface work and automated coverage; not yet a Minecraft-launch build.
 
 - [How we think the original client works](docs/THEORY.md) — evidence, hypotheses and unresolved engine integration.
@@ -44,4 +45,4 @@ Install the host and demo APKs from the **same workflow run**. Open **Client Bas
 
 Passing this milestone proves a cooperative plugin can execute in the host. It does **not** establish Minecraft lifecycle virtualization, engine loading, hooks, entitlement compatibility or access to Minecraft's private worlds/account data.
 
-The host offers a fingerprint-pinned engine import/link experiment and a separate consent-gated JVM initialization experiment using the hash-identical installed engine. The latter executes original Java/native initialization, but creates no Minecraft Activity or title screen. Host 0.4.3 requests only the normal `ACCESS_NETWORK_STATE` permission required by the original Xbox network observer; the demo requests none. No runtime permission dialog or `INTERNET` permission is added in this patch. Guest code is **not sandboxed from the host**; the loader accepts only our fixed, same-signed demo. No ProtoHax runtime, Minecraft engine/content, private keys or credentials are packaged into the debug APKs.
+The host offers a fingerprint-pinned engine import/link experiment and a separate consent-gated JVM initialization experiment using the hash-identical installed engine. The latter executes original Java/native initialization, but creates no Minecraft Activity or title screen. Host 0.5.0 requests normal `ACCESS_NETWORK_STATE` and `INTERNET` for the original networked Activity/SDK startup. No runtime permission dialog is needed. The AppCompat developer fixture uses its own app-specific signature permission for private receivers; no other Android platform grant is added. Guest code is **not sandboxed from the host**; the loader accepts only our fixed, same-signed demo. No ProtoHax runtime, Minecraft engine/content, private keys or credentials are packaged into the debug APKs.

@@ -9,7 +9,8 @@ import android.view.LayoutInflater;
 
 /** Activity-local guest resources, with real host identity, services and storage. */
 public final class ActivityResourceContext extends ContextThemeWrapper {
-    private final Context resourceContext;
+    private Context resourceContext;
+    private boolean resourcesAccessed, overrideApplied;
     private final ClassLoader guestLoader;
     private final int themeId;
     private LayoutInflater inflater;
@@ -21,7 +22,14 @@ public final class ActivityResourceContext extends ContextThemeWrapper {
         this.themeId = themeId;
     }
 
-    @Override public Resources getResources() { return resourceContext.getResources(); }
+    @Override public Resources getResources() { resourcesAccessed = true; return resourceContext.getResources(); }
+    @Override public void applyOverrideConfiguration(Configuration override) {
+        // AppCompat attaches by applying configuration before first resources access.
+        // Keep ContextThemeWrapper's one-shot contract instead of ignoring its override.
+        if (resourcesAccessed || overrideApplied) throw new IllegalStateException("Resources accessed or override already applied");
+        resourceContext = resourceContext.createConfigurationContext(override);
+        overrideApplied = true;
+    }
     @Override public AssetManager getAssets() { return getResources().getAssets(); }
     @Override public ClassLoader getClassLoader() { return guestLoader; }
 

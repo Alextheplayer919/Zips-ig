@@ -60,6 +60,7 @@ public final class GameHostController {
             else MAIN.postDelayed(TIMEOUT, 180000);
         } catch (Exception e) { bound = false; show("Game service binding failed: " + e); }
     }
+    private static final Runnable TIMEOUT = () -> stop("180-second startup timeout; host cleanup requested");
     private static final Messenger RECEIVER = new Messenger(new Handler(Looper.getMainLooper(), message -> {
         Bundle data = message.getData();
         if (!bound || data.getInt("id") != generation || data.getInt("uid", -1) != Process.myUid()) return true;
@@ -102,7 +103,6 @@ public final class GameHostController {
             MAIN.postDelayed(this, 500);
         }
     };
-    private static final Runnable TIMEOUT = () -> stop("180-second startup timeout; host cleanup requested");
     private static void unbind() {
         MAIN.removeCallbacks(TIMEOUT); MAIN.removeCallbacks(STARTUP_WATCH);
         ready = false; binder = null;

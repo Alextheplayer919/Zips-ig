@@ -26,7 +26,7 @@ No secrets/signing credentials are required. These are **debug** APKs, not produ
 6. Rotate and load again; tap repeatedly. There should be no duplicate-native-library error.
 7. Open **Client Base Demo** separately to compare execution under the guest app's own UID.
 
-Do not uninstall Minecraft or ProtoHax for this experiment. No wireless ADB, rooting, game files, credentials or private worlds are needed. Host 0.4.3 requests only normal `ACCESS_NETWORK_STATE` (no runtime prompt); demo/contract request none. Older builds requested no permissions, which caused the confirmed Xbox network-observer initialization abort.
+Do not uninstall Minecraft or ProtoHax for this experiment. No wireless ADB, rooting, game files, credentials or private worlds are needed. Host 0.5.0 requests normal `ACCESS_NETWORK_STATE` and `INTERNET` (no runtime prompt); the developer AppCompat demo also has its own signature-only private-receiver permission. Contract requests none. Older builds requested no permissions, which caused the confirmed Xbox network-observer initialization abort.
 
 Both APKs must have matching signing certificates. GitHub runners can generate different debug keys across runs, so updating an older pair may require uninstalling **our host/demo only**, deleting their own data. Do not mix APKs from different runs. Force-stop/reopen the host after updating the demo.
 
