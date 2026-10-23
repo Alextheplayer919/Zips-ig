@@ -12,7 +12,7 @@ The user reports that the 0.6.1 external overlay works on their phone. This is u
 
 ## Validation gate
 
-28 local source/native guards pass. Full Android build/APK/emulator validation pending. The real overlay regression now switches every category, checks exclusive selection and Close/reopen state, and checks old memory controls are absent. Existing native/IPC regressions remain. A new real Controls UI regression performs the no-game memory request and copies its result to the Android clipboard without preparing/launching the game. Do not deliver until full validation passes.
+28 local source/native guards pass. Full Android build/APK/emulator validation passed; see below. The real overlay regression now switches every category, checks exclusive selection and Close/reopen state, and checks old memory controls are absent. Existing native/IPC regressions remain. A new real Controls UI regression performs the no-game memory request and copies its result to the Android clipboard without preparing/launching the game. No existing backend/IPC regression was disabled.
 
 ## Inputs for actual modules
 
@@ -21,3 +21,12 @@ No additional file is needed for this UI, and no arbitrary archive resend is req
 Start by selecting **one concrete first module and its intended behavior**, rather than developing four categories at once. Then identify its exact required engine API/event/read/write semantics and lifecycle/thread ownership. If available, the most useful additional developer material is a **symbol/map file or C++ headers/source matched to this exact engine build ID** (`afa62bd3385161f1facfe36aad58ac63998f46d2`), especially the interface needed by that module. Unmatched offsets, another version's SDK, or merely drawing toggles cannot prove correct calls/layouts. These files are helpful, not something the user must magically produce; if absent, targeted investigation/validation is needed and feasibility is not guaranteed. Do not restore old archives/history or silently switch game versions.
 
 Any concrete native implementation needs version/identity gating, safe session/pointer lifecycle, thread-appropriate execution, explicit IPC commands, honest unavailable states and tests before a toggle becomes functional. Ask only for the specific missing input after choosing the first module. No root, private worlds, account credentials, giant memory dump or generic repeat bootstrap trace is requested now.
+
+## Validated category build
+
+[Android 13 CI run 40000628335](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40000628335) **passed**, job **120576121947**, **7m35s**, app/test commit **95e31482af1ed1cbaeca106ecb16e23f2005350f**, host **0.6.2 / code15**. Build/APK exclusion checks and the full **60-case Android 13 x86_64 suite** passed. **28 local source/native guards** pass. Includes actual category-window attachment, every category selection, selection retention after Close/reopen, absence of old diagnostic controls, notification Stop, permission revocation/reflow, and real Controls-only memory IPC/clipboard. Original ARM64 game is not run in CI. Reports were not parsed locally; validation is the successful Actions job.
+
+- [APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40000628335/artifacts/12522700433): **client-base-debug-95**, **6,250,441 bytes**. Install only **client-base-host-debug.apk**; Minecraft stays unchanged. Keep working 0.6.1 and 0.5.4 APKs as references.
+- [Device reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40000628335/artifacts/12522511599): **client-base-device-tests-95**, **410,060 bytes**.
+- Existing Enable/permission/launch flow remains. Tap the floating ZIPS chip, choose Movement/Combat/Visual/Misc. Categories are intentionally empty. Close restores the chip; Stop removes the overlay. Android Back still belongs to the game. Memory refresh/copy and exports stay in the host Controls/launcher, not in any category.
+- Native backend, game startup/lifecycle/SDK source, OverlayService and engine archive unchanged from 0.6.1. Archive blob **c78f6e8642d334916d247487897eb871ad27c160**. PR#1 remains open, no merge/release/history rewrite.

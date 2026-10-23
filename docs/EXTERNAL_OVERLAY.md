@@ -2,6 +2,8 @@
 
 The user supplied a Compose overlay sketch, then authorized using our existing Java/native-view implementation style instead of Kotlin. This revises the earlier screen-only preference: **the separate Controls task remains the fallback; the new overlay is optional**. One APK, normal host UI process, fixed memory IPC to :game_host. No view or renderer is injected into Minecraft, no wrapper/lifecycle/SDK/native-memory backend changes. No fake module switches or Kotlin/Compose dependencies.
 
+> **0.6.2 update:** The user reports this overlay works and requested a category-only menu. [Current click GUI / validated APK](CLICK_GUI.md): Movement, Combat, Visual, Misc; memory diagnostics remain in host Controls, not the overlay. This page records the preceding 0.6.1 Memory menu and service/permission design.
+
 ## Permission and foreground lifecycle
 
 From **Open client controls → Enable external overlay**:
