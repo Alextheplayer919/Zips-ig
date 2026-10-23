@@ -49,7 +49,7 @@ The last command requires an emulator/device. CI supplies an Android 13 x86_64 e
 python3 tools/test_client_base.py
 ```
 
-Twelve checks cover manifests/permissions, demo visibility/native extraction, protocol version, trust-check ordering, app separation, official wrapper identity, JNI names native process identity, engine fingerprint pins, private/match-gated probe configuration, static-bootstrap no-loading guards and JNI-evidence identity. The native test needs `g++`; otherwise it is skipped. These do **not** compile Android resources/classes or validate Android runtime behavior.
+Fourteen checks cover manifests/permissions, demo visibility/native extraction, protocol version, trust-check ordering, app separation, official wrapper identity, JNI names native process identity, engine fingerprint pins, private/match-gated probe configuration, static-bootstrap no-loading guards and JNI-evidence identity. The native test needs `g++`; otherwise it is skipped. These do **not** compile Android resources/classes or validate Android runtime behavior.
 
 The wrapper files are from Gradle's official `v8.11.1` source tag. Its JAR contains the upstream license; the local suite checks SHA-256 `2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046`.
 
@@ -62,3 +62,7 @@ Host 0.2.0 adds the opt-in [engine link probe](ENGINE_PROBE.md). The workflow ad
 Host **0.3.0** adds **Inspect Minecraft bootstrap (no code execution)**. For this step install just the new host APK; no demo or instrumentation APK is needed. Keep Minecraft installed and unchanged. If Android rejects the new debug signature, uninstall only Client Base host before installing it again. This inspection does not require an imported engine copy.
 
 Tap the inspection button, then **Share current engine / bootstrap report** and send its text. Do not repeat the demo or native link test. The matching installed engine is hashed, then MainActivity DEX is read as data; no Minecraft classes or native libraries are loaded. See [JNI_BOOTSTRAP.md](JNI_BOOTSTRAP.md) for evidence, limits and the boundary before real JNI initialization.
+
+## Next step after the successful host 0.3 report
+
+Host **0.4** adds **Initialize Minecraft Java / JNI (no Activity)** with explicit execution consent. Install only the new host APK; keep Minecraft unchanged. No demo, repeated link/static test or archive import is needed. Send the result using the share button, even if blocked or disconnected. See [JVM_INITIALIZATION.md](JVM_INITIALIZATION.md) for the gates, native-code risks and result boundaries. Older host 0.3 inspection instructions above are historical for the completed report.

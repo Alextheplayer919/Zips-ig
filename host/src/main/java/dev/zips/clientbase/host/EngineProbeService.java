@@ -34,12 +34,14 @@ public final class EngineProbeService extends Service {
     private final AtomicBoolean started = new AtomicBoolean();
     private Messenger client;
     private int runId;
+    private String lastStage = "No stage saved";
+    private boolean completed;
     private final Messenger messenger = new Messenger(new Handler(Looper.getMainLooper(), message -> {
-        if ((message.what == 1 || message.what == 2) && started.compareAndSet(false, true)) {
+        if ((message.what >= 1 && message.what <= 3) && started.compareAndSet(false, true)) {
             client = message.replyTo;
             runId = message.getData().getInt("id");
-            boolean inspectOnly = message.what == 2;
-            new Thread(() -> probe(inspectOnly), "engine-probe").start();
+            int mode = message.what;
+            new Thread(() -> probe(mode), "engine-probe").start();
         }
         return true;
     }));
@@ -50,7 +52,10 @@ public final class EngineProbeService extends Service {
 
     @Override public IBinder onBind(Intent intent) { return messenger.getBinder(); }
 
-    private void report(String text, boolean done) {
+    private synchronized void report(String text, boolean done) {
+        if (completed) return;
+        if (done) completed = true;
+        if (!done) lastStage = text;
         String full = "Probe PID: " + Process.myPid() + "\nProbe UID: " + Process.myUid() + "\n" + text;
         AtomicFile file = new AtomicFile(reportFile(this));
         FileOutputStream stream = null;
@@ -65,6 +70,8 @@ public final class EngineProbeService extends Service {
         Message response = Message.obtain();
         Bundle data = new Bundle();
         data.putInt("id", runId);
+        data.putInt("pid", Process.myPid());
+        data.putInt("uid", Process.myUid());
         data.putString("text", full);
         data.putBoolean("done", done);
         response.setData(data);
@@ -72,16 +79,18 @@ public final class EngineProbeService extends Service {
         catch (RemoteException ignored) { /* Controller can read the saved last stage. */ }
     }
 
-    private void probe(boolean inspectOnly) {
+    private void probe(int mode) {
+        boolean inspectOnly = mode == 2;
         try {
             report(inspectOnly ? "Checking installed engine fingerprint; no game code will be executed."
+                    : mode == 3 ? "Preparing installed Java/JNI bootstrap; no game code executed yet."
                     : "Checking imported engine and process ABI; no engine code executed yet.", false);
             String arch = System.getProperty("os.arch", "unknown");
             if (!inspectOnly && (!Process.is64Bit() || !(arch.equals("aarch64") || arch.equals("arm64")))) {
                 throw new IOException("ARM64 engine cannot run in this process (" + arch + ").");
             }
             File engine = EngineInput.library(this);
-            if (!inspectOnly) EngineInput.verifyLibrary(engine);
+            if (mode == 1) EngineInput.verifyLibrary(engine);
             PackageManager pm = getPackageManager();
             ApplicationInfo game = pm.getApplicationInfo(GAME, 0);
             PackageInfo pkg = pm.getPackageInfo(GAME, 0);
@@ -104,6 +113,12 @@ public final class EngineProbeService extends Service {
                 report(version + "\nEngine hash matched.\nBOOTSTRAP_INSPECTION_COMPLETE\n"
                         + bootstrap.toString(2) + "\nNo guest class was defined/initialized; no dlopen, JNI_OnLoad "
                         + "or game entrypoint was invoked. Reachable initializers and lifecycle remain untested.", true);
+                return;
+            }
+            if (mode == 3) {
+                String result = MinecraftBootstrap.run(this, game, pkg, apks,
+                        text -> report(version + "\nEngine hash matched.\n" + text, false));
+                report(version + "\nEngine hash matched.\n" + result, true);
                 return;
             }
             List<String> nativePaths = new ArrayList<>();
@@ -131,7 +146,7 @@ public final class EngineProbeService extends Service {
                     .invoke(null, engine.getAbsolutePath());
             report(version + "\nEngine hash matched.\n" + result, true);
         } catch (Exception | LinkageError error) {
-            report("PROBE_BLOCKED\n" + error.getClass().getSimpleName() + ": " + error.getMessage(), true);
+            report("PROBE_BLOCKED\n" + MinecraftBootstrap.describeFailure(error) + "\nLast saved stage:\n" + lastStage, true);
         }
     }
 

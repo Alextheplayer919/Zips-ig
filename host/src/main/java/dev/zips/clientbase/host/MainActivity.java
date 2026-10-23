@@ -31,7 +31,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         int padding = (int) (24 * getResources().getDisplayMetrics().density);
         page.setPadding(padding, padding, padding, padding);
         scroll.addView(page);
-        TextView eyebrow = text("CLIENT BASE / 0.3", 13);
+        TextView eyebrow = text("CLIENT BASE / 0.4", 13);
         eyebrow.setTextColor(Color.rgb(113, 217, 193));
         page.addView(eyebrow);
         page.addView(text("One process.\nA separate guest.", 30));
@@ -82,6 +82,19 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         page.addView(bootstrap);
         page.addView(text("Reads the installed game's MainActivity DEX and static initializer as data. "
                 + "No engine import or repeat link test is needed. Does not launch or initialize Minecraft.", 14));
+        Button initialize = new Button(this);
+        initialize.setText("Initialize Minecraft Java / JNI (no Activity)");
+        initialize.setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setTitle("Execute original Minecraft initialization?")
+                .setMessage("Only use your trusted original Minecraft 1.26.50.4 installation. We verify the "
+                        + "known initializer and exact supplied engine fingerprint, then let the real game class "
+                        + "load its native libraries through the JVM. Java static initializers, SDK callbacks, "
+                        + "ELF constructors and JNI_OnLoad may execute or crash in the private process. It shares "
+                        + "this host's UID/permissions and is not a security sandbox. No Activity, lifecycle or "
+                        + "title screen is started. No engine re-import is needed. Keep the app open.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Initialize", (dialog, which) -> EngineProbeController.initializeMinecraft()).show());
+        page.addView(initialize);
         Button share = new Button(this);
         share.setText("Share current engine / bootstrap report");
         share.setOnClickListener(v -> {

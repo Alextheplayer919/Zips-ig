@@ -17,5 +17,6 @@
   "execution": "User reports successful dlopen/constructor completion in the private host probe process. Our probe did not invoke engine JNI_OnLoad/game entrypoints.",
   "archive_path": "libminecraftpe.7z",
   "library_retention": "Extracted library stays in ignored cache. Archive used as CI import-test fixture, never bundled in APKs.",
-  "runtime_evidence": "docs/ENGINE_DEVICE_TEST.md"
+  "runtime_evidence": "docs/ENGINE_DEVICE_TEST.md",
+  "java_bootstrap_evidence": "docs/BOOTSTRAP_DEVICE_TEST.json"
 }

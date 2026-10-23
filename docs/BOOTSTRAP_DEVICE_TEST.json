@@ -1,0 +1,135 @@
+{
+  "evidence": "User-pasted host 0.3 report; not independent device capture. Escaped slashes and HTML arrows normalized for readability.",
+  "probe_pid": 19652,
+  "probe_uid": 11064,
+  "version_name": "1.26.50.4",
+  "version_code": 972605004,
+  "apk_paths": 1,
+  "engine_hash_matched": true,
+  "result": "BOOTSTRAP_INSPECTION_COMPLETE",
+  "main_activity": {
+    "class": "Lcom/mojang/minecraftpe/MainActivity;",
+    "superclass": "Lcom/google/androidgamesdk/GameActivity;",
+    "native_methods": [
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeWaitCrashManagementSetupComplete()V",
+      "Lcom/mojang/minecraftpe/MainActivity;->isAndroidAmazon()Z",
+      "Lcom/mojang/minecraftpe/MainActivity;->isAndroidChromebook()Z",
+      "Lcom/mojang/minecraftpe/MainActivity;->isAndroidTrial()Z",
+      "Lcom/mojang/minecraftpe/MainActivity;->isBrazeEnabled()Z",
+      "Lcom/mojang/minecraftpe/MainActivity;->isEduMode()Z",
+      "Lcom/mojang/minecraftpe/MainActivity;->isPreview()Z",
+      "Lcom/mojang/minecraftpe/MainActivity;->isPublishBuild()Z",
+      "Lcom/mojang/minecraftpe/MainActivity;->isTestInfrastructureDisabled()Z",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeBackPressed()V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeBackSpacePressed()V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeClearAButtonState()V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeDeviceCorrelation(JLjava/lang/String;JLjava/lang/String;)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeGetDeviceId()Ljava/lang/String;",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeKeyHandler(III)Z",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeOnDestroy()V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeOnPickFileCanceled()V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeOnPickFileSuccess(Ljava/lang/String;)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeOnPickImageCanceled(J)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeOnPickImageSuccess(JLjava/lang/String;)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeProcessIntentUriQuery(Ljava/lang/String;Ljava/lang/String;)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeResize(II)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeReturnKeyPressed()V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeRunNativeCallbackOnUiThread(J)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeSetHeadphonesConnected(Z)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeSetIntegrityToken(Ljava/lang/String;)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeSetIntegrityTokenErrorMessage(Ljava/lang/String;)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeSetTextboxText(Ljava/lang/String;II)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeShiftKeyPressed(I)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeShutdown()V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeStopThis()V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeStoragePermissionRequestResult(ZI)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeSuspend()V",
+      "Lcom/mojang/minecraftpe/MainActivity;->nativeSuspendGameplayUpdates(Z)V",
+      "Lcom/mojang/minecraftpe/MainActivity;->onSoftKeyboardClosed()V"
+    ],
+    "clinit": {
+      "registers": 2,
+      "code_units_total": 45,
+      "code_units_hex": "001a 6d20 011a a017 1071 3b0c 0001 011a d702 1071 3b0c 0001 0628 011a d703 2071 024f 0010 011a 3ccf 1071 3b0c 0001 011a 763f 1071 3b0c 0001 0628 011a e306 2071 024f 0010 001a b3e4 1071 3b0c 0000 001a d954 1071 3b0c 0000 000e",
+      "truncated": false,
+      "references": [
+        {
+          "unit": 0,
+          "reference": "const-string: [non-library string omitted]"
+        },
+        {
+          "unit": 2,
+          "reference": "const-string: c++_shared"
+        },
+        {
+          "unit": 4,
+          "reference": "Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V"
+        },
+        {
+          "unit": 7,
+          "reference": "const-string: maesdk"
+        },
+        {
+          "unit": 9,
+          "reference": "Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V"
+        },
+        {
+          "unit": 13,
+          "reference": "const-string: [non-library string omitted]"
+        },
+        {
+          "unit": 15,
+          "reference": "Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I"
+        },
+        {
+          "unit": 18,
+          "reference": "const-string: HttpClient.Android"
+        },
+        {
+          "unit": 20,
+          "reference": "Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V"
+        },
+        {
+          "unit": 23,
+          "reference": "const-string: PlayFabMultiplayer"
+        },
+        {
+          "unit": 25,
+          "reference": "Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V"
+        },
+        {
+          "unit": 29,
+          "reference": "const-string: [non-library string omitted]"
+        },
+        {
+          "unit": 31,
+          "reference": "Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I"
+        },
+        {
+          "unit": 34,
+          "reference": "const-string: fmod"
+        },
+        {
+          "unit": 36,
+          "reference": "Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V"
+        },
+        {
+          "unit": 39,
+          "reference": "const-string: minecraftpe"
+        },
+        {
+          "unit": 41,
+          "reference": "Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V"
+        }
+      ],
+      "reference_scan_complete": true
+    },
+    "native_method_count": 35,
+    "native_methods_truncated": false,
+    "apk_index": 0,
+    "dex_entry": "classes3.dex",
+    "dex_bytes": 9336804,
+    "dex_crc": 1326635678
+  },
+  "boundary": "No guest class was defined/initialized; no dlopen, JNI_OnLoad or game entrypoint was invoked. Reachable initializers and lifecycle remain untested."
+}

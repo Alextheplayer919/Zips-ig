@@ -12,6 +12,8 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 - [Build and install APKs from your phone](docs/BUILDING.md).
 - [Engine phone-test result](docs/ENGINE_DEVICE_TEST.md) — linking passed as reported for the hash-matched Minecraft 1.26.50.4 engine; JNI/game startup pending.
 - [Try the supplied engine](docs/ENGINE_PROBE.md) — optional hash-checked import and private-process link diagnostic.
+- [Phone Java bootstrap result](docs/BOOTSTRAP_DEVICE_TEST.md) — original MainActivity loads the dependencies and engine itself.
+- [Controlled Java/JNI initialization](docs/JVM_INITIALIZATION.md) — host 0.4 experiment; not an Activity launch.
 - [JNI bootstrap inspection](docs/JNI_BOOTSTRAP.md) — native prerequisites and the no-execution installed-DEX diagnostic.
 - [Engine input provenance](docs/ENGINE_INPUT.json).
 

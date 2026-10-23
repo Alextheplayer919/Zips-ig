@@ -24,6 +24,7 @@ public final class EngineProbeController {
     private static boolean bound;
     private static int runId;
     private static int requestMode;
+    private static int probePid;
     private static long finishedAt;
     private static String latest;
     private EngineProbeController() {}
@@ -63,6 +64,10 @@ public final class EngineProbeController {
     private static final Runnable TIMEOUT = () -> finish("PROBE_TIMEOUT\nLast saved stage:\n" + lastReport());
     private static final Messenger RECEIVER = new Messenger(new Handler(Looper.getMainLooper(), message -> {
         if (!running || message.getData().getInt("id") != runId) return true;
+        if (message.getData().getInt("uid", -1) == android.os.Process.myUid()) {
+            int pid = message.getData().getInt("pid", 0);
+            if (pid > 0 && pid != android.os.Process.myPid()) probePid = pid;
+        }
         String text = message.getData().getString("text", "Empty probe response");
         if (message.getData().getBoolean("done")) finish(text);
         else show(text);
@@ -92,6 +97,8 @@ public final class EngineProbeController {
 
     public static void inspectBootstrap() { start(2); }
 
+    public static void initializeMinecraft() { start(3); }
+
     private static void start(int mode) {
         if (app == null || running) return;
         if (android.os.SystemClock.uptimeMillis() - finishedAt < 2000) {
@@ -99,10 +106,12 @@ public final class EngineProbeController {
             return;
         }
         if (EngineInput.IMPORTING.get()) { show("Wait for the engine import to complete."); return; }
+        probePid = 0;
         requestMode = mode;
         running = true;
         runId++;
         show(mode == 2 ? "Reading installed Minecraft DEX in the private process. No guest code will run."
+                : mode == 3 ? "Preparing JVM-managed Minecraft initialization in a fresh private process. No Activity will be created."
                 : "Starting private probe process. Native constructors may crash that process; no game startup is attempted.");
         try {
             bound = app.bindService(new Intent(app, EngineProbeService.class), CONNECTION, Context.BIND_AUTO_CREATE);
@@ -119,6 +128,13 @@ public final class EngineProbeController {
             bound = false;
             app.unbindService(CONNECTION); // Service destroys only its own private process.
         }
+        // JNI initialization runs on the child's main looper. If it hangs, that
+        // looper cannot dispatch Service.onDestroy; terminate the reported own-UID
+        // child directly instead. Never target the UI process or a remembered PID.
+        if (requestMode == 3 && probePid > 0 && probePid != android.os.Process.myPid()) {
+            android.os.Process.killProcess(probePid);
+        }
+        probePid = 0;
         show(text);
     }
 }

@@ -5,5 +5,9 @@ public final class EngineNativeBridge {
     static { System.loadLibrary("clientbase_engineprobe"); }
     private EngineNativeBridge() {}
     private static native String nativeProbe(String path);
+    private static native String nativeDescribeLoaded(String path);
+    private static native int nativeInitializationCount();
+    public static int initializationCount() { return nativeInitializationCount(); }
+    public static String describeLoaded(String path) { return nativeDescribeLoaded(java.util.Objects.requireNonNull(path)); }
     public static String run(String path) { return nativeProbe(java.util.Objects.requireNonNull(path)); }
 }

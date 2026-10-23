@@ -23,17 +23,23 @@ The host now accepts the exact supplied archive/raw library, verifies its hash, 
 
 **Phone result:** the user reports `LINK_CHECK_SUCCESS`, engine hash matching installed Minecraft **1.26.50.4 / 972605004**, and `JNI_OnLoad` resolving to our imported library. See [the engine device record](ENGINE_DEVICE_TEST.md). JNI initialization and game startup remain untested.
 
-### JNI/bootstrap step — implemented diagnostic; actual initializer still pending
+### JNI/bootstrap step — actual MainActivity inspected; initialization experiment implemented
 
 Bounded static inspection of the supplied engine shows `JNI_OnLoad` needs the real `com/mojang/minecraftpe/MainActivity` class loader and changes the SIGTERM handler. Its normal success return is JNI 1.4. The existing link-only loader does not contain Minecraft Java code, and manual function-pointer invocation would not itself establish JVM native-library ownership.
 
-Host **0.3.0** adds a separate, match-gated **static DEX bootstrap inspection** and a share-report button. It reads MainActivity's superclass, native declarations and bounded `<clinit>` instructions without defining/initializing game classes or loading game native code. The installed game's actual initializer remains unknown until the device report is collected. See [JNI_BOOTSTRAP.md](JNI_BOOTSTRAP.md) for findings, limits and the next phone step. This does not invoke `JNI_OnLoad` and does not complete Gate 2.
+Host **0.3.0** adds a separate, match-gated **static DEX bootstrap inspection** and a share-report button. It reads MainActivity's superclass, native declarations and bounded `<clinit>` instructions without defining/initializing game classes or loading game native code. The user has now supplied a successful report: 45 MainActivity initializer code units, superclass `com.google.androidgamesdk.GameActivity`, 35 native declarations and native loads ending in `minecraftpe`. See [the phone record](BOOTSTRAP_DEVICE_TEST.md). This executed no game initialization. See [JNI_BOOTSTRAP.md](JNI_BOOTSTRAP.md) for findings, limits and the next phone step. This does not invoke `JNI_OnLoad` and does not complete Gate 2.
 
 **Host 0.3 validation:** [run 39902922705](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39902922705) passed compilation and Android 13 emulator integration for app/test commit `d132ae71a5dd233e0cda1f99e0f398b0f950c8f9` (5m17s). It includes the no-initialization sentinel, real demo DEX decoding, malformed-header/table checks and instruction-width cases. [Download APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39902922705/artifacts/12479691483), `client-base-debug-32`. For this phone step install only the host, inspect bootstrap and share the report. No new demo/link test or engine import is needed.
 
+### Host 0.4 — controlled JVM initialization, phone execution pending
+
+[The new experiment](JVM_INITIALIZATION.md) verifies the reported MainActivity initializer and the actual direct superclass DEX, blocks an unreviewed GameActivity `<clinit>`, and hashes the exact loader-selected installed engine. With explicit consent it can initialize the original MainActivity class on the private process main looper through one guest class loader. Original `System.loadLibrary` calls let ART mediate JNI initialization; no manual function-pointer invocation, fake classes, binary patch or native getter is used.
+
+No engine re-import is needed: the selected installed engine must have the supplied library's exact SHA. No Activity instance/lifecycle or title screen is created. Parent/SDK initialization can still fail or hang; results/last stages and nested causes are saved, and the controller can terminate the reported own-UID child even if its main looper is stuck. Actual GameActivity/JVM initialization results remain pending. New own-bridge JVM/native-library tests are implemented; their workflow result must be recorded, not assumed.
+
 ### Validation boundary
 
-Eight local checks passed before and after the repository migration; the engine changes expanded the local suite to ten checks; the bootstrap diagnostic adds two source guards (twelve total). These are source guards plus an actually compiled/executed **Linux** native PID/UID test. The six Java sources also passed syntax parsing before migration; the Android source was moved unchanged.
+Eight local checks passed before and after the repository migration; the engine changes expanded the local suite to ten checks; the bootstrap diagnostic added two source guards and JVM initialization adds two more guards (fourteen total). These are source guards plus an actually compiled/executed **Linux** native PID/UID test. The six Java sources also passed syntax parsing before migration; the Android source was moved unchanged.
 
 The local sandbox does not have an Android SDK and cannot fetch the Gradle distribution. Therefore local checks are **not** evidence of a successful Android build or device run. Check the [workflow runs](https://github.com/Alextheplayer919/Zips-ig/actions) for actual compilation, artifact and emulator outcomes. A workflow definition alone is not a passing test.
 

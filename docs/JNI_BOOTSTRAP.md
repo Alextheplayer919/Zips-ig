@@ -1,5 +1,9 @@
 # JNI bootstrap: bounded inspection and next device diagnostic
 
+## Latest update
+
+The host 0.3 [phone report](BOOTSTRAP_DEVICE_TEST.md) has arrived: MainActivity's complete 45-unit initializer loads the native dependencies and `minecraftpe` itself. This resolves the previous unknown for the actual installed MainActivity. Host 0.4's next [controlled JVM initialization experiment](JVM_INITIALIZATION.md) uses that original load path, with actual superclass inspection and additional gates. The initial investigation and host 0.3 instructions below are retained as historical context; do not repeat that phone step.
+
 ## Evidence and scope
 
 The supplied ARM64 engine linked on the phone **as reported**, matching installed Minecraft **1.26.50.4 / 972605004**. That remains a link result, not game startup. This inspection advances from that result; it does not repeat the cooperative demo or expand the old VM traces.

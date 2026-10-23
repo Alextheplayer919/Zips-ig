@@ -118,6 +118,33 @@ class ClientBaseSourceTests(unittest.TestCase):
         self.assertEqual('com/mojang/minecraftpe/MainActivity', source['literal_references']['anchor_class']['value'])
         self.assertIn('sigaction', [call['name'] for call in source['jni_onload']['calls']])
 
+    def test_jvm_bootstrap_is_gated_and_has_bounded_process_cleanup(self):
+        runtime = (BASE / 'host/src/main/java/dev/zips/clientbase/host/MinecraftBootstrap.java').read_text()
+        initialize = runtime.index('Class.forName(MAIN, true, loader)')
+        for gate in ('verifyMainInitializer(main)', 'verifyParentInitializer(parent)', 'verifySelectedEngine(enginePath, game, apks)'):
+            self.assertLess(runtime.index(gate), initialize)
+        self.assertLess(runtime.index('verifySelectedEngine(enginePath, game, apks)'), runtime.index('Class.forName(MAIN, false, loader)'))
+        self.assertIn('onMainThread(', runtime)
+        self.assertNotIn('.newInstance(', runtime)
+        self.assertNotIn('getDeclaredConstructor', runtime)
+        self.assertIn('RTLD_NOLOAD', (BASE / 'host/src/main/cpp/engine_probe.cpp').read_text())
+        controller = (BASE / 'host/src/main/java/dev/zips/clientbase/host/EngineProbeController.java').read_text()
+        self.assertIn('getInt("uid", -1) == android.os.Process.myUid()', controller)
+        self.assertIn('probePid != android.os.Process.myPid()', controller)
+        self.assertIn('probePid = 0;', controller)
+
+    def test_phone_bootstrap_metadata_matches_initialization_policy(self):
+        import json
+        report = json.loads((BASE / 'docs/BOOTSTRAP_DEVICE_TEST.json').read_text())
+        main = report['main_activity']
+        runtime = (BASE / 'host/src/main/java/dev/zips/clientbase/host/MinecraftBootstrap.java').read_text()
+        code = re.search(r'KNOWN_CODE = "([^"]+)"', runtime).group(1)
+        self.assertEqual(main['clinit']['code_units_hex'], code)
+        self.assertEqual(45, len(code.split()))
+        self.assertEqual(main['native_method_count'], len(main['native_methods']))
+        self.assertIn(report['version_name'], runtime)
+        self.assertIn(str(report['version_code']) + 'L', runtime)
+
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:
