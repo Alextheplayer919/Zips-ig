@@ -31,3 +31,10 @@ Following the user's choice of **in-process internal handling** inside the hoste
 
 - **34 local source/native tests pass**, including `-Wall -Wextra -Werror` and ASan/UBSan execution of `module_policies_test`, `self_tracker_test`, `module_runtime_test`, `slot_patch_test`, and `native_module_engine_test`, plus byte-for-byte static verification of all 7 vtables, 17 virtual methods, and 7 helper functions against the hash-verified `libminecraftpe.so`.
 - Android 13 x86_64 CI validates compilation of both `arm64-v8a` and `x86_64` NDK targets, UI/overlay controls, classloader isolation, and closed-fail IPC rejection when no ARM64 `1.26.50.4` session is active. Actual ARM64 Minecraft gameplay execution requires testing on the target Android 13 phone.
+
+## Validated 0.6.4 build artifact
+
+- [Android 13 CI run 40015588459](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40015588459) **passed** (job `120627321568`, `7m22s`, app/test commit `52dd79f1817930083fa5f5f0ecb5a44fe07e6bf3`, host **0.6.4 / versionCode 17**, **64 Android 13 x86_64 cases** + **34 local source/native tests**).
+- [Download host 0.6.4 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40015588459/artifacts/12528686610): **client-base-debug-107** (`6,379,881 bytes`). Install only **`client-base-host-debug.apk`**.
+- [Device test reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40015588459/artifacts/12527749564): **client-base-device-tests-107** (`369,301 bytes`).
+- Note: CI executes on an x86_64 Android 13 emulator without proprietary ARM64 Minecraft; in-world flight and native combat behavior require testing on your ARM64 Android 13 phone with Minecraft `1.26.50.4`. Keep 0.6.2 (`12522700433`) and 0.6.1 (`12520922597`) available as rollback references.
