@@ -8,6 +8,8 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 
 ## Documentation
 
+- [Activity bridge implementation](docs/ACTIVITY_BRIDGE.md) — framework Activity/resources/lifecycle/Surface work and automated coverage; not yet a Minecraft-launch build.
+
 - [How we think the original client works](docs/THEORY.md) — evidence, hypotheses and unresolved engine integration.
 - [Current implementation and roadmap](docs/STATUS.md) — what is implemented versus tested, and our next acceptance gates.
 - [First phone-test result](docs/DEVICE_TEST.md) — initial load, repeated loads and rotation passed as reported; cooperative-demo gate complete.

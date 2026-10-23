@@ -192,6 +192,30 @@ class ClientBaseSourceTests(unittest.TestCase):
         self.assertLess(runtime.index('verifyHostPermissions(context)'), runtime.index('Class.forName(MAIN, false, loader)'))
         self.assertLess(runtime.index('verifyHostPermissions(context)'), runtime.index('Class.forName(MAIN, true, loader)'))
 
+    def test_framework_activity_is_fixed_private_fixture_not_game_launch(self):
+        app = self.manifest('host').find('application')
+        self.assertEqual('.HostComponentFactory', app.get(ANDROID + 'appComponentFactory'))
+        fixture = next(a for a in app.findall('activity') if a.get(ANDROID + 'name') == '.HostedGuestPlaceholderActivity')
+        self.assertEqual('false', fixture.get(ANDROID + 'exported'))
+        self.assertFalse(any('mojang' in a.get(ANDROID + 'name', '') for a in app.findall('activity')))
+        factory = (BASE / 'host/src/main/java/dev/zips/clientbase/host/HostComponentFactory.java').read_text()
+        self.assertIn('super.instantiateActivity(loader, name, intent)', factory)
+        self.assertIn('getComponent().getPackageName()', factory)
+        runtime = (BASE / 'host/src/main/java/dev/zips/clientbase/host/FrameworkActivityRuntime.java').read_text()
+        self.assertLess(runtime.index('GuestRuntime.load(context)'), runtime.index('Class.forName(FIXTURE'))
+        self.assertIn('type.getClassLoader() != guest.loader', runtime)
+        self.assertNotIn('.onCreate(', runtime)
+        self.assertNotIn('setAccessible', runtime)
+        self.assertNotIn('CONTEXT_INCLUDE_CODE', runtime)
+
+    def test_activity_resource_wrapper_retains_host_identity_and_storage(self):
+        source = (BASE / 'host/src/main/java/dev/zips/clientbase/host/ActivityResourceContext.java').read_text()
+        for required in ('resourceContext.getResources()', 'getResources().getAssets()', 'return guestLoader;',
+                         'cloneInContext(this)', 'resourceContext.createConfigurationContext(override)'):
+            self.assertIn(required, source)
+        for forbidden in ('getPackageName()', 'getApplicationInfo()', 'getFilesDir()', 'checkPermission(', 'setAccessible'):
+            self.assertNotIn(forbidden, source)
+
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:

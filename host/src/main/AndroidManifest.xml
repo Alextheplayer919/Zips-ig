@@ -5,9 +5,12 @@
         <package android:name="dev.zips.clientbase.guest" />
         <package android:name="com.mojang.minecraftpe" />
     </queries>
-    <application android:label="Client Base" android:allowBackup="false"
+    <application android:name=".ClientBaseApplication" android:appComponentFactory=".HostComponentFactory" android:label="Client Base" android:allowBackup="false"
         android:extractNativeLibs="true" android:supportsRtl="true" android:theme="@style/AppTheme">
         <service android:name=".EngineProbeService" android:process=":engine_probe" android:exported="false" />
+        <!-- Developer fixture only; no exported/arbitrary guest launch or Minecraft launch. -->
+        <activity android:name=".HostedGuestPlaceholderActivity" android:exported="false"
+            android:theme="@android:style/Theme.Material.NoActionBar" android:excludeFromRecents="true" />
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
