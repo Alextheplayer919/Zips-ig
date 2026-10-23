@@ -98,6 +98,26 @@ class ClientBaseSourceTests(unittest.TestCase):
         self.assertLess(source.index('if (!matchesInstalledEngine'), source.index('Class.forName'))
         self.assertNotIn('System.load(', source)
 
+    def test_bootstrap_inspection_does_not_load_guest_code(self):
+        source = (BASE / 'host/src/main/java/dev/zips/clientbase/host/DexBootstrapInspector.java').read_text()
+        for forbidden in ('Class.forName(', 'DexClassLoader', 'System.load(', 'System.loadLibrary(', 'EngineNativeBridge'):
+            self.assertNotIn(forbidden, source)
+        for required in ('MAX_DEX', 'MAX_UNITS', 'reference_scan_complete', 'Files.deleteIfExists'):
+            self.assertIn(required, source)
+        service = (BASE / 'host/src/main/java/dev/zips/clientbase/host/EngineProbeService.java').read_text()
+        self.assertLess(service.index('if (!matchesInstalledEngine'), service.index('DexBootstrapInspector.inspectApks'))
+        self.assertLess(service.index('DexBootstrapInspector.inspectApks'), service.index('DexClassLoader loader'))
+
+    def test_jni_bootstrap_record_matches_input_identity(self):
+        import json
+        source = json.loads((BASE / 'docs/JNI_BOOTSTRAP.json').read_text())
+        engine = json.loads((BASE / 'docs/ENGINE_INPUT.json').read_text())
+        self.assertEqual(engine['library_sha256'], source['library_sha256'])
+        self.assertEqual('0x852e0e0', source['jni_onload']['elf_va'])
+        self.assertEqual(288, source['jni_onload']['bytes'])
+        self.assertEqual('com/mojang/minecraftpe/MainActivity', source['literal_references']['anchor_class']['value'])
+        self.assertIn('sigaction', [call['name'] for call in source['jni_onload']['calls']])
+
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:

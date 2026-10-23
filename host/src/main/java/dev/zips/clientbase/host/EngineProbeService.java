@@ -35,10 +35,11 @@ public final class EngineProbeService extends Service {
     private Messenger client;
     private int runId;
     private final Messenger messenger = new Messenger(new Handler(Looper.getMainLooper(), message -> {
-        if (started.compareAndSet(false, true)) {
+        if ((message.what == 1 || message.what == 2) && started.compareAndSet(false, true)) {
             client = message.replyTo;
             runId = message.getData().getInt("id");
-            new Thread(this::probe, "engine-probe").start();
+            boolean inspectOnly = message.what == 2;
+            new Thread(() -> probe(inspectOnly), "engine-probe").start();
         }
         return true;
     }));
@@ -71,15 +72,16 @@ public final class EngineProbeService extends Service {
         catch (RemoteException ignored) { /* Controller can read the saved last stage. */ }
     }
 
-    private void probe() {
+    private void probe(boolean inspectOnly) {
         try {
-            report("Checking imported engine and process ABI; no engine code executed yet.", false);
+            report(inspectOnly ? "Checking installed engine fingerprint; no game code will be executed."
+                    : "Checking imported engine and process ABI; no engine code executed yet.", false);
             String arch = System.getProperty("os.arch", "unknown");
-            if (!Process.is64Bit() || !(arch.equals("aarch64") || arch.equals("arm64"))) {
+            if (!inspectOnly && (!Process.is64Bit() || !(arch.equals("aarch64") || arch.equals("arm64")))) {
                 throw new IOException("ARM64 engine cannot run in this process (" + arch + ").");
             }
             File engine = EngineInput.library(this);
-            EngineInput.verifyLibrary(engine);
+            if (!inspectOnly) EngineInput.verifyLibrary(engine);
             PackageManager pm = getPackageManager();
             ApplicationInfo game = pm.getApplicationInfo(GAME, 0);
             PackageInfo pkg = pm.getPackageInfo(GAME, 0);
@@ -94,6 +96,15 @@ public final class EngineProbeService extends Service {
             if (!matchesInstalledEngine(game, apks)) {
                 throw new IOException(version + "\nInstalled ARM64 engine is absent or does not match the supplied file. "
                         + "Refusing to mix native dependencies across unknown game builds.");
+            }
+            if (inspectOnly) {
+                report(version + "\nEngine hash matched. Reading MainActivity DEX as data only...", false);
+                org.json.JSONObject bootstrap = DexBootstrapInspector.inspectApks(apks,
+                        "Lcom/mojang/minecraftpe/MainActivity;", getCacheDir());
+                report(version + "\nEngine hash matched.\nBOOTSTRAP_INSPECTION_COMPLETE\n"
+                        + bootstrap.toString(2) + "\nNo guest class was defined/initialized; no dlopen, JNI_OnLoad "
+                        + "or game entrypoint was invoked. Reachable initializers and lifecycle remain untested.", true);
+                return;
             }
             List<String> nativePaths = new ArrayList<>();
             nativePaths.add(getApplicationInfo().nativeLibraryDir);

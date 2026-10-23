@@ -62,3 +62,7 @@ For bounded offline inventory (no execution):
 python -m pip install -r tools/requirements-engine.txt
 python tools/inspect_engine.py /path/to/extracted/libminecraftpe.so
 ```
+
+## Next step after the reported link success
+
+Do not repeat the link test just to inspect Java prerequisites. Host 0.3 adds **Inspect Minecraft bootstrap (no code execution)**; see [JNI_BOOTSTRAP.md](JNI_BOOTSTRAP.md). It reads the installed MainActivity DEX as data, without requiring an imported engine copy or invoking JNI initialization.

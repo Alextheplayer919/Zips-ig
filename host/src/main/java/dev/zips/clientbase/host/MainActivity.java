@@ -31,7 +31,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         int padding = (int) (24 * getResources().getDisplayMetrics().density);
         page.setPadding(padding, padding, padding, padding);
         scroll.addView(page);
-        TextView eyebrow = text("CLIENT BASE / 0.2", 13);
+        TextView eyebrow = text("CLIENT BASE / 0.3", 13);
         eyebrow.setTextColor(Color.rgb(113, 217, 193));
         page.addView(eyebrow);
         page.addView(text("One process.\nA separate guest.", 30));
@@ -76,6 +76,22 @@ public final class MainActivity extends Activity implements EngineProbeControlle
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Run probe", (dialog, which) -> EngineProbeController.start()).show());
         page.addView(probe);
+        Button bootstrap = new Button(this);
+        bootstrap.setText("Inspect Minecraft bootstrap (no code execution)");
+        bootstrap.setOnClickListener(v -> EngineProbeController.inspectBootstrap());
+        page.addView(bootstrap);
+        page.addView(text("Reads the installed game's MainActivity DEX and static initializer as data. "
+                + "No engine import or repeat link test is needed. Does not launch or initialize Minecraft.", 14));
+        Button share = new Button(this);
+        share.setText("Share current engine / bootstrap report");
+        share.setOnClickListener(v -> {
+            if (EngineProbeController.isRunning()) return;
+            Intent send = new Intent(Intent.ACTION_SEND);
+            send.setType("text/plain");
+            send.putExtra(Intent.EXTRA_TEXT, engineStatus.getText().toString());
+            startActivity(Intent.createChooser(send, "Share diagnostic report"));
+        });
+        page.addView(share);
         engineStatus = text("Engine not imported.", 14);
         engineStatus.setTypeface(Typeface.MONOSPACE);
         engineStatus.setTextIsSelectable(true);

@@ -23,6 +23,7 @@ public final class EngineProbeController {
     private static boolean running;
     private static boolean bound;
     private static int runId;
+    private static int requestMode;
     private static long finishedAt;
     private static String latest;
     private EngineProbeController() {}
@@ -55,7 +56,8 @@ public final class EngineProbeController {
                         + new String(Files.readAllBytes(EngineProbeService.reportFile(app).toPath()), StandardCharsets.UTF_8);
             } catch (IOException ignored) { /* Show initial instructions instead. */ }
         }
-        return "Import the exact supplied libminecraftpe.7z (or extracted .so), then run the optional link probe.";
+        return "Inspect installed Minecraft bootstrap without running game code. "
+                + "Engine import is needed only for the optional link probe.";
     }
 
     private static final Runnable TIMEOUT = () -> finish("PROBE_TIMEOUT\nLast saved stage:\n" + lastReport());
@@ -70,7 +72,7 @@ public final class EngineProbeController {
         @Override public void onServiceConnected(ComponentName name, IBinder binder) {
             try {
                 Message request = Message.obtain();
-                request.what = 1;
+                request.what = requestMode;
                 request.getData().putInt("id", runId);
                 request.replyTo = RECEIVER;
                 new Messenger(binder).send(request);
@@ -86,16 +88,22 @@ public final class EngineProbeController {
         @Override public void onNullBinding(ComponentName name) { finish("Probe service returned no binding."); }
     };
 
-    public static void start() {
+    public static void start() { start(1); }
+
+    public static void inspectBootstrap() { start(2); }
+
+    private static void start(int mode) {
         if (app == null || running) return;
         if (android.os.SystemClock.uptimeMillis() - finishedAt < 2000) {
             show("Wait two seconds for the previous probe process to exit.");
             return;
         }
         if (EngineInput.IMPORTING.get()) { show("Wait for the engine import to complete."); return; }
+        requestMode = mode;
         running = true;
         runId++;
-        show("Starting private probe process. Native constructors may crash that process; no game startup is attempted.");
+        show(mode == 2 ? "Reading installed Minecraft DEX in the private process. No guest code will run."
+                : "Starting private probe process. Native constructors may crash that process; no game startup is attempted.");
         try {
             bound = app.bindService(new Intent(app, EngineProbeService.class), CONNECTION, Context.BIND_AUTO_CREATE);
             if (!bound) finish("Could not bind the private probe service.");

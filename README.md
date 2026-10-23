@@ -12,13 +12,14 @@ A clean Android hosting prototype for an independent, rootless client. The inten
 - [Build and install APKs from your phone](docs/BUILDING.md).
 - [Engine phone-test result](docs/ENGINE_DEVICE_TEST.md) — linking passed as reported for the hash-matched Minecraft 1.26.50.4 engine; JNI/game startup pending.
 - [Try the supplied engine](docs/ENGINE_PROBE.md) — optional hash-checked import and private-process link diagnostic.
+- [JNI bootstrap inspection](docs/JNI_BOOTSTRAP.md) — native prerequisites and the no-execution installed-DEX diagnostic.
 - [Engine input provenance](docs/ENGINE_INPUT.json).
 
 ## Repository layout
 
 | Path | Purpose |
 | --- | --- |
-| `host/` | Launcher, demo loader, engine import/link probe and Android tests |
+| `host/` | Launcher, demo loader, engine import/link probe, static bootstrap inspection and Android tests |
 | `demo-guest/` | Separate demo app with guest resources and a tiny native library |
 | `contract/` | Cooperative Java interface shared by both apps |
 | `.github/workflows/build-apk.yml` | Builds debug APKs; runs Android 13 emulator tests |
