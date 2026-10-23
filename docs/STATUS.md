@@ -4,6 +4,8 @@
 
 **Latest phone milestone:** **[The user confirms a fully functioning hosted launch](HOSTED_LAUNCH_SUCCESS.md) after host 0.5.4.** This is the first reported working Bedrock launch, not merely onCreate/Surface progress. Preserve app/test commit `287e04b` and [the validated 0.5.4 APK](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056/artifacts/12516682587) as the working baseline. The confirmation is user-reported, without a new PID/UID or capture; it does not establish every SDK feature or long-session stability. No engine reimport or repeated bootstrap/demo test is needed. Native-memory integration/hooks remain the next development stage, not a completed feature.
 
+**Current development:** [0.6.0 external controls + on-demand memory inspection](MEMORY_CONTROLS.md), [Android 13 build/APK and 54-case regressions passed](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39993673423). [Host 0.6.0 APK](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39993673423/artifacts/12518682891). Separate UI task/process, no in-game GUI/overlay, read-only ELF header/build-ID/segment snapshot through fixed private IPC. Split-screen remains an optional real-device compatibility experiment. Native player-field manipulation/hooks remain unimplemented.
+
 We are building a clean, independent hosting client, not porting the original protected native VM. The current repository contains only the retained engine archive and the source/documentation/build infrastructure needed for the new base.
 
 ### Implemented

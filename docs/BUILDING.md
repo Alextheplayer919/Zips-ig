@@ -1,6 +1,6 @@
 # Building and testing APKs
 
-**Current phone status:** [the user confirms host 0.5.4 launches the game fully functioning](HOSTED_LAUNCH_SUCCESS.md). Keep the working [0.5.4 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39988805056/artifacts/12516682587) as the reference build. No new phone attempt, engine import, demo/link/bootstrap repeat or additional input is currently requested. Earlier phone instructions below are historical.
+**Current integration build:** [host 0.6.0 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39993673423/artifacts/12518682891), build/APK and 54 Android 13 regressions passed. [External controls/memory architecture and phone steps](MEMORY_CONTROLS.md#first-phone-integration-check). Keep the user-confirmed working 0.5.4 APK as the reference baseline. Install only the new host; controls have their own task, no GUI is rendered inside Minecraft. No demo/import/link/bootstrap repeat. Split-screen is optional and device-dependent, not guaranteed. Earlier phone instructions are historical.
 
 ## GitHub Actions
 
