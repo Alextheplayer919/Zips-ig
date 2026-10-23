@@ -34,10 +34,16 @@ The small `HostedActivity`/`ActivityEnvironment` interfaces belong to our cooper
 
 Four new Android integration tests exercise framework-created Activity identity/resources/theme/JNI, recreation with the same loader, actual Surface creation/destruction, and rejection of an invalid component while preserving the ordinary host creation path. They do not execute Minecraft. Two additional local source guards check the fixed/private mapping and that the resource context does not override host identity/storage/permission methods.
 
-Android compilation/emulator outcome must be recorded separately after CI; adding tests is not itself validation. The existing demo, archive/hash, native-loader, initializer and exit-diagnostic tests remain enabled.
+**Android validation passed:** [run 39966947699](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39966947699), app/test commit `3cd8f7f1e705de3892952d58230b3b7c862cfb7c`, job `120459176807`, **5m2s**. The four new framework Activity cases pass alongside the retained 21 cases (25 total); 20 local source/native guards pass. Archive extraction/hash, native-loader, initializer and exit-diagnostic checks remain enabled. No ARM64 Minecraft execution takes place in this x86_64 emulator suite.
+
+The first run [39965976294](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39965976294) compiled and exercised the bridge but failed the ordinary-Activity factory check because the test constructed it on the instrumentation worker thread (no Looper). The correction uses the framework's main-thread contract; no test was disabled or removed. Surface teardown assertions also wait for UI idle after closing the scenario.
+
+- [Developer APK artifact](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39966947699/artifacts/12506489935): `client-base-debug-51`, 3,483,713 bytes. This is **not a new phone task or a Minecraft-launch build**; the host version remains 0.4.3 during adapter development.
+- [CI device reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39966947699/artifacts/12506843295): `client-base-device-tests-51`, 183,804 bytes. CI success is authoritative here; local downloading/parsing of these artifact XMLs is not claimed.
+- Supplied engine archive Git blob remains `c78f6e8642d334916d247487897eb871ad27c160`. Proprietary DEX input and raw disassembly remain ignored.
 
 ## Remaining implementation
 
-The primitive above is not a Minecraft Activity adapter yet. Original-game attachment still needs the same-loader subclass/factory path, exact component metadata/theme mapping, process-scoped preparation and lifetime, original Application/provider/SDK context requirements, and existing diagnostic integration. In particular, the fixture keeps the host Application unchanged and does not prove that returning that Application/resources is adequate for Bedrock's SDKs.
+The fixture is a plain framework Activity; it does not validate Bedrock's AppCompat/SplashScreen compatibility. The primitive above is not a Minecraft Activity adapter yet. Original-game attachment still needs the same-loader subclass/factory path, exact component metadata/theme mapping, process-scoped preparation and lifetime, original Application/provider/SDK context requirements, and existing diagnostic integration. In particular, the fixture keeps the host Application unchanged and does not prove that returning that Application/resources is adequate for Bedrock's SDKs.
 
 No user-facing launch button is enabled until those requirements are implemented and guarded. Gate 2 remains a **real hosted Bedrock title screen**, not this fixture passing or a returned bootstrap. No hook/entitlement/account bypass or speculative new permission is introduced.
