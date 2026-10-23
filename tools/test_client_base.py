@@ -159,6 +159,31 @@ class ClientBaseSourceTests(unittest.TestCase):
                       'code.getBoolean("reference_scan_complete")', 'code.getJSONArray("references").length() == 0'):
             self.assertIn(guard, runtime)
 
+    def test_exit_diagnostics_are_own_identity_filtered_and_bounded(self):
+        source = (BASE / 'host/src/main/java/dev/zips/clientbase/host/ProbeExitDiagnostics.java').read_text()
+        for required in ('getHistoricalProcessExitReasons(context.getPackageName(), run.pid, 8)',
+                         'run.uid != Process.myUid()', 'pid == run.pid', 'uid == run.uid',
+                         'packageName + ":engine_probe"', 'TRACE_LIMIT', 'getTraceInputStream()',
+                         '24 * 1024', '2500, TimeUnit.MILLISECONDS'):
+            self.assertIn(required, source)
+        parser = (BASE / 'host/src/main/java/dev/zips/clientbase/host/NativeTombstoneSummary.java').read_text()
+        self.assertIn('pid != expectedPid || uid != expectedUid', parser)
+        self.assertIn('new int[] {100000}', parser)
+        self.assertIn('frames < 32', parser)
+        self.assertNotIn('FileOutputStream', parser)
+        controller = (BASE / 'host/src/main/java/dev/zips/clientbase/host/EngineProbeController.java').read_text()
+        self.assertIn('if (!running) return;', controller)
+        self.assertIn('savedStage(), true, false)', controller)
+        self.assertIn('diagnosticId != generation', controller)
+        self.assertIn('12000', controller)
+
+    def test_disconnect_evidence_does_not_claim_playfab_is_the_cause(self):
+        import json
+        report = json.loads((BASE / 'docs/JVM_DISCONNECT_DEVICE_TEST.json').read_text())
+        self.assertEqual('JVM_INITIALIZATION_IN_PROGRESS', report['last_stage'])
+        self.assertEqual('PlayFabMultiplayer', report['native_library_lookups_not_completion_receipts'][-1]['name'])
+        self.assertTrue(report['cause'].startswith('Unknown:'))
+
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:

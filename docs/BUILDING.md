@@ -49,7 +49,7 @@ The last command requires an emulator/device. CI supplies an Android 13 x86_64 e
 python3 tools/test_client_base.py
 ```
 
-Fifteen checks cover manifests/permissions, demo visibility/native extraction, protocol version, trust-check ordering, app separation, official wrapper identity, JNI names native process identity, engine fingerprint pins, private/match-gated probe configuration, static-bootstrap no-loading guards and JNI-evidence identity. The native test needs `g++`; otherwise it is skipped. These do **not** compile Android resources/classes or validate Android runtime behavior.
+Seventeen checks cover manifests/permissions, demo visibility/native extraction, protocol version, trust-check ordering, app separation, official wrapper identity, JNI names native process identity, engine fingerprint pins, private/match-gated probe configuration, static-bootstrap no-loading guards and JNI-evidence identity. The native test needs `g++`; otherwise it is skipped. These do **not** compile Android resources/classes or validate Android runtime behavior.
 
 The wrapper files are from Gradle's official `v8.11.1` source tag. Its JAR contains the upstream license; the local suite checks SHA-256 `2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046`.
 
@@ -70,3 +70,7 @@ Host **0.4** adds **Initialize Minecraft Java / JNI (no Activity)** with explici
 ### Empty GameActivity initializer correction
 
 Use **host 0.4.1** for the next initialization attempt. Host 0.4 stopped on a present-but-empty superclass initializer (`000e`, DEX `return-void`). The patch accepts only that exact reviewed no-op shape, preserving all other checks. Install the new host only; tap the same **Initialize Minecraft Java / JNI (no Activity)** button and share the result. No archive import, static-only inspection, demo or link test is needed. See [the recorded reason for the correction](GAMEACTIVITY_DEVICE_TEST.md).
+
+### Current step: diagnose the initialization disconnect
+
+Use **host 0.4.2** and see [EXIT_DIAGNOSTICS.md](EXIT_DIAGNOSTICS.md). If the update preserves host data/UID, try **Collect last probe exit details** first. A new debug key may require uninstalling only Client Base host and lose old crash-history access; then make one new initialization attempt, leave the host open for automatic exit collection, and share the full report. Retry the diagnostic button if details are delayed; it never starts game code. No demo/link test or engine import is required. Do not uninstall Minecraft.

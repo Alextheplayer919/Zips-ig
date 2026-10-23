@@ -43,6 +43,12 @@ The user reported host 0.4 stopping at the superclass gate, **before game initia
 
 Host 0.4.1 / code 5 narrowly accepts that exact empty form as well as absence. Longer/changed/partial code, references, extra registers, missing data and unexpected classes remain blocked. Other gates and the Java/JNI initialization path are unchanged. Fifteen local checks pass; Android regression coverage is extended for the no-op and rejected mutations. **Corrected build validated:** [run 39911337051](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39911337051) passed compilation and Android 13 emulator regression checks for app/test commit `8399e9750c0fd46012e49ce2a743948f1c90ac76` (5m0s). [Current host 0.4.1 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/39911337051/artifacts/12483002590), `client-base-debug-38`. Actual phone JNI execution remains pending; no title screen is claimed.
 
+### Host 0.4.2 — JVM initialization entered; private process disconnected
+
+The user reports PID 18392 / UID 11068 reaching `JVM_INITIALIZATION_IN_PROGRESS` after the corrected no-op gate. Last lookup is `PlayFabMultiplayer`; it is not a completion receipt or proof of the culprit. No completed bootstrap, exit reason/signal, abort message or native frames were supplied. [Recorded disconnect and diagnostic plan](EXIT_DIAGNOSTICS.md).
+
+The initialization sequence is unchanged. Host 0.4.2 adds own-UID/PID/process/time-filtered Android exit history, available native tombstone selected-field summaries, bounded own-PID logcat, automatic post-disconnect collection and a no-execution retry button. Cleanup SIGKILL is labelled; unexpected disconnect no longer directly triggers a UI SIGKILL. Changed debug keys/uninstalls can lose old-UID history, so a new controlled attempt may be required. Seventeen local guards pass; new parser/filter/real-own-child-termination Android tests require build validation. Actual phone failure attribution and real Minecraft JNI/bootstrap completion remain unresolved.
+
 ### Validation boundary
 
 Eight local checks passed before and after the repository migration; the engine changes expanded the local suite to ten checks; the bootstrap diagnostic added two source guards and JVM initialization adds two more guards (fifteen total, including the reported no-op guard). These are source guards plus an actually compiled/executed **Linux** native PID/UID test. The six Java sources also passed syntax parsing before migration; the Android source was moved unchanged.

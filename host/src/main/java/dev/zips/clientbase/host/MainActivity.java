@@ -31,7 +31,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         int padding = (int) (24 * getResources().getDisplayMetrics().density);
         page.setPadding(padding, padding, padding, padding);
         scroll.addView(page);
-        TextView eyebrow = text("CLIENT BASE / 0.4.1", 13);
+        TextView eyebrow = text("CLIENT BASE / 0.4.2", 13);
         eyebrow.setTextColor(Color.rgb(113, 217, 193));
         page.addView(eyebrow);
         page.addView(text("One process.\nA separate guest.", 30));
@@ -95,6 +95,10 @@ public final class MainActivity extends Activity implements EngineProbeControlle
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Initialize", (dialog, which) -> EngineProbeController.initializeMinecraft()).show());
         page.addView(initialize);
+        Button exitDetails = new Button(this);
+        exitDetails.setText("Collect last probe exit details (no game execution)");
+        exitDetails.setOnClickListener(v -> EngineProbeController.collectLastExitDetails());
+        page.addView(exitDetails);
         Button share = new Button(this);
         share.setText("Share current engine / bootstrap report");
         share.setOnClickListener(v -> {

@@ -1,4 +1,8 @@
-# Host 0.4.1 — controlled original Java / JNI initialization
+# Host 0.4.2 — controlled original Java / JNI initialization
+
+## Current failure and diagnosis
+
+Host 0.4.1 passed the empty-superclass gate on the phone, then the private process disconnected during JVM initialization, last recording a PlayFabMultiplayer lookup. The cause is not established. Host 0.4.2 keeps this initialization path unchanged and [adds Android own-process exit/crash diagnostics](EXIT_DIAGNOSTICS.md). Prefer collecting existing exit details; if a debug-key uninstall lost them, make one new controlled attempt and collect the result. A lookup is not a completed load or proof of a failing module.
 
 ## Why this is the next experiment
 
@@ -29,7 +33,7 @@ Initialization/SDK callbacks can crash or hang. Stages are saved before entering
 
 ## Phone steps
 
-1. Install **host 0.4.1** from the validated APK artifact. No demo/test APK is needed for this experiment. If the debug key changed, uninstall **Client Base host only**, not Minecraft.
+1. Install **host 0.4.2** from the validated APK artifact. No demo/test APK is needed for this experiment. If the debug key changed, uninstall **Client Base host only**, not Minecraft.
 2. Tap **Initialize Minecraft Java / JNI (no Activity)** and read/accept the execution consent. Keep the host open.
 3. Use **Share current engine / bootstrap report** and send the result, including a blocked/last-stage result if it does not return normally.
 

@@ -1,0 +1,53 @@
+{
+  "evidence": "User-pasted host 0.4.1 disconnect report; not independent crash capture. Install-specific path components omitted; library basenames/order preserved.",
+  "probe_pid": 18392,
+  "probe_uid": 11068,
+  "version_name": "1.26.50.4",
+  "version_code": 972605004,
+  "apk_paths": 1,
+  "engine_hash_matched": true,
+  "result": "PROBE_PROCESS_DISCONNECTED_BEFORE_COMPLETION",
+  "last_stage": "JVM_INITIALIZATION_IN_PROGRESS",
+  "main_initializer_matched": true,
+  "game_activity_metadata_reference": "GAMEACTIVITY_DEVICE_TEST.json",
+  "game_activity_snapshot": {
+    "class": "Lcom/google/androidgamesdk/GameActivity;",
+    "superclass": "Landroidx/appcompat/app/AppCompatActivity;",
+    "clinit": {
+      "registers": 0,
+      "code_units_total": 1,
+      "code_units_hex": "000e",
+      "truncated": false,
+      "references": [],
+      "reference_scan_complete": true
+    },
+    "native_method_count": 24,
+    "dex_entry": "classes2.dex",
+    "dex_bytes": 1655112,
+    "dex_crc": 3014425259
+  },
+  "native_library_lookups_not_completion_receipts": [
+    {
+      "name": "c++_shared",
+      "file": "libc++_shared.so",
+      "source": "installed game nativeLibraryDir (/data/app/.../lib/arm64/)"
+    },
+    {
+      "name": "maesdk",
+      "file": "libmaesdk.so",
+      "source": "installed game nativeLibraryDir (/data/app/.../lib/arm64/)"
+    },
+    {
+      "name": "HttpClient.Android",
+      "file": "libHttpClient.Android.so",
+      "source": "installed game nativeLibraryDir (/data/app/.../lib/arm64/)"
+    },
+    {
+      "name": "PlayFabMultiplayer",
+      "file": "libPlayFabMultiplayer.so",
+      "source": "installed game nativeLibraryDir (/data/app/.../lib/arm64/)"
+    }
+  ],
+  "cause": "Unknown: no Android exit reason, signal, abort message or native frames supplied. Last lookup alone does not identify the failing library.",
+  "boundary": "JVM initialization was entered, but did not return a completion result. No fmod/minecraftpe lookup was recorded; no Minecraft JNI success or title screen is established."
+}
