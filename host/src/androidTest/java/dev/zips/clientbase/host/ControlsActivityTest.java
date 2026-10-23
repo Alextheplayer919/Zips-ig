@@ -32,6 +32,27 @@ public final class ControlsActivityTest {
             }
         }
     }
+    @Test public void diagnosticsStayInControlsWithRealMemoryIpcAndCopy() throws Exception {
+        String before=GameHostReport.read(GameHostReport.stageFile(context()));
+        try(ActivityScenario<ControlsActivity> controls=ActivityScenario.launch(ControlsActivity.intent(context()))) {
+            controls.onActivity(a->a.findViewById(R.id.memory_refresh).performClick());
+            long deadline=android.os.SystemClock.uptimeMillis()+10000;
+            final String[] report={""};
+            while(android.os.SystemClock.uptimeMillis()<deadline) {
+                controls.onActivity(a->report[0]=((TextView)a.findViewById(R.id.memory_report)).getText().toString());
+                if(report[0].contains("No live prepared Activity session"))break;
+                android.os.SystemClock.sleep(50);
+            }
+            assertTrue(report[0],report[0].contains("No live prepared Activity session"));
+            assertEquals(before,GameHostReport.read(GameHostReport.stageFile(context())));
+            controls.onActivity(a->{
+                a.findViewById(R.id.memory_copy).performClick();
+                android.content.ClipboardManager clipboard=a.getSystemService(android.content.ClipboardManager.class);
+                assertNotNull(clipboard.getPrimaryClip());
+                assertEquals(report[0],clipboard.getPrimaryClip().getItemAt(0).coerceToText(a).toString());
+            });
+        }
+    }
     @Test public void developerToolsAreCollapsedButRetained() {
         try(ActivityScenario<MainActivity> main=ActivityScenario.launch(MainActivity.class)){
             main.onActivity(a -> {

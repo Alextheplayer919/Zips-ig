@@ -3,12 +3,10 @@ package dev.zips.clientbase.host;
 import static org.junit.Assert.*;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.AppOpsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
-import android.content.res.Configuration;
 import android.os.ParcelFileDescriptor;
 import android.os.Process;
 import android.os.SystemClock;
@@ -66,7 +64,7 @@ public final class OverlayTest {
             });
         }finally{cleanup();}
     }
-    @Test public void realForegroundOverlayMenuMemoryIpcAndNotificationStop()throws Exception{
+    @Test public void realForegroundCategoryMenuAndNotificationStop()throws Exception{
         permission(true);shell("pm grant "+context().getPackageName()+" android.permission.POST_NOTIFICATIONS");
         String before=GameHostReport.read(GameHostReport.stageFile(context()));
         try(ActivityScenario<ControlsActivity> scenario=ActivityScenario.launch(ControlsActivity.intent(context()))){
@@ -84,12 +82,21 @@ public final class OverlayTest {
             MinecraftBootstrap.onMainThread(()->{
                 assertTrue(first.panel().isAttachedToWindow());
                 WindowManager.LayoutParams p=(WindowManager.LayoutParams)first.panel().getLayoutParams();assertTrue(p.width>0&&p.height>0);
-                first.panel().findViewById(R.id.overlay_refresh).performClick();return null;
+                assertNull(first.panel().findViewById(R.id.overlay_refresh));
+                assertNull(first.panel().findViewById(R.id.overlay_report));
+                for(ModuleCategory category:ModuleCategory.values()) {
+                    first.panel().findViewById(category.viewId).performClick();
+                    assertEquals(category.title,((TextView)first.panel().findViewById(R.id.overlay_category_title)).getText().toString());
+                    for(ModuleCategory item:ModuleCategory.values())
+                        assertEquals(item==category,first.panel().findViewById(item.viewId).isSelected());
+                }
+                return null;
             });
-            await(()->first.panel()!=null&&((TextView)first.panel().findViewById(R.id.overlay_report)).getText().toString().contains("No live prepared Activity session"));
             assertEquals(before,GameHostReport.read(GameHostReport.stageFile(context())));
             MinecraftBootstrap.onMainThread(()->{
                 first.panel().findViewById(R.id.overlay_close).performClick();assertNull(first.panel());assertEquals(View.VISIBLE,first.chip().getVisibility());
+                first.chip().performClick();
+                assertEquals("Misc",((TextView)first.panel().findViewById(R.id.overlay_category_title)).getText().toString());
                 return null;
             });
             Notification notification=null;

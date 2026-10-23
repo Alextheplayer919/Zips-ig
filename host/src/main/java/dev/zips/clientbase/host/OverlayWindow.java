@@ -1,7 +1,5 @@
 package dev.zips.clientbase.host;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
@@ -29,8 +27,9 @@ final class OverlayWindow {
     private Button chip;
     private LinearLayout panel;
     private WindowManager.LayoutParams chipParams,panelParams;
-    private MemoryClient client;
-    private String report="No memory snapshot yet. Launch Bedrock normally, then Refresh.";
+    private ModuleCategory selected = ModuleCategory.MOVEMENT;
+    private LinearLayout categoryBody;
+    private Button[] categoryButtons;
     private boolean closed;
     OverlayWindow(Context context,Runnable stop,Consumer<String> failure){
         this.context=context;this.stop=stop;this.failure=failure;
@@ -68,26 +67,67 @@ final class OverlayWindow {
     }
     private void showPanel(){
         int[] area=area();panel=ClientUi.card(context);panel.setId(R.id.overlay_panel);panel.setClickable(true);
-        panelParams=params(OverlayGeometry.size(ClientUi.dp(context,360),area[0]),OverlayGeometry.size(ClientUi.dp(context,480),area[1]));
+        panelParams=params(OverlayGeometry.size(ClientUi.dp(context,480),area[0]),OverlayGeometry.size(ClientUi.dp(context,360),area[1]));
         panelParams.x=OverlayGeometry.clamp(chipParams.x,panelParams.width,area[0]);panelParams.y=OverlayGeometry.clamp(chipParams.y,panelParams.height,area[1]);
         LinearLayout heading=new LinearLayout(context);heading.setGravity(Gravity.CENTER_VERTICAL);
-        TextView title=ClientUi.label(context,"ZIPS  /  MEMORY",16,ClientUi.ACCENT);title.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        TextView title=ClientUi.label(context,"ZIPS  /  CLIENT",16,ClientUi.ACCENT);title.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
         title.setContentDescription("Drag menu");heading.addView(title,new LinearLayout.LayoutParams(0,-2,1));drag(title,panel,panelParams);
         Button close=ClientUi.button(context,"Close",false);close.setId(R.id.overlay_close);close.setOnClickListener(v->hidePanel());
         heading.addView(close,new LinearLayout.LayoutParams(ClientUi.dp(context,76),ClientUi.dp(context,44)));panel.addView(heading);
-        ScrollView scroll=new ScrollView(context);LinearLayout body=ClientUi.column(context);scroll.addView(body);panel.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
-        body.addView(ClientUi.label(context,"External window · manual read-only IPC\nClose hides the panel. Android Back still belongs to the game.",12,ClientUi.MUTED));
-        Button refresh=ClientUi.button(context,"Refresh memory snapshot",true);refresh.setId(R.id.overlay_refresh);body.addView(refresh);
-        TextView output=ClientUi.label(context,report,12,ClientUi.TEXT);output.setId(R.id.overlay_report);output.setTypeface(Typeface.MONOSPACE);
-        refresh.setOnClickListener(v->{
-            if(client!=null||closed)return;refresh.setEnabled(false);output.setText("Requesting a read-only snapshot…");
-            client=new MemoryClient(context,value->{client=null;report=value;if(!closed&&panel!=null){refresh.setEnabled(true);output.setText(value);}});client.start();
-        });
-        Button copy=ClientUi.button(context,"Copy memory report",false);body.addView(copy);
-        copy.setOnClickListener(v->((ClipboardManager)context.getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Engine memory",report)));
-        Button halt=ClientUi.button(context,"Stop overlay",false);halt.setId(R.id.overlay_stop);halt.setOnClickListener(v->stop.run());body.addView(halt);
-        body.addView(output);
+        LinearLayout sections = new LinearLayout(context);
+        panel.addView(sections, new LinearLayout.LayoutParams(-1, 0, 1));
+        ScrollView navigation = new ScrollView(context);
+        navigation.setFillViewport(true);
+        LinearLayout categories = ClientUi.column(context);
+        categories.addView(ClientUi.label(context, "CATEGORIES", 10, ClientUi.MUTED));
+        navigation.addView(categories);
+        sections.addView(navigation, new LinearLayout.LayoutParams(ClientUi.dp(context,112), -1));
+        categoryButtons = new Button[ModuleCategory.values().length];
+        for (ModuleCategory category : ModuleCategory.values()) {
+            Button button = ClientUi.button(context, category.title, false);
+            button.setId(category.viewId);
+            button.setContentDescription(category.title + " category");
+            button.setOnClickListener(v -> select(category));
+            categoryButtons[category.ordinal()] = button;
+            LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(-1, -2);
+            buttonParams.setMargins(0,ClientUi.dp(context,2),0,ClientUi.dp(context,2));
+            categories.addView(button,buttonParams);
+        }
+        ScrollView content = new ScrollView(context);
+        content.setFillViewport(true);
+        LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(0, -1, 1);
+        contentParams.leftMargin = ClientUi.dp(context,16);
+        sections.addView(content, contentParams);
+        categoryBody = ClientUi.column(context);
+        content.addView(categoryBody);
+        select(selected);
+        LinearLayout footer = new LinearLayout(context);
+        footer.setGravity(Gravity.CENTER_VERTICAL);
+        footer.addView(ClientUi.label(context, "0 MODULES", 11, ClientUi.MUTED), new LinearLayout.LayoutParams(0,-2,1));
+        Button halt=ClientUi.button(context,"Stop overlay",false);
+        halt.setId(R.id.overlay_stop);halt.setOnClickListener(v->stop.run());
+        footer.addView(halt, new LinearLayout.LayoutParams(ClientUi.dp(context,120),ClientUi.dp(context,44)));
+        panel.addView(footer);
         manager.addView(panel,panelParams);chip.setVisibility(View.GONE);
+    }
+    private void select(ModuleCategory category) {
+        selected = category;
+        for (ModuleCategory item : ModuleCategory.values()) {
+            Button button = categoryButtons[item.ordinal()];
+            boolean active = item == category;
+            button.setSelected(active);
+            button.setTextColor(active ? ClientUi.BG : ClientUi.TEXT);
+            button.setBackground(ClientUi.shape(active ? ClientUi.ACCENT : ClientUi.CARD,
+                    active ? 0 : ClientUi.LINE, context, 12));
+        }
+        categoryBody.removeAllViews();
+        TextView title = ClientUi.label(context, category.title, 22, ClientUi.TEXT);
+        title.setId(R.id.overlay_category_title);
+        title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        categoryBody.addView(title);
+        categoryBody.addView(ClientUi.label(context, "No modules yet", 15, ClientUi.MUTED));
+        categoryBody.addView(ClientUi.label(context,
+                "Modules will appear here as they are implemented.", 13, ClientUi.MUTED));
     }
     private void drag(View handle,View window,WindowManager.LayoutParams p){
         handle.setOnTouchListener(new View.OnTouchListener(){
@@ -111,10 +151,11 @@ final class OverlayWindow {
     void reflow(){
         if(closed)return;int[] bounds=area();
         if(chipParams!=null){chipParams.width=OverlayGeometry.size(ClientUi.dp(context,76),bounds[0]);chipParams.height=OverlayGeometry.size(ClientUi.dp(context,48),bounds[1]);chipParams.x=OverlayGeometry.clamp(chipParams.x,chipParams.width,bounds[0]);chipParams.y=OverlayGeometry.clamp(chipParams.y,chipParams.height,bounds[1]);update(chip,chipParams);}
-        if(panelParams!=null){panelParams.width=OverlayGeometry.size(ClientUi.dp(context,360),bounds[0]);panelParams.height=OverlayGeometry.size(ClientUi.dp(context,480),bounds[1]);panelParams.x=OverlayGeometry.clamp(panelParams.x,panelParams.width,bounds[0]);panelParams.y=OverlayGeometry.clamp(panelParams.y,panelParams.height,bounds[1]);update(panel,panelParams);}
+        if(panelParams!=null){panelParams.width=OverlayGeometry.size(ClientUi.dp(context,480),bounds[0]);panelParams.height=OverlayGeometry.size(ClientUi.dp(context,360),bounds[1]);panelParams.x=OverlayGeometry.clamp(panelParams.x,panelParams.width,bounds[0]);panelParams.y=OverlayGeometry.clamp(panelParams.y,panelParams.height,bounds[1]);update(panel,panelParams);}
     }
     void hidePanel(){
-        if(client!=null){client.cancel();client=null;}remove(panel);panel=null;panelParams=null;if(chip!=null)chip.setVisibility(View.VISIBLE);
+        remove(panel);panel=null;panelParams=null;categoryBody=null;categoryButtons=null;
+        if(chip!=null)chip.setVisibility(View.VISIBLE);
     }
     private void remove(View view){if(view!=null&&view.getParent()!=null){try{manager.removeViewImmediate(view);}catch(Exception ignored){try{manager.removeView(view);}catch(Exception ignoredAgain){}}}}
     void close(){if(closed)return;closed=true;hidePanel();remove(chip);chip=null;chipParams=null;}

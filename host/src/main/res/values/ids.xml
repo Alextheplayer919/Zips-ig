@@ -16,4 +16,10 @@
     <item name="overlay_refresh" type="id" />
     <item name="overlay_report" type="id" />
     <item name="overlay_stop" type="id" />
+    <item name="category_movement" type="id" />
+    <item name="category_combat" type="id" />
+    <item name="category_visual" type="id" />
+    <item name="category_misc" type="id" />
+    <item name="overlay_category_title" type="id" />
+    <item name="memory_copy" type="id" />
 </resources>

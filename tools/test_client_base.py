@@ -318,12 +318,25 @@ class ClientBaseSourceTests(unittest.TestCase):
             self.assertIn(required, source)
         self.assertNotIn('return START_STICKY', source)
         window = (BASE / 'host/src/main/java/dev/zips/clientbase/host/OverlayWindow.java').read_text()
-        for required in ('TYPE_APPLICATION_OVERLAY', 'FLAG_NOT_FOCUSABLE', 'FLAG_NOT_TOUCH_MODAL', 'new MemoryClient(', 'client.cancel()'):
+        for required in ('TYPE_APPLICATION_OVERLAY', 'FLAG_NOT_FOCUSABLE', 'FLAG_NOT_TOUCH_MODAL', 'ModuleCategory.values()'):
             self.assertIn(required, window)
-        for forbidden in ('MATCH_PARENT', 'FLAG_LAYOUT_NO_LIMITS', 'GameHostController.start()', 'setFocusableInTouchMode(true)'):
+        for forbidden in ('MATCH_PARENT', 'FLAG_LAYOUT_NO_LIMITS', 'GameHostController.start()', 'setFocusableInTouchMode(true)', 'MemoryClient', 'ClipboardManager', 'Refresh memory', 'Copy memory'):
             self.assertNotIn(forbidden, window)
         self.assertFalse(any((BASE / 'host/src').rglob('*.kt')))
         self.assertNotIn('compose', (BASE / 'host/build.gradle').read_text().lower())
+
+    def test_category_gui_is_navigation_only_and_diagnostics_remain_in_controls(self):
+        category = (BASE / 'host/src/main/java/dev/zips/clientbase/host/ModuleCategory.java').read_text()
+        for title in ('Movement', 'Combat', 'Visual', 'Misc'):
+            self.assertIn('"' + title + '"', category)
+        window = (BASE / 'host/src/main/java/dev/zips/clientbase/host/OverlayWindow.java').read_text()
+        self.assertIn('No modules yet', window)
+        self.assertIn('button.setSelected(active)', window)
+        for forbidden in ('Switch(', 'CheckBox(', 'MemoryClient', 'ClipboardManager', 'GameHostController'):
+            self.assertNotIn(forbidden, window)
+        controls = (BASE / 'host/src/main/java/dev/zips/clientbase/host/ControlsActivity.java').read_text()
+        for required in ('new MemoryClient(', 'R.id.memory_copy', 'Copy memory report'):
+            self.assertIn(required, controls)
 
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):

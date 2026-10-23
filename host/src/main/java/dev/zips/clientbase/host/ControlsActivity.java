@@ -26,7 +26,7 @@ public final class ControlsActivity extends Activity {
         LinearLayout page=ClientUi.column(this);int p=ClientUi.dp(this,20);page.setPadding(p,p,p,p);scroll.addView(page);
         page.addView(ClientUi.label(this,"Z I P S   /   C O N T R O L S",13,ClientUi.ACCENT));
         page.addView(ClientUi.label(this,"Outside the game.\nConnected to the engine.",28,ClientUi.TEXT));
-        page.addView(ClientUi.label(this,"0.6.1  ·  separate UI process  ·  read-only integration",13,ClientUi.MUTED));
+        page.addView(ClientUi.label(this,"0.6.2  ·  separate UI process  ·  read-only integration",13,ClientUi.MUTED));
         LinearLayout overlay=ClientUi.card(this);page.addView(overlay);
         overlay.addView(ClientUi.label(this,"OPTIONAL / EXTERNAL OVERLAY",12,ClientUi.ACCENT));
         overlay.addView(ClientUi.label(this,"A floating menu, not a game renderer.",20,ClientUi.TEXT));
@@ -45,7 +45,7 @@ public final class ControlsActivity extends Activity {
             if(client!=null)return;refresh.setEnabled(false);report.setText("Requesting a read-only snapshot…");
             client=new MemoryClient(this,text -> {client=null;refresh.setEnabled(true);report.setText(text);});client.start();
         });
-        Button copy=ClientUi.button(this,"Copy memory report",false);card.addView(copy);
+        Button copy=ClientUi.button(this,"Copy memory report",false);copy.setId(R.id.memory_copy);card.addView(copy);
         copy.setOnClickListener(v -> ((ClipboardManager)getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Engine memory",report.getText())));
         report=ClientUi.label(this,state==null?"Launch Bedrock first, then refresh here. This request never launches the game.":state.getString("report","Refresh to inspect the current session."),12,ClientUi.TEXT);
         report.setId(R.id.memory_report);report.setTypeface(Typeface.MONOSPACE);report.setTextIsSelectable(true);card.addView(report);
