@@ -49,10 +49,16 @@ The last command requires an emulator/device. CI supplies an Android 13 x86_64 e
 python3 tools/test_client_base.py
 ```
 
-Ten checks cover manifests/permissions, demo visibility/native extraction, protocol version, trust-check ordering, app separation, official wrapper identity, JNI names native process identity, engine fingerprint pins and private/match-gated probe configuration. The native test needs `g++`; otherwise it is skipped. These do **not** compile Android resources/classes or validate Android runtime behavior.
+Twelve checks cover manifests/permissions, demo visibility/native extraction, protocol version, trust-check ordering, app separation, official wrapper identity, JNI names native process identity, engine fingerprint pins, private/match-gated probe configuration, static-bootstrap no-loading guards and JNI-evidence identity. The native test needs `g++`; otherwise it is skipped. These do **not** compile Android resources/classes or validate Android runtime behavior.
 
 The wrapper files are from Gradle's official `v8.11.1` source tag. Its JAR contains the upstream license; the local suite checks SHA-256 `2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046`.
 
 ## Engine diagnostic
 
 Host 0.2.0 adds the opt-in [engine link probe](ENGINE_PROBE.md). The workflow additionally provisions the exact archive as a private test fixture using `run-as` on our debuggable host. Android tests extract/hash it on x86_64 **as data only**, and test our own native bridge without executing the ARM64 engine. The engine remains excluded from the APK artifact. The real link attempt needs the ARM64 phone and a matching trusted Minecraft installation.
+
+## Current phone step: static Minecraft bootstrap report
+
+Host **0.3.0** adds **Inspect Minecraft bootstrap (no code execution)**. For this step install just the new host APK; no demo or instrumentation APK is needed. Keep Minecraft installed and unchanged. If Android rejects the new debug signature, uninstall only Client Base host before installing it again. This inspection does not require an imported engine copy.
+
+Tap the inspection button, then **Share current engine / bootstrap report** and send its text. Do not repeat the demo or native link test. The matching installed engine is hashed, then MainActivity DEX is read as data; no Minecraft classes or native libraries are loaded. See [JNI_BOOTSTRAP.md](JNI_BOOTSTRAP.md) for evidence, limits and the boundary before real JNI initialization.

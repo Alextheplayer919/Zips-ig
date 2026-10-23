@@ -48,6 +48,9 @@ public final class DexBootstrapInspectorTest {
     }
 
     @Test public void malformedHeadersAndTablesFailClosed() throws Exception {
+        // Positive control: ensure malformed variants reach field/table validation,
+        // rather than all failing because the fixture's buffer position is wrong.
+        assertNull(new DexBootstrapInspector(header(56, 0)).inspect("Lmissing/Empty;"));
         for (ByteBuffer bytes : new ByteBuffer[] {ByteBuffer.allocate(4), header(56, Integer.MAX_VALUE),
                 header(96, 1), header(40, 0), header(32, 100)}) {
             try { new DexBootstrapInspector(bytes); fail("Malformed DEX accepted"); }
@@ -60,6 +63,7 @@ public final class DexBootstrapInspectorTest {
         b.put("dex\n035\0".getBytes(StandardCharsets.US_ASCII));
         b.putInt(32, 112); b.putInt(36, 112); b.putInt(40, 0x12345678);
         b.putInt(offset, value);
+        b.position(0);
         return b;
     }
 
