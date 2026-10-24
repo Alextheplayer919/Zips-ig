@@ -38,3 +38,10 @@ On `0.6.5`, Xbox sign-in (`XAL`) and joining a multiplayer anarchy server succee
 4. **UI & IPC separation (`ModuleProtocol`, `ModuleClient`, `ModuleState`, `OverlayWindow`, `ControlsActivity`)**
    - Dedicated `ModuleProtocol` opcodes (`6..8`) keep `MemoryProtocol` opcode `2` strictly read-only and never auto-launch or prepare Minecraft.
    - `OverlayWindow` exposes interactive **MotionFly** (`Movement`) and **KillAura** (`Combat`, with `Mobs` / `Multi` / `Hurt` option chips) buttons whose state (`OFF`, `ARMED`, `ON`) comes strictly from `:game_host` replies—never optimistic local flips. `Visual` and `Misc` remain empty; diagnostic counters (`Client normalTicks observed`, `AuthInput`, `MotionSet`, `Attacks`) and `Disarm native hooks` stay in `ControlsActivity`.
+
+## Validated 0.6.6 build artifact
+
+- [Android 13 CI run 40072020558](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40072020558) **passed** (job `120807604730`, `6m20s`, app/test commit `1eacdb9908b5eb6a67af3fd1215a30f73f244e7a`, host **0.6.6 / versionCode 19**, **68 Android 13 x86_64 cases** + **36 local source/native tests**).
+- [Download host 0.6.6 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40072020558/artifacts/12551369283): **client-base-debug-113** (`6,368,120 bytes`). Install only **`client-base-host-debug.apk`**.
+- [Device test reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40072020558/artifacts/12551524199): **client-base-device-tests-113** (`435,905 bytes`).
+- Note: CI executes on an x86_64 Android 13 emulator without proprietary ARM64 Minecraft; in-world flight and native combat behavior require testing on your ARM64 Android 13 phone with Minecraft `1.26.50.4`. Keep 0.6.5 (`12549893036`) and 0.6.2 (`12522700433`) available as rollback references.
