@@ -51,6 +51,7 @@ final class ModuleClient {
     }
 
     static boolean isGameHostProcessRunning(Context context) {
+        if (GameHostLiveBinder.get() != null) return true;
         ActivityManager am = context.getSystemService(ActivityManager.class);
         if (am == null) return false;
         String expected = context.getPackageName() + ":game_host";
@@ -75,16 +76,24 @@ final class ModuleClient {
         return true;
     }
 
+    private boolean sendOverBinder(IBinder binder) {
+        if (binder == null || !binder.isBinderAlive()) return false;
+        try {
+            Message msg = ModuleProtocol.request(
+                    operation, requestId, fly, aura, attackMobs, multiTarget, checkHurtTime);
+            msg.replyTo = receiver;
+            new Messenger(binder).send(msg);
+            return true;
+        } catch (android.os.RemoteException error) {
+            return false;
+        }
+    }
+
     private final ServiceConnection connection = new ServiceConnection() {
         @Override public void onServiceConnected(ComponentName name, IBinder binder) {
             if (done) return;
-            try {
-                Message msg = ModuleProtocol.request(
-                        operation, requestId, fly, aura, attackMobs, multiTarget, checkHurtTime);
-                msg.replyTo = receiver;
-                new Messenger(binder).send(msg);
-            } catch (android.os.RemoteException error) {
-                finish(ModuleState.unavailable("Module IPC unavailable: " + error.getMessage(),
+            if (!sendOverBinder(binder)) {
+                finish(ModuleState.unavailable("Module IPC unavailable · game process unreachable",
                         attackMobs, multiTarget, checkHurtTime));
             }
         }
@@ -103,6 +112,11 @@ final class ModuleClient {
     };
 
     void start() {
+        IBinder liveBinder = GameHostLiveBinder.get();
+        if (liveBinder != null && sendOverBinder(liveBinder)) {
+            main.postDelayed(timeout, 6000);
+            return;
+        }
         if (requireRunningHost && !isGameHostProcessRunning(context)) {
             main.post(() -> finish(ModuleState.unavailable(
                     "Launch Bedrock first · game process is not running", attackMobs, multiTarget, checkHurtTime)));
@@ -112,7 +126,9 @@ final class ModuleClient {
             bound = context.bindService(
                     new Intent(context, GameHostService.class), connection, Context.BIND_AUTO_CREATE);
             if (!bound) {
-                finish(ModuleState.unavailable("Module service binding rejected", attackMobs, multiTarget, checkHurtTime));
+                finish(ModuleState.unavailable(
+                        "Launch Bedrock from Client Base first · cold :game_host service bind is blocked until launch wakes it",
+                        attackMobs, multiTarget, checkHurtTime));
             } else {
                 main.postDelayed(timeout, 6000);
             }

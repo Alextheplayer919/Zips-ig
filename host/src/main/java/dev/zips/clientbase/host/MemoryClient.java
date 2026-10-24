@@ -28,20 +28,32 @@ final class MemoryClient {
             finish(message.getData().getString("report","Empty memory report"));
         return true;
     }));
+    private boolean sendOverBinder(IBinder binder){
+        if(binder==null || !binder.isBinderAlive())return false;
+        try {
+            Message message=Message.obtain(null,MemoryProtocol.SNAPSHOT);
+            message.arg1=request;
+            message.replyTo=receiver;
+            new Messenger(binder).send(message);
+            return true;
+        }catch(android.os.RemoteException error){return false;}
+    }
     private final ServiceConnection connection=new ServiceConnection(){
         @Override public void onServiceConnected(ComponentName name,IBinder binder){
             if(done)return;
-            try {Message message=Message.obtain(null,MemoryProtocol.SNAPSHOT);message.arg1=request;message.replyTo=receiver;new Messenger(binder).send(message);}
-            catch(android.os.RemoteException error){finish("Memory IPC unavailable: "+error.getMessage());}
+            if(!sendOverBinder(binder))finish("Memory IPC unavailable: game process unreachable");
         }
         @Override public void onServiceDisconnected(ComponentName name){finish("Game process disconnected. No restart attempted.");}
         @Override public void onBindingDied(ComponentName name){finish("Memory connection died. Refresh manually.");}
         @Override public void onNullBinding(ComponentName name){finish("Memory binding unavailable.");}
     };
     void start(){
+        IBinder liveBinder=GameHostLiveBinder.get();
+        if(liveBinder!=null && sendOverBinder(liveBinder)){main.postDelayed(timeout,8000);return;}
         try {
             bound=context.bindService(new Intent(context,GameHostService.class),connection,Context.BIND_AUTO_CREATE);
-            if(!bound)finish("Memory service binding rejected");else main.postDelayed(timeout,8000);
+            if(!bound)finish("Launch Bedrock from Client Base first (cold :game_host service bind is currently blocked by Android; Launch wakes :game_host automatically).");
+            else main.postDelayed(timeout,8000);
         }catch(Exception error){finish("Memory connection unavailable: "+error.getMessage());}
     }
     private void finish(String result){if(done)return;Consumer<String> target=callback;cancel();if(target!=null)target.accept(result);}

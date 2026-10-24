@@ -33,8 +33,16 @@ public final class HostComponentFactory extends AppComponentFactory {
                     || !ClientBaseApplication.current().getPackageName().equals(intent.getComponent().getPackageName())) {
                 throw new SecurityException("Expected exact private host component");
             }
-            if (game) return GameActivityRuntime.create(ClientBaseApplication.current());
-            if (support) return GameActivityRuntime.createSupportActivity(ClientBaseApplication.current(), name);
+            if (game) {
+                Activity created = GameActivityRuntime.create(ClientBaseApplication.current());
+                if (created instanceof AbortedSessionActivity) intent.replaceExtras((android.os.Bundle) null);
+                return created;
+            }
+            if (support) {
+                Activity created = GameActivityRuntime.createSupportActivity(ClientBaseApplication.current(), name);
+                if (created instanceof AbortedSessionActivity) intent.replaceExtras((android.os.Bundle) null);
+                return created;
+            }
             return FrameworkActivityRuntime.create(ClientBaseApplication.current());
         } catch (Exception | LinkageError error) {
             InstantiationException blocked = new InstantiationException("Guest Activity creation blocked: " + error);

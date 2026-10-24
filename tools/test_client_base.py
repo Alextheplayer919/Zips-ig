@@ -449,9 +449,28 @@ class ClientBaseSourceTests(unittest.TestCase):
                          'hookLocalPlayerNormalTick',
                          'resolveVerifiedGameMode',
                          'RawActorVector',
-                         'engineDelete(raw.begin)'):
+                         'engineDelete(raw.begin)',
+                         'gSessionAccessMutex',
+                         'gLocalPlayerBound'):
             self.assertIn(required, engine)
         self.assertNotIn('readField<std::size_t>(self, abi::kSenderVariantIndexOffset)', engine)
+
+    def test_quarantined_game_host_warmup_and_recreation_parcel_guards(self):
+        app = self.manifest('host').find('application')
+        warmup = app.find("activity[@" + ANDROID + "name='.GameHostWarmupActivity']")
+        self.assertIsNotNone(warmup)
+        self.assertEqual('false', warmup.get(ANDROID + 'exported'))
+        self.assertEqual(':game_host', warmup.get(ANDROID + 'process'))
+        self.assertEqual('true', warmup.get(ANDROID + 'noHistory'))
+        self.assertEqual('true', warmup.get(ANDROID + 'excludeFromRecents'))
+        controller = (BASE / 'host/src/main/java/dev/zips/clientbase/host/GameHostController.java').read_text()
+        self.assertIn('tryWarmupFallback', controller)
+        self.assertIn('releaseAutoCreateBinding()', controller)
+        self.assertNotIn('Force stop', controller)
+        factory = (BASE / 'host/src/main/java/dev/zips/clientbase/host/HostComponentFactory.java').read_text()
+        self.assertIn('intent.replaceExtras((android.os.Bundle) null)', factory)
+        live_binder = (BASE / 'host/src/main/java/dev/zips/clientbase/host/GameHostLiveBinder.java').read_text()
+        self.assertIn('linkToDeath', live_binder)
 
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):

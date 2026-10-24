@@ -24,6 +24,10 @@
             <meta-data android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar" android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar" />
         </service>
+        <activity android:name=".GameHostWarmupActivity"
+            android:process=":game_host" android:exported="false"
+            android:noHistory="true" android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity android:name=".MinecraftHostedActivity" android:process=":game_host" android:exported="false"
             android:theme="@android:style/Theme.Material.NoActionBar" android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape" android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|fontScale" android:excludeFromRecents="true">

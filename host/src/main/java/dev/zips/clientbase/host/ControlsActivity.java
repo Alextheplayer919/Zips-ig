@@ -36,7 +36,7 @@ public final class ControlsActivity extends Activity {
 
         page.addView(ClientUi.label(this, "Z I P S   /   C O N T R O L S", 13, ClientUi.ACCENT));
         page.addView(ClientUi.label(this, "Outside the game.\nConnected to the engine.", 28, ClientUi.TEXT));
-        page.addView(ClientUi.label(this, "0.6.6  ·  separate UI process  ·  internal 26.50 module bindings", 13, ClientUi.MUTED));
+        page.addView(ClientUi.label(this, "0.6.7  ·  separate UI process  ·  internal 26.50 module bindings", 13, ClientUi.MUTED));
 
         LinearLayout overlay = ClientUi.card(this);
         page.addView(overlay);

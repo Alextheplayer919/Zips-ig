@@ -26,10 +26,13 @@ using namespace clientbase::modules;
 #if defined(__aarch64__)
 
 std::mutex gLifecycleMutex;
+std::recursive_mutex gSessionAccessMutex;
 std::atomic<bool> gHooksInstalled{false};
 std::atomic<std::uintptr_t> gLoadBias{0};
 std::atomic<void*> gActiveLcnh{nullptr};
 std::atomic<void*> gActiveLocalPlayer{nullptr};
+std::atomic<bool> gLocalPlayerBound{false};
+std::atomic<bool> gGameModeBound{false};
 std::atomic<std::uint64_t> gClientNormalTicks{0};
 std::string gStatusMessage{"Module engine idle · toggle a module while Bedrock is running"};
 
@@ -373,15 +376,19 @@ void hookSendToServer(void* self, void* packet) {
     }
 
     if (isClientAuthInput) {
+        std::lock_guard<std::recursive_mutex> sessionLock(gSessionAccessMutex);
         gCoordinator.onOutboundAuthInput(gEngineBackend, authEv);
     }
 }
 
 void clearSessionPointersForDisconnect(void* lcnhMaybe) {
+    std::lock_guard<std::recursive_mutex> sessionLock(gSessionAccessMutex);
     if (lcnhMaybe == nullptr || gActiveLcnh.load(std::memory_order_acquire) == lcnhMaybe) {
         gActiveLcnh.store(nullptr, std::memory_order_release);
     }
     gActiveLocalPlayer.store(nullptr, std::memory_order_release);
+    gLocalPlayerBound.store(false, std::memory_order_release);
+    gGameModeBound.store(false, std::memory_order_release);
     gCoordinator.notifyWorldTeardown();
 }
 
@@ -437,8 +444,11 @@ void hookLcnhChangeDim(void* self, const void* netId, const void* packet) {
 }
 
 void clearLocalPlayerPointer(void* lp) {
+    std::lock_guard<std::recursive_mutex> sessionLock(gSessionAccessMutex);
     void* expected = lp;
     if (gActiveLocalPlayer.compare_exchange_strong(expected, nullptr, std::memory_order_acq_rel)) {
+        gLocalPlayerBound.store(false, std::memory_order_release);
+        gGameModeBound.store(false, std::memory_order_release);
         gCoordinator.notifyWorldTeardown();
     }
 }
@@ -463,7 +473,10 @@ void hookLocalPlayerNormalTick(void* self) {
     auto isClientSide = resolveFn<IsClientSideFn>(abi::kActorIsClientSide.fnVa);
     if (isClientSide && !isClientSide(self)) return;
 
+    std::lock_guard<std::recursive_mutex> sessionLock(gSessionAccessMutex);
     gActiveLocalPlayer.store(self, std::memory_order_release);
+    gLocalPlayerBound.store(true, std::memory_order_release);
+    gGameModeBound.store(resolveVerifiedGameMode(self, bias) != nullptr, std::memory_order_release);
     gClientNormalTicks.fetch_add(1, std::memory_order_relaxed);
     gCoordinator.onGameThreadTick(gEngineBackend);
 }
@@ -474,9 +487,14 @@ void uninstallAllPatchesLocked() {
     }
     gSlotPatchCount = 0;
     gHooksInstalled.store(false, std::memory_order_release);
-    gActiveLcnh.store(nullptr, std::memory_order_release);
-    gActiveLocalPlayer.store(nullptr, std::memory_order_release);
-    gCoordinator.disarmAll();
+    {
+        std::lock_guard<std::recursive_mutex> sessionLock(gSessionAccessMutex);
+        gActiveLcnh.store(nullptr, std::memory_order_release);
+        gActiveLocalPlayer.store(nullptr, std::memory_order_release);
+        gLocalPlayerBound.store(false, std::memory_order_release);
+        gGameModeBound.store(false, std::memory_order_release);
+        gCoordinator.disarmAll();
+    }
 }
 
 template <typename OrigFn>
@@ -592,10 +610,8 @@ bool ensureHooksInstalledLocked(const std::string& enginePath, std::string* reas
 std::string buildControlPayload(bool supported, const std::string& message) {
     const CoordinatorSnapshot s = gCoordinator.snapshot();
     const bool hooks = gHooksInstalled.load(std::memory_order_acquire);
-    const auto bias = gLoadBias.load(std::memory_order_acquire);
-    void* lp = gActiveLocalPlayer.load(std::memory_order_acquire);
-    const bool lpBound = isVerifiedLocalPlayer(lp, bias);
-    const bool gmBound = resolveVerifiedGameMode(lp, bias) != nullptr;
+    const bool lpBound = gLocalPlayerBound.load(std::memory_order_acquire);
+    const bool gmBound = gGameModeBound.load(std::memory_order_acquire);
     const auto normalTicks = gClientNormalTicks.load(std::memory_order_relaxed);
 
     std::ostringstream out;
