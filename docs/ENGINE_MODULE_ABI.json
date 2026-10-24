@@ -1,0 +1,87 @@
+{
+  "engine_sha256": "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",
+  "engine_build_id": "afa62bd3385161f1facfe36aad58ac63998f46d2",
+  "target_version": "1.26.50.4 (versionCode 972605004, Android ARM64)",
+  "method": "Static ELF64 .rodata/.rela.dyn RTTI vtable resolution + Capstone ARM64 instruction/caller disassembly on hash-verified libminecraftpe.so",
+  "dynsym_summary": {
+    "sections": 26,
+    "symtab_present": false,
+    "defined_dynamic_symbols": 90653,
+    "named_gameplay_exports": 0
+  },
+  "rtti_vtables": {
+    "20LoopbackPacketSender": { "address_point": "0x12e2f288", "typeinfo": "0x12e2f9c8" },
+    "26LegacyClientNetworkHandler": { "address_point": "0x12d248c8", "typeinfo": "0x12d25348" },
+    "8GameMode": { "address_point": "0x13016718", "typeinfo": "0x13016ad0" },
+    "12SurvivalMode": { "address_point": "0x13016848", "typeinfo": "0x13016b08" },
+    "11LocalPlayer": { "address_point": "0x12d08918", "typeinfo": "0x12d09928" },
+    "12RemotePlayer": { "address_point": "0x12d09120" },
+    "21PlayerAuthInputPacket": { "address_point": "0x12e86ab0", "typeinfo": "0x12e7fbd8" },
+    "5Level": { "address_point": "0x1305bb98" },
+    "14ClientInstance": { "address_point": "0x12bc2c80", "typeinfo": "0x12bc3c38" }
+  },
+  "hooked_relro_slots": [
+    { "owner": "LoopbackPacketSender", "slot": 5, "fn": "0xc68fd38", "role": "sendToServer(Packet&)" },
+    { "owner": "LegacyClientNetworkHandler", "slot": 0, "fn": "0xad6a638", "role": "~LegacyClientNetworkHandler() complete" },
+    { "owner": "LegacyClientNetworkHandler", "slot": 1, "fn": "0xad6aa14", "role": "~LegacyClientNetworkHandler() deleting" },
+    { "owner": "LegacyClientNetworkHandler", "slot": 19, "fn": "0xad6bca8", "role": "handle(DisconnectPacket)" },
+    { "owner": "LegacyClientNetworkHandler", "slot": 37, "fn": "0xad6d300", "role": "handle(StartGamePacket)" },
+    { "owner": "LegacyClientNetworkHandler", "slot": 47, "fn": "0xad749a0", "role": "handle(MovePlayerPacket)" },
+    { "owner": "LegacyClientNetworkHandler", "slot": 99, "fn": "0xad7c52c", "role": "handle(ChangeDimensionPacket)" },
+    { "owner": "LegacyClientNetworkHandler", "slot": 170, "fn": "0x9ed3754", "role": "handle(RespawnPacket)" },
+    { "owner": "LocalPlayer", "slot": 8, "fn": "0xaac61a0", "role": "~LocalPlayer() complete (after 8 pre-dtor Actor virtuals)" },
+    { "owner": "LocalPlayer", "slot": 9, "fn": "0xaac658c", "role": "~LocalPlayer() deleting" },
+    { "owner": "LocalPlayer", "slot": 25, "fn": "0xaac7cf8", "role": "normalTick() (live client tick; GameMode::tick has 0 callers in 1.26.50.4)" }
+  ],
+  "verified_engine_calls": {
+    "GameMode::attack(Actor&, Vec3 const&)": "vtable +0x80 (slot 16: 0xf89f570 / 0xf8a3adc; GameMode* read dynamically from [LocalPlayer + 0x9e8])",
+    "LocalPlayer::swing(ActorSwingSource, bool)": "vtable +0x370 (slot 110: 0xaaca6cc, Attack=4)",
+    "Actor::isAlive()": "vtable +0x178 (slot 47: 0xf285c14)",
+    "Actor::lerpMotion(Vec3 const&)": "vtable +0xb8 (slot 23: 0xf578d1c -> StateVectorComponent::mPosDelta at [lp+0x208]+0x18, bypassing server-auth-with-rewind ReplayStateComponent drops)",
+    "ILevel::getRuntimeEntity(ActorRuntimeID, bool)": "vtable +0x208 (0xfb3520c)",
+    "ILevel::getRuntimeActorList()": "vtable +0xa30 (0xfb3a0e8; freed via _ZdlPv PLT 0x12911250)",
+    "Actor::getRuntimeID": "0xf566b90 (non-aborting 0xfc0dbbb5 RuntimeIDComponent reader in tryReadActorRuntimeId)",
+    "Actor::getUniqueID": "0xf566e30",
+    "Actor::getPosition": "0xf563e6c (StateVectorComponent::mPos at [actor+0x208]+0x00)",
+    "Actor::canSee(Actor const&, ShapeType)": "0xf5841c0 (Collision=1)",
+    "Actor::isClientSide": "0xf56aa70",
+    "Player::getDimensionId": "0xf9e34f8"
+  },
+  "actor_and_packet_offsets": {
+    "LoopbackPacketSender::mNetworkSystemVariantIndex": "0x28 (uint32_t: 0U=ClientNetworkSystem*, 1U=ServerNetworkSystem*)",
+    "Player::mGameMode": "0x9e8",
+    "Actor::mHurtTimeMirror": "0x194 (int32_t)",
+    "Actor::mLevel": "0x1d0",
+    "Actor::mCategories": "0x200 (Player=1, Mob=2)",
+    "Actor::mStateVectorComponent": "0x208 (+0x00 mPos, +0x0c mPosPrev, +0x18 mPosDelta)",
+    "Actor::mAABBShapeComponent": "0x210 (+0x00 Vec3 min, +0x0c Vec3 max, +0x18 Vec2 dim)",
+    "Actor::mActorRotationComponent": "0x218 (+0x00 float pitch, +0x04 float yaw)",
+    "Actor::mMobHurtTimeComponent": "0x408 (+0x00 int32_t mHurtTime, 10 -> 0)",
+    "PlayerAuthInputPacket": {
+      "mRot": "0x30 (pitch +0x30, yaw +0x34)",
+      "mPos": "0x38",
+      "mMove": "0x64 (strafe +0x64, forward +0x68)",
+      "mInputData": "0x88 (Jumping=6, Sneaking=8, WantUp=16, WantDown=17)"
+    },
+    "StartGamePacket": {
+      "dimension": "0x88",
+      "mEntityId": "0x488",
+      "mRuntimeId": "0x490",
+      "mPos": "0x49c",
+      "mRot": "0x4a8"
+    },
+    "MovePlayerPacket": {
+      "mPlayerID": "0x30",
+      "mPos": "0x38",
+      "mRot": "0x44"
+    },
+    "RespawnPacket": {
+      "mPos": "0x30",
+      "mState": "0x3c"
+    },
+    "ChangeDimensionPacket": {
+      "mDimensionId": "0x2c",
+      "mPos": "0x30"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "sha256": "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",
+  "bytes": 328419680,
+  "elf_class": 64,
+  "machine": "EM_AARCH64",
+  "sonames": [
+    "libminecraftpe.so"
+  ],
+  "needed": [
+    "libGLESv2.so",
+    "libPlayFabMultiplayer.so",
+    "libEGL.so",
+    "libfmod.so",
+    "liblog.so",
+    "libHttpClient.Android.so",
+    "libmaesdk.so",
+    "libdl.so",
+    "libandroid.so",
+    "libc++_shared.so",
+    "libm.so",
+    "libc.so"
+  ],
+  "non_system_needed": [
+    "libPlayFabMultiplayer.so",
+    "libfmod.so",
+    "libHttpClient.Android.so",
+    "libmaesdk.so",
+    "libc++_shared.so"
+  ],
+  "selected_exports": {
+    "Java_com_mojang_minecraftpe_MainActivity_nativeResize": {
+      "elf_va": "0x852e228",
+      "bytes": 720
+    },
+    "Java_com_mojang_minecraftpe_MainActivity_nativeOnDestroy": {
+      "elf_va": "0x852e21c",
+      "bytes": 4
+    },
+    "JNI_OnLoad": {
+      "elf_va": "0x852e0e0",
+      "bytes": 288
+    }
+  },
+  "init_array_bytes": [
+    18624
+  ],
+  "boundary": "Static export presence is not a callable ABI or successful runtime initialization. dlopen executes constructors; our probe does not invoke JNI_OnLoad or engine entrypoints."
+}

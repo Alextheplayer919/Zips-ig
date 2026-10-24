@@ -1,0 +1,60 @@
+{
+  "evidence": "User-pasted host 0.4.2 exit diagnostic and selected tombstone, not independent device access. Installation-specific path components omitted; selected causal lines/frames retained.",
+  "probe_pid": 31985,
+  "probe_uid": 11070,
+  "version_name": "1.26.50.4",
+  "version_code": 972605004,
+  "apk_paths": 1,
+  "engine_hash_matched": true,
+  "stage": "JVM_INITIALIZATION_IN_PROGRESS",
+  "last_lookup_not_completion": "PlayFabMultiplayer",
+  "exit": {
+    "reason": "NATIVE_CRASH",
+    "reason_code": 5,
+    "status_signal": 6,
+    "timestamp_ms": 1792760944916,
+    "description": "crash",
+    "crashing_tid": 31985,
+    "signal": "SIGABRT",
+    "signal_number": 6,
+    "signal_code": -1,
+    "signal_code_name": "SI_QUEUE"
+  },
+  "abort_message_excerpt": "JNI DETECTED ERROR IN APPLICATION: JNI FindClass called with pending exception java.lang.SecurityException: ConnectivityService: Neither user 11070 nor current process has android.permission.ACCESS_NETWORK_STATE.",
+  "java_causal_frames": [
+    "android.net.IConnectivityManager$Stub$Proxy.listenForNetwork",
+    "android.net.ConnectivityManager.registerNetworkCallback",
+    "com.xbox.httpclient.NetworkObserver.Initialize (NetworkObserver.java:72)",
+    "java.lang.Runtime.nativeLoad",
+    "java.lang.System.loadLibrary",
+    "com.mojang.minecraftpe.MainActivity.<clinit> (MainActivity.java:1863)"
+  ],
+  "native_causal_frames": [
+    {
+      "index": 8,
+      "file": "libart.so",
+      "relative_pc": "0x80ceb8",
+      "function": "CheckJNI::FindClass",
+      "function_offset": 200
+    },
+    {
+      "index": 9,
+      "file": "libPlayFabMultiplayer.so",
+      "relative_pc": "0x219600",
+      "function": "AndroidJniHelper::Init",
+      "function_offset": 784,
+      "build_id": ""
+    },
+    {
+      "index": 10,
+      "file": "libPlayFabMultiplayer.so",
+      "relative_pc": "0x2190f4",
+      "function": "JNI_OnLoad",
+      "function_offset": 128,
+      "build_id": ""
+    }
+  ],
+  "limits": "Abort message was marked truncated, trace showed the configured maximum 32 frames and pasted logcat ended mid-line. Not a full tombstone or full-device log.",
+  "conclusion": "Host ACCESS_NETWORK_STATE permission was missing. The pending SecurityException during Xbox network-observer setup was followed by a JNI FindClass call in PlayFab initialization; ART CheckJNI aborted.",
+  "not_proven": "No completed Minecraft engine JNI initialization, original Activity/lifecycle or title screen. Removing this permission failure does not prove later bootstrap succeeds."
+}

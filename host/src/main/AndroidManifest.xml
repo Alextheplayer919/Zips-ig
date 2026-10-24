@@ -1,0 +1,69 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Original Xbox HTTP initialization listens for connectivity under the host UID. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Real Activity startup configures networked SDKs under OUR UID, not the game's. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Optional, user-authorized external overlay; foreground lifecycle and visible Stop controls. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <queries>
+        <package android:name="dev.zips.clientbase.guest" />
+        <package android:name="com.mojang.minecraftpe" />
+    </queries>
+    <application android:name=".ClientBaseApplication" android:appComponentFactory=".HostComponentFactory" android:label="Client Base" android:allowBackup="false"
+        android:extractNativeLibs="true" android:supportsRtl="true" android:theme="@style/AppTheme">
+        <service android:name=".EngineProbeService" android:process=":engine_probe" android:exported="false" />
+        <service android:name=".OverlayService" android:exported="false" android:stopWithTask="true" />
+        <service android:name=".GameHostService" android:process=":game_host" android:exported="false" />
+        <!-- Original SDK discovery uses ComponentName(host package, this SDK class).
+             Metadata only in normal startup; any framework creation is strictly factory-gated. -->
+        <service android:name="com.google.firebase.components.ComponentDiscoveryService"
+            android:process=":game_host" android:exported="false" android:directBootAware="true">
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar" android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar" android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar" />
+        </service>
+        <activity android:name=".GameHostWarmupActivity"
+            android:process=":game_host" android:exported="false"
+            android:noHistory="true" android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity android:name=".MinecraftHostedActivity" android:process=":game_host" android:exported="false"
+            android:theme="@android:style/Theme.Material.NoActionBar" android:launchMode="singleTask"
+            android:screenOrientation="sensorLandscape" android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|fontScale" android:excludeFromRecents="true">
+            <meta-data android:name="android.app.lib_name" android:value="minecraftpe" />
+        </activity>
+        <!-- Private, non-exported :game_host support Activities for XAL in-process sign-in and Play Games resolution. -->
+        <activity android:name="com.microsoft.xal.browser.BrowserLaunchActivity"
+            android:process=":game_host" android:exported="false"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar"
+            android:configChanges="keyboard|keyboardHidden|orientation|uiMode|screenSize|smallestScreenSize"
+            android:excludeFromRecents="true" />
+        <activity android:name="com.microsoft.xal.browser.WebKitWebViewController"
+            android:process=":game_host" android:exported="false"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="keyboard|keyboardHidden|orientation|uiMode|screenSize|smallestScreenSize"
+            android:excludeFromRecents="true" />
+        <activity android:name="com.google.android.gms.games.internal.v2.resolution.GamesResolutionActivity"
+            android:process=":game_host" android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true" />
+        <activity android:name="com.google.android.gms.common.api.GoogleApiActivity"
+            android:process=":game_host" android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true" />
+        <!-- Developer fixture only; no exported/arbitrary guest launch or Minecraft launch. -->
+        <activity android:name=".HostedGuestPlaceholderActivity" android:exported="false"
+            android:theme="@android:style/Theme.Material.NoActionBar" android:excludeFromRecents="true" />
+        <activity android:name=".ControlsActivity" android:exported="false"
+            android:label="Zips Controls" android:taskAffinity="dev.zips.clientbase.host.controls"
+            android:launchMode="singleTask" android:resizeableActivity="true" />
+        <activity android:name=".MainActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

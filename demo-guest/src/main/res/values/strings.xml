@@ -1,0 +1,3 @@
+<resources>
+    <string name="guest_banner">Guest resource loaded from the separate demo APK.</string>
+</resources>

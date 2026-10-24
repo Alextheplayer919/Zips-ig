@@ -1,0 +1,40 @@
+{
+  "melody": {
+    "repository": "Alextheplayer919/Zips-ig",
+    "ref": "main (observed input only, not session branch)",
+    "file": "Melody-1.20.51.zip",
+    "git_blob": "4511c4aef8a7022075950ecdee4b0006e5bd7ae4",
+    "bytes": 2791070,
+    "sha256": "704ffe2d571aba6791f5cfab70228bdb0996a1a9aebb282184ef0c9c25229daf",
+    "license": "MIT, copyright (c) 2024 tonytranrp",
+    "sources": {
+      "Killaura.h": {
+        "sha256": "1db6390414b1544d8d6af257086a74a57dd8558522d0a43cf55114f96a7fec69",
+        "bytes": 758
+      },
+      "Killaura.cpp": {
+        "sha256": "1417edbf717668462e7049129189af77e3555489b32e0030a833bb38ea2d62e4",
+        "bytes": 9292
+      }
+    }
+  },
+  "fly": {
+    "attachment": "MotionFly.kt (1).txt",
+    "sha256": "aa51460ab146afc7f2d792084754fcb3e07eb556fa322cb21dd4661b671d1e99",
+    "bytes": 6298,
+    "scope_update": "User explicitly removed CollisionGuard and MovementCompliance; direct movement output without collision/adaptive governor"
+  },
+  "target": {
+    "platform": "Android ARM64",
+    "host_version": "0.6.2 (unchanged; ports not wired)",
+    "minecraft": "26.50 / 1.26.50.4 / 972605004",
+    "engine_build_id": "afa62bd3385161f1facfe36aad58ac63998f46d2"
+  },
+  "status": "Portable logic ports and host-native tests only; no native engine adapter or proxy transport connected",
+  "entity_tracker": {
+    "attachment": "EntityTracker.kt (1).txt",
+    "sha256": "d16da8a2b197ce6597d8186711e3bcd43dd5668021327bf4772e1dc7088020c7",
+    "bytes": 40665,
+    "adapted_subset": "self runtime/unique ID, raw position/rotation, StartGame/AuthInput/MovePlayer/respawn/dimension lifecycle; no account/inventory/agent dependencies"
+  }
+}

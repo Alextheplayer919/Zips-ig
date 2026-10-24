@@ -1,0 +1,50 @@
+{
+  "evidence": "Selected normalized user-pasted phone Activity/exit report, not independent device capture. Earlier attachment was empty. Random install paths, device identifier, SDK configuration/API-key values and session identifiers omitted.",
+  "associated_delivery": "Host 0.5.0, by conversation context; pasted excerpt does not print a host version/build identifier.",
+  "pid": 17899,
+  "uid": 11075,
+  "process": "dev.zips.clientbase.host:game_host",
+  "reported_sdk_version": 33,
+  "passed": [
+    "Supplied manifest, five DEX files and resource table pinned bytes verified",
+    "Selected installed engine fingerprint verified",
+    "Reviewed MainActivity and GameActivity initializer gates",
+    "Game environment preparation and framework launch readiness",
+    "Original class initialization/construction and Activity attachment (later onCreate is evidenced)",
+    "Original MainActivity onCreate returned"
+  ],
+  "engine_log_evidence": [
+    "Minecraft: Entering JNI_OnLoad [transient address omitted]",
+    "Minecraft: JNI_OnLoad completed",
+    "GameActivity: GameActivity_register",
+    "GameActivity: SDK version: 33",
+    "Minecraft: android_main starting. internalDataPath and externalDataPath point into the host's own storage"
+  ],
+  "last_stage": "ORIGINAL_ON_CREATE_RETURNED (not title screen)",
+  "exit": {
+    "reason": "JAVA_CRASH",
+    "reason_code": 4,
+    "status": 0,
+    "timestamp_ms": 1792768598301,
+    "cleanup_note": "none"
+  },
+  "fatal_exception": "java.lang.IllegalAccessError: Illegal class access: 'dev.zips.clientbase.host.MinecraftHostedActivity' attempting to access 'dev.zips.clientbase.host.MinecraftHostedActivity$1'",
+  "selected_fatal_frames": [
+    "dev.zips.clientbase.host.MinecraftHostedActivity.observeSurfaces:42",
+    "dev.zips.clientbase.host.MinecraftHostedActivity.observeSurfaces:50 (recursive traversal)",
+    "dev.zips.clientbase.host.MinecraftHostedActivity.onCreate:37",
+    "android.app.Activity.performCreate"
+  ],
+  "other_observations_not_the_fatal_stack": [
+    "AppCompat getActivityInfo lookup for host package / MinecraftHostedActivity failed because only a differently named placeholder component was declared",
+    "SwappyDisplayManager's InMemoryDexClassLoader could not find libminecraftpe.so; potential separate follow-up requirement",
+    "Unsupported custom-loader, GC and vendor-property warnings were also logged"
+  ],
+  "cause": "Our child-defined wrapper attempted to construct its package-private anonymous callback from the parent loader. Same textual Java package is not the same runtime package across loaders. The passive host observer crashed after the original onCreate returned.",
+  "not_proven": [
+    "Completed start/resume and rendering Surface lifecycle",
+    "Visible rendered game output or title screen",
+    "All SDK/provider/package/Swappy requirements resolved",
+    "Separately instrumented engine JNI callback return value or call count"
+  ]
+}

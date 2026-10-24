@@ -1,0 +1,140 @@
+{
+  "library_sha256": "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",
+  "method": "Static disassembly only; addresses are ELF VAs, not process addresses.",
+  "jni_onload": {
+    "elf_va": "0x852e0e0",
+    "bytes": 288,
+    "calls": [
+      {
+        "site": "0x852e100",
+        "target": "0x12911220",
+        "name": "pthread_self"
+      },
+      {
+        "site": "0x852e11c",
+        "target": "0x12911210",
+        "name": "__android_log_print"
+      },
+      {
+        "site": "0x852e124",
+        "target": "0x1290dcf4",
+        "name": "internal@0x1290dcf4"
+      },
+      {
+        "site": "0x852e12c",
+        "target": "0x128db910",
+        "name": "internal@0x128db910"
+      },
+      {
+        "site": "0x852e158",
+        "target": "0x12911230",
+        "name": "sigaction"
+      },
+      {
+        "site": "0x852e160",
+        "target": "0x128db3f8",
+        "name": "internal@0x128db3f8"
+      },
+      {
+        "site": "0x852e170",
+        "target": "0x128db5b0",
+        "name": "internal@0x128db5b0"
+      },
+      {
+        "site": "0x852e198",
+        "target": "0x12911210",
+        "name": "__android_log_print"
+      },
+      {
+        "site": "0x852e1b4",
+        "target": "0x12911210",
+        "name": "__android_log_print"
+      },
+      {
+        "site": "0x852e1e4",
+        "target": "0x12911240",
+        "name": "perror"
+      },
+      {
+        "site": "0x852e1fc",
+        "target": "0x1291d400",
+        "name": "__stack_chk_fail"
+      }
+    ]
+  },
+  "literal_references": {
+    "anchor_class": {
+      "elf_va": "0x23b2ac1",
+      "value": "com/mojang/minecraftpe/MainActivity"
+    },
+    "class_loader_class": {
+      "elf_va": "0x2674f04",
+      "value": "java/lang/ClassLoader"
+    },
+    "get_class_loader": {
+      "elf_va": "0x26e39cb",
+      "value": "getClassLoader"
+    },
+    "get_class_loader_signature": {
+      "elf_va": "0x2629b29",
+      "value": "()Ljava/lang/ClassLoader;"
+    },
+    "load_class": {
+      "elf_va": "0x23a9ac0",
+      "value": "findClass"
+    },
+    "load_class_signature": {
+      "elf_va": "0x2366f3c",
+      "value": "(Ljava/lang/String;)Ljava/lang/Class;"
+    },
+    "failure_log": {
+      "elf_va": "0x2424a6e",
+      "value": "Failed to initialize JavaClassLoader"
+    }
+  },
+  "audited_windows": [
+    {
+      "role": "JNI_OnLoad",
+      "elf_va": "0x852e0e0",
+      "bytes": 288,
+      "sha256": "cf723b8febfbbabd6185ec5bdd01baa4aa3f3b0f51f288fc6ab2f5b147b981bb"
+    },
+    {
+      "role": "class-loader helper including cleanup",
+      "elf_va": "0x128db5b0",
+      "bytes": 840,
+      "sha256": "eda8ad99f086e15b59d167351f1812274271e5716752d01cd04ae06bf7ed120e"
+    },
+    {
+      "role": "store JavaVM",
+      "elf_va": "0x128db910",
+      "bytes": 12,
+      "sha256": "7125af6c027005dad1deffc99bdfad0b83612963ed4b31f359541427bf2f1f45"
+    },
+    {
+      "role": "signal handler",
+      "elf_va": "0x852e200",
+      "bytes": 4,
+      "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91"
+    }
+  ],
+  "manual_interpretation": {
+    "success_jni_version": "0x00010004 (JNI_VERSION_1_4)",
+    "class_loader_failure_return": 0,
+    "sigaction_failure_return": 1,
+    "signal": "sigaction(15/SIGTERM, flags=4/SA_SIGINFO, handler=0x852e200/RET)",
+    "class_loader_helper": [
+      "JavaVM GetEnv(1.4), AttachCurrentThread fallback",
+      "PushLocalFrame(128)",
+      "FindClass(anchor_class)",
+      "GetObjectClass(anchor jclass)",
+      "FindClass(java/lang/ClassLoader)",
+      "GetMethodID(getClassLoader)",
+      "CallObjectMethod(anchor jclass)",
+      "NewGlobalRef(loader)",
+      "GetMethodID(loadClass)",
+      "PopLocalFrame and exception diagnostics"
+    ],
+    "not_proven": "Actual installed Java initializer, reachable initializers, JNI execution, native binding or game startup"
+  }
+}

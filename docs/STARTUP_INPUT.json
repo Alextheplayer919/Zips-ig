@@ -1,0 +1,171 @@
+{
+  "source": "User-directed GitHub input; downloaded from origin/main without merging main or importing legacy files. Static archive audit, not a device launch or APK-signature verification.",
+  "archive": {
+    "repository": "Alextheplayer919/Zips-ig",
+    "path": "dexes.7z",
+    "git_blob": "c402a77d42600d3db046bed81517725077bb2b8c",
+    "bytes": 5913382,
+    "sha256": "44e99c0a0f06bc662ff8f6654dc4124db7a6164b06e6ccbe94a7e4aa50c9f594"
+  },
+  "files": [
+    {
+      "name": "AndroidManifest.xml",
+      "bytes": 27172,
+      "sha256": "d8039a55d0f5ee203f6b7273844213c94ae13de3b073d8f66df43e9dcd132fe5"
+    },
+    {
+      "name": "classes.dex",
+      "bytes": 6905400,
+      "sha256": "581a41725aa431887a5bfae23bb72afa7f80d9f97de89b187d59209a8cf35e94",
+      "crc32": 3054764795,
+      "header_file_size_matches": true,
+      "adler32_matches": true,
+      "header_sha1_matches": true
+    },
+    {
+      "name": "classes2.dex",
+      "bytes": 1655112,
+      "sha256": "2eca7cbd75a8b250ae9744e29a7f69534c26ec2f0671e1f0b49449abb50a15dc",
+      "crc32": 3014425259,
+      "header_file_size_matches": true,
+      "adler32_matches": true,
+      "header_sha1_matches": false
+    },
+    {
+      "name": "classes3.dex",
+      "bytes": 9336804,
+      "sha256": "31d0ab885d2e1a166d2e717d78b403397eb30fcb6ec186a6399c9970173e126a",
+      "crc32": 1326635678,
+      "header_file_size_matches": true,
+      "adler32_matches": true,
+      "header_sha1_matches": true
+    },
+    {
+      "name": "classes4.dex",
+      "bytes": 1802892,
+      "sha256": "11b43dbe9299bb7fae22e574af65764b686e6a734ffdb8fa638056c211cfe1fe",
+      "crc32": 1523599507,
+      "header_file_size_matches": true,
+      "adler32_matches": true,
+      "header_sha1_matches": false
+    },
+    {
+      "name": "classes5.dex",
+      "bytes": 36436,
+      "sha256": "4198dbbbf4700fb2274c84d2a98d14c974acafcaaa4552abc924106b62ff9531",
+      "crc32": 4263076049,
+      "header_file_size_matches": true,
+      "adler32_matches": true,
+      "header_sha1_matches": true
+    },
+    {
+      "name": "resources.arsc",
+      "bytes": 277104,
+      "sha256": "ef308a4464555dcd7e0acaf0e4c6cfec6b5ee371358f4b6f4374668c252d2363"
+    }
+  ],
+  "manifest": {
+    "identity": {
+      "versionCode": "972605004",
+      "versionName": "1.26.50.4",
+      "installLocation": "2",
+      "compileSdkVersion": "36",
+      "compileSdkVersionCodename": "16",
+      "package": "com.mojang.minecraftpe",
+      "platformBuildVersionCode": "36",
+      "platformBuildVersionName": "16"
+    },
+    "sdk": {
+      "minSdkVersion": "29",
+      "targetSdkVersion": "36"
+    },
+    "application": {
+      "label": "@7F0D00D2",
+      "icon": "@7F0700A4",
+      "name": "android.app.Application",
+      "extractNativeLibs": "true",
+      "networkSecurityConfig": "@7F100003",
+      "appCategory": "0",
+      "appComponentFactory": "androidx.core.app.CoreComponentFactory",
+      "hasFragileUserData": "true",
+      "requestLegacyExternalStorage": "true",
+      "preserveLegacyExternalStorage": "true"
+    },
+    "main_activity": {
+      "theme": "@7F0E0007",
+      "label": "@7F0D00D4",
+      "name": "com.mojang.minecraftpe.MainActivity",
+      "exported": "true",
+      "excludeFromRecents": "false",
+      "launchMode": "2",
+      "screenOrientation": "6",
+      "configChanges": "0x40001FFF",
+      "alwaysRetainTaskState": "true",
+      "enableOnBackInvokedCallback": "false"
+    },
+    "main_activity_metadata": [
+      {
+        "name": "android.app.lib_name",
+        "value": "minecraftpe"
+      }
+    ],
+    "providers": [
+      {
+        "attributes": {
+          "name": "androidx.core.content.FileProvider",
+          "exported": "false",
+          "authorities": "com.mojang.minecraftpe.fileprovider",
+          "grantUriPermissions": "true"
+        },
+        "metadata": [
+          {
+            "name": "android.support.FILE_PROVIDER_PATHS",
+            "resource": "@7F100001"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "name": "com.google.android.gms.games.provider.PlayGamesInitProvider",
+          "exported": "false",
+          "authorities": "com.mojang.minecraftpe.playgamesinitprovider",
+          "initOrder": "99"
+        },
+        "metadata": []
+      },
+      {
+        "attributes": {
+          "name": "com.google.firebase.provider.FirebaseInitProvider",
+          "exported": "false",
+          "authorities": "com.mojang.minecraftpe.firebaseinitprovider",
+          "initOrder": "100",
+          "directBootAware": "true"
+        },
+        "metadata": []
+      },
+      {
+        "attributes": {
+          "name": "androidx.startup.InitializationProvider",
+          "exported": "false",
+          "authorities": "com.mojang.minecraftpe.androidx-startup"
+        },
+        "metadata": [
+          {
+            "name": "androidx.emoji2.text.EmojiCompatInitializer",
+            "value": "androidx.startup"
+          },
+          {
+            "name": "androidx.lifecycle.ProcessLifecycleInitializer",
+            "value": "androidx.startup"
+          },
+          {
+            "name": "androidx.profileinstaller.ProfileInstallerInitializer",
+            "value": "androidx.startup"
+          }
+        ]
+      }
+    ]
+  },
+  "phone_cross_check": "classes2.dex size/CRC32 match reported GameActivity DEX; classes3.dex size/CRC32 match reported MainActivity DEX. This is a partial identity cross-check, not cryptographic authentication of all Java code.",
+  "integrity_caveat": "All five DEX declared file sizes and Adler-32 checks agree. Stored header SHA-1 differs from recomputation for classes2.dex and classes4.dex. Preserve supplied bytes; do not silently repair or infer why. The archive has no APK signing block/certificate, so it cannot establish original APK signature authenticity."
+}
