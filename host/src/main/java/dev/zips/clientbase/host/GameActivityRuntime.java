@@ -54,6 +54,7 @@ final class GameActivityRuntime {
         if (!BedrockActivityPolicy.GAME.equals(resourceOnly.getResources().getResourcePackageName(activity.getThemeResource()))) throw new IOException("Theme belongs to unexpected resource package");
         resources = resourceOnly; theme = activity.getThemeResource(); progress = report;
         ClientBaseApplication.current().installGameResources(resourceOnly, candidate.loader);
+        GameSupportActivities.installLifecycleSupport(ClientBaseApplication.current(), candidate.loader);
         prepared = candidate;
         report.accept("GAME_ENVIRONMENT_PREPARED\nExact supplied startup bytes and engine matched. Original providers are NOT installed; later SDK failures remain possible.");
     }
@@ -92,9 +93,34 @@ final class GameActivityRuntime {
                 ? "ENGINE IDENTITY VERIFIED (in-memory build ID)\n" : "ENGINE IDENTITY NOT CONFIRMED — no offsets may be used\n")
                 + snapshot + "\nStartup file SHA-256 pin: " + EngineInput.LIBRARY_SHA;
     }
+    static Activity createSupportActivity(Context context, String className) throws Exception {
+        requireGameProcess(context);
+        if (!GameSupportActivities.isSupported(className)) {
+            throw new SecurityException("Unsupported game support Activity: " + className);
+        }
+        MinecraftBootstrap.Prepared session = prepared;
+        if (session == null || !created) {
+            return new AbortedSessionActivity();
+        }
+        ClassLoader previous = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(session.loader);
+        try {
+            Class<?> type = Class.forName(className, true, session.loader);
+            if (type.getClassLoader() != session.loader || !Activity.class.isAssignableFrom(type)) {
+                throw new IOException("Unexpected support Activity loader identity: " + className);
+            }
+            if (progress != null) progress.accept("GAME_SUPPORT_ACTIVITY_CREATED: " + className);
+            return (Activity) type.getDeclaredConstructor().newInstance();
+        } finally {
+            Thread.currentThread().setContextClassLoader(previous);
+        }
+    }
     static Activity create(Context context) throws Exception {
         requireGameProcess(context);
-        if (prepared == null || created) throw new IOException("No fresh prepared game session (no automatic relaunch/recreation)");
+        if (prepared == null || created) {
+            // Finish cleanly instead of crashing :game_host on framework auto-recreation after an exit.
+            return new AbortedSessionActivity();
+        }
         created = true;
         ClassLoader previous = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(prepared.loader);

@@ -406,6 +406,28 @@ class ClientBaseSourceTests(unittest.TestCase):
                            check=True, timeout=30)
             subprocess.run([binary], check=True, timeout=10)
 
+    def test_game_support_activities_and_unprepared_recreation_guard(self):
+        app = self.manifest('host').find('application')
+        expected = {
+            'com.microsoft.xal.browser.BrowserLaunchActivity',
+            'com.microsoft.xal.browser.WebKitWebViewController',
+            'com.google.android.gms.games.internal.v2.resolution.GamesResolutionActivity',
+            'com.google.android.gms.common.api.GoogleApiActivity',
+        }
+        for name in expected:
+            activity = app.find("activity[@" + ANDROID + "name='" + name + "']")
+            self.assertIsNotNone(activity, name)
+            self.assertEqual('false', activity.get(ANDROID + 'exported'))
+            self.assertEqual(':game_host', activity.get(ANDROID + 'process'))
+        webview = app.find("activity[@" + ANDROID + "name='com.microsoft.xal.browser.WebKitWebViewController']")
+        self.assertIsNone(webview.get(ANDROID + 'launchMode'))
+        runtime = (BASE / 'host/src/main/java/dev/zips/clientbase/host/GameActivityRuntime.java').read_text()
+        self.assertIn('return new AbortedSessionActivity();', runtime)
+        self.assertIn('GameSupportActivities.installLifecycleSupport(', runtime)
+        aborted = (BASE / 'host/src/main/java/dev/zips/clientbase/host/AbortedSessionActivity.java').read_text()
+        self.assertIn('super.onCreate(null);', aborted)
+        self.assertIn('finish();', aborted)
+
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:

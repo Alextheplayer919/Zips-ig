@@ -29,6 +29,26 @@
             android:screenOrientation="sensorLandscape" android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|fontScale" android:excludeFromRecents="true">
             <meta-data android:name="android.app.lib_name" android:value="minecraftpe" />
         </activity>
+        <!-- Private, non-exported :game_host support Activities for XAL in-process sign-in and Play Games resolution. -->
+        <activity android:name="com.microsoft.xal.browser.BrowserLaunchActivity"
+            android:process=":game_host" android:exported="false"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar"
+            android:configChanges="keyboard|keyboardHidden|orientation|uiMode|screenSize|smallestScreenSize"
+            android:excludeFromRecents="true" />
+        <activity android:name="com.microsoft.xal.browser.WebKitWebViewController"
+            android:process=":game_host" android:exported="false"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="keyboard|keyboardHidden|orientation|uiMode|screenSize|smallestScreenSize"
+            android:excludeFromRecents="true" />
+        <activity android:name="com.google.android.gms.games.internal.v2.resolution.GamesResolutionActivity"
+            android:process=":game_host" android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true" />
+        <activity android:name="com.google.android.gms.common.api.GoogleApiActivity"
+            android:process=":game_host" android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true" />
         <!-- Developer fixture only; no exported/arbitrary guest launch or Minecraft launch. -->
         <activity android:name=".HostedGuestPlaceholderActivity" android:exported="false"
             android:theme="@android:style/Theme.Material.NoActionBar" android:excludeFromRecents="true" />

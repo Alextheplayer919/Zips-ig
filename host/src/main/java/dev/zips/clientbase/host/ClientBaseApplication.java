@@ -17,7 +17,15 @@ public final class ClientBaseApplication extends Application {
     @Override public android.content.res.AssetManager getAssets() { return getResources().getAssets(); }
     @Override public ClassLoader getClassLoader() { return gameLoader == null ? super.getClassLoader() : gameLoader; }
 
-    @Override public void onCreate() { super.onCreate(); instance = this; }
+    @Override public void onCreate() {
+        super.onCreate();
+        instance = this;
+        String process = getProcessName();
+        if (process != null && process.endsWith(":game_host")) {
+            try { android.webkit.WebView.setDataDirectorySuffix("game_host"); }
+            catch (IllegalStateException ignored) {}
+        }
+    }
     static ClientBaseApplication current() {
         if (instance == null) throw new IllegalStateException("Host Application is not ready");
         return instance;

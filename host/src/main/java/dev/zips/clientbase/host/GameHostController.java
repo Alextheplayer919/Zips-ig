@@ -67,7 +67,7 @@ public final class GameHostController {
         try {
             connection = connectionFor(generation);
             bound = app.bindService(new Intent(app, GameHostService.class), connection, Context.BIND_AUTO_CREATE);
-            if (!bound) show("Game service binding rejected");
+            if (!bound) show("Game service binding rejected: Android quarantined :game_host after repeated crashes. Open Android Settings -> Apps -> Client Base -> Force stop, then Launch again.");
             else MAIN.postDelayed(TIMEOUT, 180000);
         } catch (Exception e) { bound = false; show("Game service binding failed: " + e); }
     }

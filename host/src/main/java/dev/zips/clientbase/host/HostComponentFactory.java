@@ -23,7 +23,8 @@ public final class HostComponentFactory extends AppComponentFactory {
     @Override public Activity instantiateActivity(ClassLoader loader, String name, Intent intent)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         boolean game = GameActivityRuntime.WRAPPER.equals(name);
-        if (!game && !HostedGuestPlaceholderActivity.class.getName().equals(name)) {
+        boolean support = GameSupportActivities.isSupported(name);
+        if (!game && !support && !HostedGuestPlaceholderActivity.class.getName().equals(name)) {
             return super.instantiateActivity(loader, name, intent);
         }
         try {
@@ -32,8 +33,9 @@ public final class HostComponentFactory extends AppComponentFactory {
                     || !ClientBaseApplication.current().getPackageName().equals(intent.getComponent().getPackageName())) {
                 throw new SecurityException("Expected exact private host component");
             }
-            return game ? GameActivityRuntime.create(ClientBaseApplication.current())
-                    : FrameworkActivityRuntime.create(ClientBaseApplication.current());
+            if (game) return GameActivityRuntime.create(ClientBaseApplication.current());
+            if (support) return GameActivityRuntime.createSupportActivity(ClientBaseApplication.current(), name);
+            return FrameworkActivityRuntime.create(ClientBaseApplication.current());
         } catch (Exception | LinkageError error) {
             InstantiationException blocked = new InstantiationException("Guest Activity creation blocked: " + error);
             blocked.initCause(error);
