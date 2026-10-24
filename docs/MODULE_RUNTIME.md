@@ -1,6 +1,16 @@
-# 0.6.6 internal live module engine — MotionFly & KillAura
+# 0.6.7 internal live module engine & `:game_host` quarantine recovery
 
-Following the user's choice of **in-process internal handling** inside the hosted game (covering both local single-player worlds and remote multiplayer servers without an external proxy), `0.6.4`–`0.6.6` (`versionCode 19`) implement concrete ARM64 `1.26.50.4` bindings, a thread-safe coordinator, dedicated module IPC, and backend-acknowledged overlay toggles.
+Following the user's choice of **in-process internal handling** inside the hosted game (covering both local single-player worlds and remote multiplayer servers without an external proxy), `0.6.4`–`0.6.7` (`versionCode 20`) implement concrete ARM64 `1.26.50.4` bindings, a thread-safe coordinator, dedicated module IPC, backend-acknowledged overlay toggles, and automatic recovery from Android 13 `:game_host` service-binding quarantine.
+
+## `:game_host` quarantine fix in 0.6.7 (`Game service binding rejected ... Even when i force stop`)
+
+On Android 13, if `:game_host` crashed twice within `60s` (`ProcessList.MIN_CRASH_INTERVAL`), `AppErrors.mBadProcesses` stored `("dev.zips.clientbase.host:game_host", uid)`. Both **Settings -> Apps -> Client Base -> Force stop** and same-UID APK updates invoke `AppErrors.clearBadProcess(ApplicationInfo)`, which executes `mBadProcesses.remove(info.processName, info.uid)`—clearing only the default UI process `"dev.zips.clientbase.host"` and leaving `:game_host` permanently rejected on cold `Context.bindService` calls until phone reboot.
+
+`0.6.7` resolves both the lockout and underlying crash/restart triggers:
+
+1. **Activity-backed warmup + live `IBinder` handoff (`GameHostWarmupActivity`, `GameHostLiveBinder`, `GameHostService`):** When cold `bindService(GameHostService)` returns `false`, `GameHostController` starts private non-exported `GameHostWarmupActivity` (`android:process=":game_host"`, `noHistory="true"`). Because Android's `ActivityTaskSupervisor` spawns Activities without checking `mBadProcesses`, `:game_host` starts cleanly, hands back `GameHostService.sharedBinder` via a final boot-classloader `android.os.Messenger`, and shares that live `IBinder` (`linkToDeath`) with `GameHostController`, `ModuleClient` (overlay), and `MemoryClient` (`Controls`) without requiring a phone reboot or clearing Xbox XAL sign-in data.
+2. **No lingering `BIND_AUTO_CREATE` auto-restart hazard:** Once `MinecraftHostedActivity` reaches `ORIGINAL_ON_RESUME_RETURNED`, `GameHostController` releases its `BIND_AUTO_CREATE` `ServiceConnection` while tracking exit via `IBinder.linkToDeath`, preventing `ActiveServices` from auto-restarting `:game_host` in the background after game exit.
+3. **Guest-extra recreation & teardown hardening:** `HostComponentFactory` clears `intent.replaceExtras(null)` whenever unprepared task recreation returns `AbortedSessionActivity` (preventing Android 13 `prepareToEnterProcess` `BadParcelableException` on guest-DEX extras like XAL's `ShowUrlType`), and `native_module_engine.cpp` guards `LocalPlayer` session access with `gSessionAccessMutex` + atomic bound flags so background `QUERY` threads never dereference `LocalPlayer*` across world teardown.
 
 ## Root causes resolved in 0.6.6 (after 0.6.5 phone multiplayer test)
 
@@ -39,9 +49,9 @@ On `0.6.5`, Xbox sign-in (`XAL`) and joining a multiplayer anarchy server succee
    - Dedicated `ModuleProtocol` opcodes (`6..8`) keep `MemoryProtocol` opcode `2` strictly read-only and never auto-launch or prepare Minecraft.
    - `OverlayWindow` exposes interactive **MotionFly** (`Movement`) and **KillAura** (`Combat`, with `Mobs` / `Multi` / `Hurt` option chips) buttons whose state (`OFF`, `ARMED`, `ON`) comes strictly from `:game_host` replies—never optimistic local flips. `Visual` and `Misc` remain empty; diagnostic counters (`Client normalTicks observed`, `AuthInput`, `MotionSet`, `Attacks`) and `Disarm native hooks` stay in `ControlsActivity`.
 
-## Validated 0.6.6 build artifact
+## Validated 0.6.7 build artifact
 
-- [Android 13 CI run 40072020558](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40072020558) **passed** (job `120807604730`, `6m20s`, app/test commit `1eacdb9908b5eb6a67af3fd1215a30f73f244e7a`, host **0.6.6 / versionCode 19**, **68 Android 13 x86_64 cases** + **36 local source/native tests**).
-- [Download host 0.6.6 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40072020558/artifacts/12551369283): **client-base-debug-113** (`6,368,120 bytes`). Install only **`client-base-host-debug.apk`**.
-- [Device test reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40072020558/artifacts/12551524199): **client-base-device-tests-113** (`435,905 bytes`).
-- Note: CI executes on an x86_64 Android 13 emulator without proprietary ARM64 Minecraft; in-world flight and native combat behavior require testing on your ARM64 Android 13 phone with Minecraft `1.26.50.4`. Keep 0.6.5 (`12549893036`) and 0.6.2 (`12522700433`) available as rollback references.
+- [Android 13 CI run 40080829658](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40080829658) **passed** (job `120834145209`, `6m08s`, app/test commit `f6c85b5`, host **0.6.7 / versionCode 20**, **69 Android 13 x86_64 cases** + **37 local source/native tests**).
+- [Download host 0.6.7 APK ZIP](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40080829658/artifacts/12555465903): **client-base-debug-118** (`6,374,300 bytes`). Install only **`client-base-host-debug.apk`**.
+- [Device test reports](https://github.com/Alextheplayer919/Zips-ig/actions/runs/40080829658/artifacts/12555615919): **client-base-device-tests-118** (`387,014 bytes`).
+- Note: CI executes on an x86_64 Android 13 emulator without proprietary ARM64 Minecraft; in-world flight and native combat behavior require testing on your ARM64 Android 13 phone with Minecraft `1.26.50.4`. Keep 0.6.6 (`12551369283`) and 0.6.2 (`12522700433`) available as rollback references.
