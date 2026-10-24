@@ -11,6 +11,7 @@ import android.os.Parcel;
 import android.os.SystemClock;
 import android.widget.FrameLayout;
 import android.webkit.WebView;
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import java.io.Serializable;
@@ -121,20 +122,23 @@ public final class GameSupportActivitiesTest {
         Class<?> enumType = Class.forName("dev.zips.clientbase.guest.GuestAuthExtraFixture", true, guestLoader);
         Serializable guestOnlyExtra = (Serializable) enumType.getField("NORMAL").get(null);
 
-        // Simulate Android recreating :game_host Activities twice without a prepared session,
-        // including guest-DEX extras (like XAL ShowUrlType) that do NOT exist on PathClassLoader.
-        for (String component : new String[] {
-            GameSupportActivities.XAL_WEBVIEW,
-            GameSupportActivities.XAL_BROWSER_LAUNCH,
-            GameActivityRuntime.WRAPPER
-        }) {
-            Intent intent = new Intent()
-                    .setComponent(new ComponentName(c.getPackageName(), component))
-                    .putExtra("SHOW_TYPE", guestOnlyExtra)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            c.startActivity(intent);
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync();
-            SystemClock.sleep(250L);
+        // Simulate Android recreating :game_host Activities from a foreground task without a
+        // prepared session, including guest-DEX extras (like XAL ShowUrlType) absent on PathClassLoader.
+        try (ActivityScenario<MainActivity> main = ActivityScenario.launch(MainActivity.class)) {
+            for (String component : new String[] {
+                GameSupportActivities.XAL_WEBVIEW,
+                GameSupportActivities.XAL_BROWSER_LAUNCH,
+                GameActivityRuntime.WRAPPER
+            }) {
+                main.onActivity(activity -> {
+                    Intent intent = new Intent()
+                            .setComponent(new ComponentName(c.getPackageName(), component))
+                            .putExtra("SHOW_TYPE", guestOnlyExtra);
+                    activity.startActivity(intent);
+                });
+                InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+                SystemClock.sleep(250L);
+            }
         }
 
         // Verify :game_host service binding still succeeds right afterward (not quarantined)
@@ -176,23 +180,22 @@ public final class GameSupportActivitiesTest {
         final int[] childUid = {-1};
         final android.os.IBinder[] warmBinder = {null};
 
-        android.os.ResultReceiver receiver = new android.os.ResultReceiver(
-                new android.os.Handler(android.os.Looper.getMainLooper())) {
-            @Override protected void onReceiveResult(int resultCode, Bundle data) {
-                if (resultCode == GameHostWarmupActivity.RESULT_READY && data != null) {
-                    childPid[0] = data.getInt("pid", 0);
-                    childUid[0] = data.getInt("uid", -1);
-                    warmBinder[0] = data.getBinder("binder");
-                    warmupLatch.countDown();
-                }
-            }
-        };
+        android.os.Messenger replyTo = MinecraftBootstrap.onMainThread(() ->
+                new android.os.Messenger(new android.os.Handler(android.os.Looper.getMainLooper(), message -> {
+                    Bundle data = message.getData();
+                    if (message.what == GameHostWarmupActivity.RESULT_READY && data != null) {
+                        childPid[0] = data.getInt("pid", 0);
+                        childUid[0] = data.getInt("uid", -1);
+                        warmBinder[0] = data.getBinder("binder");
+                        warmupLatch.countDown();
+                    }
+                    return true;
+                })));
 
-        try {
-            Intent launch = GameHostWarmupActivity.intent(c, 77, receiver)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            c.startActivity(launch);
-            assertTrue("Expected GameHostWarmupActivity ResultReceiver handoff",
+        try (ActivityScenario<MainActivity> main = ActivityScenario.launch(MainActivity.class)) {
+            main.onActivity(activity ->
+                    activity.startActivity(GameHostWarmupActivity.intent(activity, 77, replyTo)));
+            assertTrue("Expected GameHostWarmupActivity Messenger handoff",
                     warmupLatch.await(10, TimeUnit.SECONDS));
             assertTrue("Expected separate :game_host PID",
                     childPid[0] > 0 && childPid[0] != android.os.Process.myPid());
@@ -235,6 +238,7 @@ public final class GameSupportActivitiesTest {
             assertTrue(memReply[0], memReply[0].contains("No live prepared Activity session"));
             MinecraftBootstrap.onMainThread(() -> { mem.cancel(); return null; });
         } finally {
+            GameHostWarmupActivity.dismissIfOpen();
             GameHostLiveBinder.clear();
             try { c.stopService(new Intent(c, GameHostService.class)); }
             catch (Exception ignored) {}

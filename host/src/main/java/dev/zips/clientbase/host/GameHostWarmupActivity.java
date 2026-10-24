@@ -8,8 +8,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
+import android.os.Messenger;
 import android.os.Process;
-import android.os.ResultReceiver;
 import java.lang.ref.WeakReference;
 
 /**
@@ -23,22 +24,23 @@ import java.lang.ref.WeakReference;
  *
  * ActivityTaskSupervisor starts Activities without consulting mBadProcesses,
  * spawning a fresh :game_host ProcessRecord so GameHostService can bind and/or
- * hand off its live IBinder directly via ResultReceiver without rebooting.
+ * hand off its live IBinder directly via a final android.os.Messenger (boot
+ * classloader Parcelable) without rebooting.
  */
 public final class GameHostWarmupActivity extends Activity {
     static final String EXTRA_ATTEMPT = "attempt";
-    static final String EXTRA_RECEIVER = "receiver";
+    static final String EXTRA_REPLY_TO = "reply_to";
     static final int RESULT_READY = 1;
 
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
     private static WeakReference<GameHostWarmupActivity> active = new WeakReference<>(null);
     private final Runnable safetyFinish = this::closeQuietly;
 
-    static Intent intent(Context launcher, int attempt, ResultReceiver receiver) {
+    static Intent intent(Context launcher, int attempt, Messenger replyTo) {
         return new Intent()
                 .setComponent(new ComponentName(launcher.getPackageName(), GameHostWarmupActivity.class.getName()))
                 .putExtra(EXTRA_ATTEMPT, attempt)
-                .putExtra(EXTRA_RECEIVER, receiver);
+                .putExtra(EXTRA_REPLY_TO, replyTo);
     }
 
     static void dismissIfOpen() {
@@ -56,26 +58,32 @@ public final class GameHostWarmupActivity extends Activity {
             return;
         }
         Intent launch = getIntent();
-        ResultReceiver receiver = launch == null ? null : launch.getParcelableExtra(EXTRA_RECEIVER);
+        Messenger replyTo = launch == null ? null : launch.getParcelableExtra(EXTRA_REPLY_TO);
         int attempt = launch == null ? 0 : launch.getIntExtra(EXTRA_ATTEMPT, 0);
         if (launch != null) {
             launch.replaceExtras((Bundle) null);
         }
-        if (receiver == null || attempt <= 0) {
+        if (replyTo == null || attempt <= 0) {
             closeQuietly();
             return;
         }
         active = new WeakReference<>(this);
         try { startService(new Intent(this, GameHostService.class)); }
         catch (Exception ignored) {}
-        MAIN.postDelayed(safetyFinish, 15000L);
+        MAIN.postDelayed(safetyFinish, 1500L);
 
         Bundle data = new Bundle();
         data.putInt("id", attempt);
         data.putInt("pid", Process.myPid());
         data.putInt("uid", Process.myUid());
         data.putBinder("binder", GameHostService.sharedBinder(getApplicationContext()));
-        receiver.send(RESULT_READY, data);
+        Message ready = Message.obtain(null, RESULT_READY);
+        ready.setData(data);
+        try {
+            replyTo.send(ready);
+        } catch (android.os.RemoteException deadCaller) {
+            closeQuietly();
+        }
     }
 
     private void closeQuietly() {

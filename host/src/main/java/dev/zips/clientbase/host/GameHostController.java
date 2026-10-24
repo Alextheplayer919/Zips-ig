@@ -12,7 +12,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.Process;
-import android.os.ResultReceiver;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import org.json.JSONObject;
@@ -113,41 +112,42 @@ public final class GameHostController {
         Activity launcher = foreground.get();
         if (launcher == null || launcher.isFinishing() || launcher.isDestroyed()) return false;
         show("Android blocked cold service bind for :game_host · waking process via private warmup Activity...");
-        ResultReceiver warmupReceiver = new ResultReceiver(MAIN) {
-            @Override protected void onReceiveResult(int resultCode, Bundle data) {
-                if (!sessionActive || attempt != generation || resultCode != GameHostWarmupActivity.RESULT_READY || data == null) {
-                    return;
-                }
-                if (data.getInt("id") != generation || data.getInt("uid", -1) != Process.myUid()) {
-                    return;
-                }
-                int child = data.getInt("pid", 0);
-                IBinder warmBinder = data.getBinder("binder");
-                if (child <= 0 || child == Process.myPid() || warmBinder == null || !warmBinder.isBinderAlive()) {
-                    stop("Warmup Activity returned invalid :game_host binder");
-                    return;
-                }
-                if (pid == 0) {
-                    pid = child;
-                    saveRun("none");
-                }
-                // Try attaching standard Service binding now that :game_host is running
-                // (ActiveServices fast-path when ProcessRecord is already live).
-                if (!serviceBound) {
-                    try {
-                        serviceBound = app.bindService(
-                                new Intent(app, GameHostService.class), connection, Context.BIND_AUTO_CREATE);
-                    } catch (Exception ignored) {
-                        serviceBound = false;
-                    }
-                }
-                // Connect immediately over the verified live :game_host IBinder so preparation
-                // proceeds even on ROMs where bindService remains blocked by mBadProcesses.
-                connectHostBinder(attempt, warmBinder);
+        Messenger warmupReply = new Messenger(new Handler(Looper.getMainLooper(), message -> {
+            Bundle data = message.getData();
+            if (!sessionActive || attempt != generation
+                    || message.what != GameHostWarmupActivity.RESULT_READY || data == null) {
+                return true;
             }
-        };
+            if (data.getInt("id") != generation || data.getInt("uid", -1) != Process.myUid()) {
+                return true;
+            }
+            int child = data.getInt("pid", 0);
+            IBinder warmBinder = data.getBinder("binder");
+            if (child <= 0 || child == Process.myPid() || warmBinder == null || !warmBinder.isBinderAlive()) {
+                stop("Warmup Activity returned invalid :game_host binder");
+                return true;
+            }
+            if (pid == 0) {
+                pid = child;
+                saveRun("none");
+            }
+            // Try attaching standard Service binding now that :game_host is running
+            // (ActiveServices fast-path when ProcessRecord is already live).
+            if (!serviceBound) {
+                try {
+                    serviceBound = app.bindService(
+                            new Intent(app, GameHostService.class), connection, Context.BIND_AUTO_CREATE);
+                } catch (Exception ignored) {
+                    serviceBound = false;
+                }
+            }
+            // Connect immediately over the verified live :game_host IBinder so preparation
+            // proceeds even on ROMs where bindService remains blocked by mBadProcesses.
+            connectHostBinder(attempt, warmBinder);
+            return true;
+        }));
         try {
-            launcher.startActivity(GameHostWarmupActivity.intent(launcher, attempt, warmupReceiver));
+            launcher.startActivity(GameHostWarmupActivity.intent(launcher, attempt, warmupReply));
             return true;
         } catch (Exception error) {
             show("Warmup Activity launch failed: " + error);
