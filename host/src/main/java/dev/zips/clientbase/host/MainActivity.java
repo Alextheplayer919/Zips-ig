@@ -36,7 +36,7 @@ public final class MainActivity extends Activity implements EngineProbeControlle
         page.setBackgroundColor(ClientUi.BG);
         page.addView(ClientUi.label(this,"Z I P S   /   B E D R O C K",13,ClientUi.ACCENT));
         page.addView(ClientUi.label(this,"A new way in.",36,ClientUi.TEXT));
-        page.addView(ClientUi.label(this,"Client base 0.6.5  ·  Android 13  ·  Bedrock 26.50",13,ClientUi.MUTED));
+        page.addView(ClientUi.label(this,"Client base 0.6.6  ·  Android 13  ·  Bedrock 26.50",13,ClientUi.MUTED));
         ClientUi.gap(page,16);
         LinearLayout launchCard=ClientUi.card(this); page.addView(launchCard);
         launchCard.addView(ClientUi.label(this,"READY TO LAUNCH",12,ClientUi.ACCENT));

@@ -311,7 +311,7 @@ final class OverlayWindow {
                     renderSelectedCategory();
                     main.removeCallbacks(liveRefresh);
                     if (panel != null && (state.flyArmed || state.auraArmed)) {
-                        main.postDelayed(liveRefresh, 1000L);
+                        main.postDelayed(liveRefresh, state.inWorld ? 1000L : 250L);
                     }
                 });
         renderSelectedCategory();

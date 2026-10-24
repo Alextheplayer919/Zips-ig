@@ -92,12 +92,83 @@ void testBinaryPacketDecoders() {
     assert(sg.kind == PacketEventKind::StartGame && sg.runtimeId == 77 && sg.uniqueId == -999 && sg.dimension == 1);
     assert(sg.yaw == 180.f && sg.pitch == 5.f);
 
+    // Regression: non-aborting tryReadActorRuntimeId reads 0xfc0dbbb5 pool and returns 0 when absent.
+    alignas(16) unsigned char emptyActor[64]{};
+    assert(abi::tryReadActorRuntimeId(emptyActor) == 0);
+    alignas(16) unsigned char registry[128]{};
+    std::int64_t buckets[4]{-1, 0, -1, -1}; // 0xfc0dbbb5 & 3 == 1 -> node 0
+    alignas(16) unsigned char nodes[64]{};
+    abi::writeField<std::int64_t>(nodes, 0x00, -1);
+    abi::writeField<std::uint32_t>(nodes, 0x08, 0xfc0dbbb5U);
+    alignas(16) unsigned char pool[128]{};
+    std::uint32_t sparsePage[8]{};
+    sparsePage[5] = 0x00080003U; // version 0x00080000, dense index 3
+    const void* sparsePages[1]{sparsePage};
+    std::uint64_t densePage[8]{};
+    densePage[3] = 424242ULL;
+    const void* densePages[1]{densePage};
+    abi::writeField<const void* const*>(pool, 0x08, sparsePages);
+    abi::writeField<const void* const*>(pool, 0x10, sparsePages + 1);
+    abi::writeField<const void* const*>(pool, 0x50, densePages);
+    abi::writeField<const void*>(nodes, 0x10, pool);
+    abi::writeField<const std::int64_t*>(registry, 0x38, buckets);
+    abi::writeField<const std::int64_t*>(registry, 0x40, buckets + 4);
+    abi::writeField<const unsigned char*>(registry, 0x50, nodes);
+    abi::writeField<const unsigned char*>(registry, 0x58, nodes + 32);
+    abi::writeField<const void*>(emptyActor, abi::kActorEntityContextMapOffset, registry);
+    abi::writeField<std::uint32_t>(emptyActor, abi::kActorEntityIdOffset, 0x00080005U);
+    assert(abi::tryReadActorRuntimeId(emptyActor) == 424242ULL);
+    // Stale entity version bits return 0 instead of aborting.
+    abi::writeField<std::uint32_t>(emptyActor, abi::kActorEntityIdOffset, 0x000c0005U);
+    assert(abi::tryReadActorRuntimeId(emptyActor) == 0ULL);
+
     alignas(16) unsigned char respawnBuf[128]{};
     abi::writeField<Vec3>(respawnBuf, abi::kRespawnPosOffset, Vec3{4.f, 80.f, 6.f});
     abi::writeField<std::uint8_t>(respawnBuf, abi::kRespawnStateOffset, 0);
     assert(abi::decodeRespawnPacket(respawnBuf).respawnPositionReady);
+    abi::writeField<std::uint8_t>(respawnBuf, abi::kRespawnStateOffset, 1);
+    assert(!abi::decodeRespawnPacket(respawnBuf).respawnPositionReady);
     abi::writeField<std::uint8_t>(respawnBuf, abi::kRespawnStateOffset, 2);
     assert(!abi::decodeRespawnPacket(respawnBuf).respawnPositionReady);
+
+    // Regression: LoopbackPacketSender variant index at +0x28 is a 32-bit uint32_t followed by
+    // 4 bytes of uninitialized padding at +0x2c..0x2f; reading uint32_t ignores tail garbage.
+    alignas(16) unsigned char senderBuf[64]{};
+    abi::writeField<std::uint32_t>(senderBuf, abi::kSenderVariantIndexOffset, 0U);
+    abi::writeField<std::uint32_t>(senderBuf, abi::kSenderVariantIndexOffset + 4, 0xdeadbeefU);
+    assert(abi::readField<std::uint32_t>(senderBuf, abi::kSenderVariantIndexOffset) == 0U);
+
+    // Regression: AABBShapeComponent (+0x210) center keeps RemotePlayer hitPos inside 1.8m hitbox.
+    alignas(16) unsigned char actorBuf[1280]{};
+    alignas(16) unsigned char aabbComp[32]{};
+    abi::writeField<Vec3>(aabbComp, 0x00, Vec3{10.0f, 64.0f, 20.0f});
+    abi::writeField<Vec3>(aabbComp, 0x0c, Vec3{10.6f, 65.8f, 20.6f});
+    abi::writeField<const void*>(actorBuf, abi::kActorAABBOffset, aabbComp);
+    const Vec3 eyeFallback{10.3f, 65.62f, 20.3f};
+    const Vec3 hit = abi::computeTargetHitPos(actorBuf, eyeFallback);
+    assert(std::fabs(hit.x - 10.3f) < 1e-4f);
+    assert(std::fabs(hit.y - 64.9f) < 1e-4f);
+    assert(std::fabs(hit.z - 20.3f) < 1e-4f);
+
+    // Regression: MobHurtTimeComponent (+0x408) reads real combat HurtTime (10 -> 0) safely.
+    assert(abi::readActorHurtTicks(actorBuf) == 0);
+    std::int32_t hurtCompValue = 7;
+    abi::writeField<const void*>(actorBuf, abi::kActorMobHurtTimeOffset, &hurtCompValue);
+    assert(abi::readActorHurtTicks(actorBuf) == 7);
+    hurtCompValue = 0;
+    abi::writeField<std::int32_t>(actorBuf, abi::kActorHurtDurationOffset, 4);
+    assert(abi::readActorHurtTicks(actorBuf) == 4);
+
+    // Regression: LocalPlayer vtable hook indices match 1.26.50.4 (Actor has 8 pre-dtor virtuals).
+    static_assert(abi::kLocalPlayerDtorD1.slotIndex == 8);
+    static_assert(abi::kLocalPlayerDtorD0.slotIndex == 9);
+    static_assert(abi::kLocalPlayerLerpMotion.slotIndex == 23);
+    static_assert(abi::kLocalPlayerNormalTick.slotIndex == 25);
+    static_assert(abi::kLocalPlayerIsAlive.slotIndex == 47);
+    static_assert(abi::kLocalPlayerSwing.slotIndex == 110);
+    static_assert(abi::kActorAABBOffset == 0x210);
+    static_assert(abi::kActorRotationOffset == 0x218);
+    static_assert(abi::kActorMobHurtTimeOffset == 0x408);
 }
 
 void testMidWorldFlyAndCrossThreadQueueAndCombat() {

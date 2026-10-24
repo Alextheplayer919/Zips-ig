@@ -428,6 +428,31 @@ class ClientBaseSourceTests(unittest.TestCase):
         self.assertIn('super.onCreate(null);', aborted)
         self.assertIn('finish();', aborted)
 
+    def test_live_localplayer_tick_and_rewind_safe_motion_bindings(self):
+        abi = (BASE / 'host/src/main/cpp/modules/native_engine_abi.h').read_text()
+        engine = (BASE / 'host/src/main/cpp/native_module_engine.cpp').read_text()
+        for required in ('kLocalPlayerNormalTick{0x12d08918, 25, 0xaac7cf8}',
+                         'kLocalPlayerDtorD1{0x12d08918, 8, 0xaac61a0}',
+                         'kLocalPlayerDtorD0{0x12d08918, 9, 0xaac658c}',
+                         'kActorGetRuntimeId{0xf566b90',
+                         'tryReadActorRuntimeId',
+                         'kEngineOperatorDelete = 0x12911250',
+                         'kActorGetPosition{0xf563e6c',
+                         'kActorAABBOffset = 0x210',
+                         'kActorRotationOffset = 0x218',
+                         'kActorMobHurtTimeOffset = 0x408'):
+            self.assertIn(required, abi)
+        for dead in ('0xf8a33ec', '0xf8a3dcc', '0xf566c5c', '0xf590ef4'):
+            self.assertNotIn(dead, abi)
+        for required in ('readField<std::uint32_t>(self, abi::kSenderVariantIndexOffset)',
+                         'kActorLerpMotionVtableByteOffset',
+                         'hookLocalPlayerNormalTick',
+                         'resolveVerifiedGameMode',
+                         'RawActorVector',
+                         'engineDelete(raw.begin)'):
+            self.assertIn(required, engine)
+        self.assertNotIn('readField<std::size_t>(self, abi::kSenderVariantIndexOffset)', engine)
+
     @unittest.skipUnless(shutil.which('g++'), 'C++ compiler not installed')
     def test_real_native_process_identity(self):
         with tempfile.TemporaryDirectory() as directory:
